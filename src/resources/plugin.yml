@@ -1,0 +1,11 @@
+name: iShop
+main: com.minedhype.ishop.iShop
+author: Beez0r
+website: https://minedhype.com
+version: "${project.version}"
+api-version: "1.16"
+softdepend: [Vault, WorldGuard]
+commands:
+  ishop:
+    description: "/shop"
+    aliases: [shop]
