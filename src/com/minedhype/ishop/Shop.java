@@ -161,14 +161,15 @@ public class Shop {
 		if(!iShop.config.getBoolean("enableShopBlock"))
 			return;
 
-		if(iShop.config.getBoolean("showParticles"));
-		for(Shop shop : shops)
-			if(shop.hasItems()) {
-				double x = shop.location.getBlockX() + 0.5;
-				double y = shop.location.getBlockY() + 1.25;
-				double z = shop.location.getBlockZ() + 0.5;
-				shop.location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, x, y, z, 10, 0.1, 0.1, 0.1);
-			}
+		if(iShop.config.getBoolean("showParticles")) {
+			for (Shop shop : shops)
+				if (shop.hasItems()) {
+					double x = shop.location.getBlockX() + 0.5;
+					double y = shop.location.getBlockY() + 1.25;
+					double z = shop.location.getBlockZ() + 0.5;
+					shop.location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, x, y, z, 10, 0.1, 0.1, 0.1);
+				}
+		}
 	}
 
 	public static void expiredShops() {
