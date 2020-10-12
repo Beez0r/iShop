@@ -162,8 +162,8 @@ public class Shop {
 			return;
 
 		if(iShop.config.getBoolean("showParticles")) {
-			for (Shop shop : shops)
-				if (shop.hasItems()) {
+			for(Shop shop : shops)
+				if(shop.hasItems()) {
 					double x = shop.location.getBlockX() + 0.5;
 					double y = shop.location.getBlockY() + 1.25;
 					double z = shop.location.getBlockZ() + 0.5;
