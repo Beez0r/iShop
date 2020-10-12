@@ -44,15 +44,12 @@ public class StockShop {
 		try {
 			stmt = iShop.getConnection().prepareStatement("DELETE FROM zooMercaStocks;");
 			stmt.execute();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+		} catch (Exception e) { e.printStackTrace(); }
+			finally {
 			try {
 				if(stmt != null)
 					stmt.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			} catch (Exception e) { e.printStackTrace(); }
 		}
 
 		for(StockShop stock : stocks)
@@ -83,15 +80,12 @@ public class StockShop {
 			stmt.setString(2, itemsJson);
 			stmt.setInt(3, pag);
 			stmt.execute();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+		} catch (Exception e) { e.printStackTrace(); }
+			finally {
 			try {
 				if(stmt != null)
 					stmt.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			} catch (Exception e) { e.printStackTrace(); }
 		}
 	}
 

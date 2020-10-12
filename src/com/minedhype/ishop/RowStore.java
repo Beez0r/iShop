@@ -32,15 +32,12 @@ public class RowStore {
 			stmt.setInt(3, idTienda);
 			stmt.setBoolean(4, broadcast);
 			stmt.execute();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+		} catch (Exception e) { e.printStackTrace(); }
+			finally {
 			try {
 				if(stmt != null)
 					stmt.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			} catch (Exception e) { e.printStackTrace(); }
 		}
 	}
 	

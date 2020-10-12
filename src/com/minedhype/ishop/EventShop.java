@@ -25,9 +25,7 @@ public class EventShop implements Listener {
 		if(match == null) {
 			try {
 				match = Material.matchMaterial(stockBlock.split("minecraft:")[1].toUpperCase());
-			} catch(Exception e) {
-				match = null;
-			}
+			} catch(Exception e) { match = null; }
 
 			if(match == null)
 				match = Material.COMPOSTER;
@@ -76,9 +74,7 @@ public class EventShop implements Listener {
 		if(match == null) {
 			try {
 				match = Material.matchMaterial(shopBlock.split("minecraft:")[1].toUpperCase());
-			} catch(Exception e) {
-				match = null;
-			}
+			} catch(Exception e) { match = null; }
 
 			if(match == null)
 				match = Material.BARREL;

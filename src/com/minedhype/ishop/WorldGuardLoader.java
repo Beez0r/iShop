@@ -22,9 +22,7 @@ public class WorldGuardLoader {
 			StateFlag flag = new StateFlag("ishop", false);
 			registry.register(flag);
 			FLAG_TRADE = flag;
-		} catch(FlagConflictException e) {
-			e.printStackTrace();
-		}
+		} catch(FlagConflictException e) { e.printStackTrace(); }
 	}
 	
 	public boolean checkRegion(Block block) {

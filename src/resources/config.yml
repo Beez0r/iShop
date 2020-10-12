@@ -17,6 +17,7 @@ enableStockBlock: true
 enableAdminShop: true
 
 # Allows players to access the stock GUI by typing /shop stock
+# Players with ishop.stock permission will bypass if disabled
 enableStockCommand: true
 
 # Number of pages to have in the stock GUI

@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -25,12 +26,21 @@ import com.minedhype.ishop.inventories.InvStock;
 public class CommandShop implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if(sender instanceof ConsoleCommandSender && args.length > 0) {
+			if(args[0].equalsIgnoreCase("reload")) {
+				reloadShop(null);
+				return true;
+			}
+			else {
+				sender.sendMessage(ChatColor.RED + "Only players in the game can use shop commands!");
+				return false;
+			}
+		}
 		if(!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.RED + "Only players in the game can use shop commands!");
 			return false;
 		}
 		Player player = (Player) sender;
-
 		if(args.length == 0)
 			listSubCmd(player, label);
 		else if(args[0].equalsIgnoreCase("adminshop"))
@@ -47,10 +57,10 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> listShops(player, null));
 		else if(args[0].equalsIgnoreCase("list") && args.length >= 2)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> listShops(player, args[1]));
+		else if(args[0].equalsIgnoreCase("listadmin"))
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> listAdminShops(player));
 		else if(args[0].equalsIgnoreCase("manage") && args.length >= 2)
 			shopManage(player, args[1]);
-		else if(args[0].equalsIgnoreCase("manageshop") && args.length >= 2)
-			manageShop(player, args[1]);
 		else if(args[0].equalsIgnoreCase("managestock") && args.length >= 2)
 			manageStock(player, args[1]);
 		else if(args[0].equalsIgnoreCase("reload"))
@@ -71,14 +81,15 @@ public class CommandShop implements CommandExecutor {
 		player.sendMessage(ChatColor.GRAY + "/" + label + " delete");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " deleteid <id>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " list");
+		if(iShop.config.getBoolean("publicListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
+			player.sendMessage(ChatColor.GRAY + "/" + label + " list <player>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " manage <id>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " stock");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " view <id>");
 		if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(ChatColor.GRAY + "/" + label + " adminshop");
 			player.sendMessage(ChatColor.GRAY + "/" + label + " createshop <player>");
-			player.sendMessage(ChatColor.GRAY + "/" + label + " list <player>");
-			player.sendMessage(ChatColor.GRAY + "/" + label + " manageshop <id>");
+			player.sendMessage(ChatColor.GRAY + "/" + label + " listadmin");
 			player.sendMessage(ChatColor.GRAY + "/" + label + " managestock <player>");
 			player.sendMessage(ChatColor.GRAY + "/" + label + " reload");
 		}
@@ -127,7 +138,7 @@ public class CommandShop implements CommandExecutor {
 		for(PermissionAttachmentInfo attInfo : player.getEffectivePermissions()) {
 			String perm = attInfo.getPermission();
 			if(perm.startsWith(permPrefix)) {
-				int num = 0;
+				int num;
 				try {
 					num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
 				} catch(Exception e) { num = 0; }
@@ -136,7 +147,7 @@ public class CommandShop implements CommandExecutor {
 			}
 		}
 
-		boolean limitShops = true;
+		boolean limitShops;
 		int numShops = Shop.getNumShops(player.getUniqueId());
 		if(iShop.config.getBoolean("usePermissions"))
 			limitShops = numShops >= maxShops;
@@ -301,7 +312,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private void deleteShopID(Player player, String shopId) {
-		int sID = -1;
+		int sID;
 		try {
 			sID = Integer.parseInt(shopId);
 		} catch (Exception e) { sID = -1; }
@@ -337,7 +348,7 @@ public class CommandShop implements CommandExecutor {
 		double cost = iShop.config.getDouble("returnAmount");
 		Optional<Economy> economy = iShop.getEconomy();
 		if(cost > 0 && economy.isPresent()) {
-			OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
+			OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(shop.get().getOwner());
 			economy.get().depositPlayer(offPlayer, cost);
 		}
 
@@ -368,8 +379,16 @@ public class CommandShop implements CommandExecutor {
 		Shop.getShopList(player, sOwner, playerName);
 	}
 
+	private void listAdminShops(Player player) {
+		if(!player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.NO_PERMISSION.toString());
+			return;
+		}
+		Shop.getAdminShopList(player);
+	}
+
 	private void stockShop(Player player) {
-		if(!iShop.config.getBoolean("enableStockCommand")) {
+		if(!iShop.config.getBoolean("enableStockCommand") && !player.hasPermission(Permission.SHOP_ADMIN.toString()) && !player.hasPermission(Permission.SHOP_STOCK.toString())) {
 			player.sendMessage(Messages.STOCK_COMMAND_DISABLED.toString());
 			return;
 		}
@@ -389,7 +408,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private void reloadShop(Player player) {
-		if(!player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(player != null && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(Messages.NO_PERMISSION.toString());
 			return;
 		}
@@ -397,7 +416,11 @@ public class CommandShop implements CommandExecutor {
 		iShop plugin = (iShop) Bukkit.getPluginManager().getPlugin("iShop");
 		if(plugin != null)
 			plugin.createConfig();
-		player.sendMessage(Messages.SHOP_RELOAD.toString());
+
+		if(player != null)
+			player.sendMessage(Messages.SHOP_RELOAD.toString());
+		else
+			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
 	}
 
 	private static UUID getUUID(String name) throws Exception {
@@ -411,12 +434,12 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private static void shopManage(Player player, String shopID) {
-		if(!iShop.config.getBoolean("remoteManage")) {
+		if(!iShop.config.getBoolean("remoteManage") && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(Messages.SHOP_REMOTE.toString());
 			return;
 		}
 
-		int shopId = -1;
+		int shopId;
 		try {
 			shopId = Integer.parseInt(shopID);
 		} catch (Exception e) { shopId = -1; }
@@ -427,7 +450,7 @@ public class CommandShop implements CommandExecutor {
 		}
 
 		Optional<Shop> shop = Shop.getShopById(shopId);
-		if(!shop.isPresent() || !shop.get().isOwner(player.getUniqueId())) {
+		if(!shop.isPresent() || (!shop.get().isOwner(player.getUniqueId()) && !player.hasPermission(Permission.SHOP_ADMIN.toString()))) {
 			player.sendMessage(Messages.SHOP_NO_SELF.toString());
 			return;
 		}
@@ -447,12 +470,12 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private static void viewShop(Player player, String shopId) {
-		if(!iShop.config.getBoolean("remoteShopping")) {
+		if(!iShop.config.getBoolean("remoteShopping") && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(Messages.SHOP_NO_REMOTE.toString());
 			return;
 		}
 
-		int sID = -1;
+		int sID;
 		try {
 			sID = Integer.parseInt(shopId);
 		} catch (Exception e) { sID = -1; }
@@ -515,36 +538,5 @@ public class CommandShop implements CommandExecutor {
 
 		InvStock inv = InvStock.getInvStock(sOwner);
 		inv.open(player);
-	}
-
-	private void manageShop(Player player, String shopId) {
-		if(!player.hasPermission(Permission.SHOP_ADMIN.toString())) {
-			player.sendMessage(Messages.NO_PERMISSION.toString());
-			return;
-		}
-
-		int sID = -1;
-		try {
-			sID = Integer.parseInt(shopId);
-		} catch (Exception e) { sID = -1; }
-
-		if(sID < 0) {
-			player.sendMessage(Messages.SHOP_ID_INTEGER.toString());
-			return;
-		}
-
-		Optional<Shop> shop = Shop.getShopById(sID);
-		if(!shop.isPresent()) {
-			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
-			return;
-		}
-
-		if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
-			player.sendMessage(Messages.SHOP_BUSY.toString());
-			return;
-		}
-
-		InvAdminShop inv = new InvAdminShop(shop.get());
-		inv.open(player, shop.get().getOwner());
 	}
 }

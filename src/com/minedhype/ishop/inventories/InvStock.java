@@ -45,7 +45,7 @@ public class InvStock extends GUI {
 	
 	public void refreshItems() {
 		Optional<StockShop> stockOpt = StockShop.getStockShopByOwner(owner, pag);
-		StockShop stock = null;
+		StockShop stock;
 		stock = stockOpt.orElseGet(() -> new StockShop(owner, pag));
 		Inventory inv = stock.getInventory();
 

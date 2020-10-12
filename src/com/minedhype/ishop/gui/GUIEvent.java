@@ -47,13 +47,13 @@ public class GUIEvent implements Listener {
 			gui.onClose(e);
 
 		GUI.inventoriesOpen.remove(player.getName());
-		InvStock.inShopInv.remove(e.getPlayer());
+		InvStock.inShopInv.remove(player);
 	}
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
 		Player player = e.getPlayer();
 		GUI.inventoriesOpen.remove(player.getName());
-		InvStock.inShopInv.remove(e.getPlayer());
+		InvStock.inShopInv.remove(player);
 	}
 }

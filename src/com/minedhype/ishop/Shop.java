@@ -2,9 +2,7 @@ package com.minedhype.ishop;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,15 +61,12 @@ public class Shop {
 					ResultSet res = stmt.getGeneratedKeys();
 					if(res.next())
 						shop.idTienda = res.getInt(1);
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
+				} catch (Exception e) { e.printStackTrace(); }
+					finally {
 					try {
 						if(stmt != null)
 							stmt.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					} catch (Exception e) { e.printStackTrace(); }
 				}
 			});
 		}
@@ -90,25 +85,62 @@ public class Shop {
 	}
 
 	public static void getShopList(Player player, UUID sOwner, String pOwner) {
-		boolean manage = iShop.config.getBoolean("remoteManage");
 		player.sendMessage(ChatColor.GOLD + "Found " + ChatColor.GREEN + getNumShops(sOwner) + ChatColor.GOLD + " shop(s) for player: " + ChatColor.GREEN + pOwner);
 		shops.parallelStream()
 				.filter(s -> !s.admin && s.isOwner(sOwner))
 				.forEach(s -> {
-					if(!s.isOwner(player.getUniqueId()) || !manage) {
-						player.sendMessage(ChatColor.GOLD + "Shop id " + ChatColor.GREEN + (s.idTienda) + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
-					} else {
-						String rawMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + (s.idTienda) + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
-						TextComponent message = new TextComponent(rawMessage);
-						
-						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + ChatColor.GOLD + "MANAGE" + ChatColor.DARK_GRAY + "]");						
+					if(s.isOwner(player.getUniqueId()) && iShop.config.getBoolean("remoteManage")) {
+						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + (s.idTienda) + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						TextComponent manageMsg = new TextComponent(manageMessage);
+						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + ChatColor.GOLD + "MANAGE" + ChatColor.DARK_GRAY + "]");
 						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage "+s.idTienda));
-						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GOLD + "Manage your shop.")));						
-						message.addExtra(manageText);
-						
-						player.spigot().sendMessage(message);
-					}
+						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GOLD + "Manage this shop!")));
+						manageMsg.addExtra(manageText);
+						player.spigot().sendMessage(manageMsg);
+					} else if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + (s.idTienda) + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						TextComponent manageMsg = new TextComponent(manageMessage);
+						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + ChatColor.GOLD + "MANAGE" + ChatColor.DARK_GRAY + "]");
+						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
+						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GOLD + "Manage this shop!")));
+						manageMsg.addExtra(manageText);
+						String shopMessage = "";
+						if(!s.isOwner(player.getUniqueId())) {
+							TextComponent shopMsg = new TextComponent(shopMessage);
+							TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + ChatColor.GOLD + "SHOP" + ChatColor.DARK_GRAY + "]");
+							shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
+							shopText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GOLD + "Remotely shop here!")));
+							shopMsg.addExtra(shopText);
+							player.spigot().sendMessage(manageMsg, shopMsg);
+						} else
+							player.spigot().sendMessage(manageMsg);
+					} else if(iShop.config.getBoolean("remoteShopping") && !s.isOwner(player.getUniqueId())) {
+						String shopMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + (s.idTienda) + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						TextComponent shopMsg = new TextComponent(shopMessage);
+						TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + ChatColor.GOLD + "SHOP" + ChatColor.DARK_GRAY + "]");
+						shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
+						shopText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GOLD + "Remotely shop here!")));
+						shopMsg.addExtra(shopText);
+						player.spigot().sendMessage(shopMsg);
+					} else
+						player.sendMessage(ChatColor.GOLD + "Shop id " + ChatColor.GREEN + (s.idTienda) + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
 				});
+	}
+
+	public static void getAdminShopList(Player player) {
+		player.sendMessage(ChatColor.GOLD + "Listing all found admin shops:");
+		shops.parallelStream()
+				.filter(s -> s.admin)
+				.forEach(s -> {
+					if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + (s.idTienda) + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						TextComponent manageMsg = new TextComponent(manageMessage);
+						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + ChatColor.GOLD + "MANAGE" + ChatColor.DARK_GRAY + "]");
+						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
+						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.GOLD + "Manage this shop!")));
+						manageMsg.addExtra(manageText);
+						player.spigot().sendMessage(manageMsg);
+						}});
 	}
 	
 	public static Shop createShop(Location loc, UUID owner) {
@@ -126,23 +158,24 @@ public class Shop {
 	}
 	
 	public static void tickShops() {
-		List<Shop> shopDelete = new ArrayList<>();
-		for(Shop shop : shops) {
-			if(shop.hasExpired() || shop.location.getWorld() == null) {
-				shopDelete.add(shop);
-				continue;
-			}
+		if(!iShop.config.getBoolean("enableShopBlock"))
+			return;
 
-			if(!shop.hasItems())
-				continue;
-
-			if(iShop.config.getBoolean("showParticles")) {
+		boolean particles = iShop.config.getBoolean("showParticles");
+		for(Shop shop : shops)
+			if(particles && shop.hasItems()) {
 				double x = shop.location.getBlockX() + 0.5;
 				double y = shop.location.getBlockY() + 1.25;
 				double z = shop.location.getBlockZ() + 0.5;
 				shop.location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, x, y, z, 10, 0.1, 0.1, 0.1);
 			}
-		}
+	}
+
+	public static void expiredShops() {
+		List<Shop> shopDelete = new ArrayList<>();
+		for(Shop shop : shops)
+			if(shop.hasExpired() || shop.location.getWorld() == null)
+				shopDelete.add(shop);
 
 		for(Shop shop : shopDelete)
 			shop.deleteShop();
@@ -168,9 +201,7 @@ public class Shop {
 					YamlConfiguration config = new YamlConfiguration();
 					try {
 						config.loadFromString(itemstackRaw);
-					} catch (InvalidConfigurationException e) {
-						e.printStackTrace();
-					}
+					} catch (InvalidConfigurationException e) { e.printStackTrace(); }
 					Map<String, Object> itemRaw = config.getValues(true);
 					itemsList.add(ItemStack.deserialize(itemRaw));
 				}
@@ -219,9 +250,7 @@ public class Shop {
 				try {
 					configIn.loadFromString(itemInstackRaw);
 					configOut.loadFromString(itemOutstackRaw);
-				} catch (InvalidConfigurationException e) {
-					e.printStackTrace();
-				}
+				} catch (InvalidConfigurationException e) { e.printStackTrace(); }
 				Map<String, Object> itemInRaw = configIn.getValues(true);
 				ItemStack itemIn = ItemStack.deserialize(itemInRaw);
 				Map<String, Object> itemOutRaw = configOut.getValues(true);
@@ -241,9 +270,7 @@ public class Shop {
 					loadRows.close();
 				if(loadShops != null)
 					loadShops.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			} catch (Exception e) { e.printStackTrace(); }
 		}
 	}
 	
@@ -253,15 +280,12 @@ public class Shop {
 		try {
 			stmt = iShop.getConnection().prepareStatement("DELETE FROM zooMercaTiendasFilas;");
 			stmt.execute();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+		} catch (Exception e) { e.printStackTrace(); }
+			finally {
 			try {
 				if(stmt != null)
 					stmt.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			} catch (Exception e) { e.printStackTrace(); }
 		}
 
 		for(Shop shop : shops)
@@ -269,19 +293,17 @@ public class Shop {
 	}
 	
 	public boolean hasItems() {
-		for(RowStore row : rows) {
+		for(RowStore row : rows)
 			if(row != null)
 				return true;
-		}
 		
 		return false;
 	}
 	
 	private void saveDataShop() {
-		for(RowStore row : rows) {
+		for(RowStore row : rows)
 			if(row != null)
 				row.saveData(idTienda);
-		}
 	}
 	
 	public void buy(Player player, int index) {
@@ -351,19 +373,16 @@ public class Shop {
 	public boolean hasExpired() {
 		if(this.admin)
 			return false;
-		
+
 		int maxDays = iShop.config.getInt("maxInactiveDays");
 		if(maxDays <= 0)
 			return false;
 		
 		OfflinePlayer player = Bukkit.getOfflinePlayer(this.owner);
-		long last = player.getLastPlayed();		
-		Calendar lastCal = Calendar.getInstance();
-		lastCal.setTimeInMillis(last);
-		Calendar todayCal = Calendar.getInstance();
-		long numDays = ChronoUnit.DAYS.between(lastCal.toInstant(), todayCal.toInstant());
-		
-		return numDays >= maxDays;
+		if(player.isOnline())
+			return false;
+		long millisecondsPerDay = 86400000;
+		return ((System.currentTimeMillis() - player.getLastPlayed()) / millisecondsPerDay) >= maxDays;
 	}
 	
 	public void giveItem(ItemStack item) {
@@ -429,9 +448,8 @@ public class Shop {
 				stmt2 = iShop.getConnection().prepareStatement("DELETE FROM zooMercaTiendas WHERE id = ?;");
 				stmt2.setInt(1, idTienda);
 				stmt2.execute();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
+			} catch (Exception e) { e.printStackTrace(); }
+				finally {
 				try {
 					if(stmt1 != null) {
 						stmt1.close();
@@ -439,9 +457,7 @@ public class Shop {
 					if(stmt2 != null) {
 						stmt2.close();
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				} catch (Exception e) { e.printStackTrace(); }
 			}
 		});
 	}

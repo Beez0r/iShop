@@ -60,11 +60,9 @@ public class iShop extends JavaPlugin {
 			Shop.loadData();
 		} catch(Exception e) { e.printStackTrace(); }
 
-		// Tick shops every 2 seconds
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, Shop::tickShops, 40, 40);
-
-		// Schedule saveData task every 5 minutes
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> Bukkit.getScheduler().runTaskAsynchronously(this, Shop::saveData), 6000, 6000);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 50, 50);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 3000, 3000);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 6000, 6000);
 	}
 
 	@Override

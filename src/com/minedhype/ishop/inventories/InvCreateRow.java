@@ -72,11 +72,10 @@ public class InvCreateRow extends GUI {
 					placeItem(event.getRawSlot(), item);
 				} else { placeItem(event.getRawSlot(), item); }
 
-				if(event.getRawSlot() == 11) {
+				if(event.getRawSlot() == 11)
 					itemOut = item;
-				} else if(event.getRawSlot() == 15) {
+				else if(event.getRawSlot() == 15)
 					itemIn = item;
-				}
 			}			
 		}
 	}
