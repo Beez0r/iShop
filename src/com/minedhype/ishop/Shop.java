@@ -161,9 +161,9 @@ public class Shop {
 		if(!iShop.config.getBoolean("enableShopBlock"))
 			return;
 
-		boolean particles = iShop.config.getBoolean("showParticles");
+		if(iShop.config.getBoolean("showParticles"));
 		for(Shop shop : shops)
-			if(particles && shop.hasItems()) {
+			if(shop.hasItems()) {
 				double x = shop.location.getBlockX() + 0.5;
 				double y = shop.location.getBlockY() + 1.25;
 				double z = shop.location.getBlockZ() + 0.5;
