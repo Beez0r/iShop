@@ -356,10 +356,12 @@ public class Shop {
 		String nameIn = row.get().getItemIn().getItemMeta().hasDisplayName() ? row.get().getItemIn().getItemMeta().getDisplayName() : row.get().getItemIn().getType().name().replaceAll("_", " ").toLowerCase();
 		String nameOut = row.get().getItemOut().getItemMeta().hasDisplayName() ? row.get().getItemOut().getItemMeta().getDisplayName() : row.get().getItemOut().getType().name().replaceAll("_", " ").toLowerCase();
 
-		player.sendMessage(Messages.SHOP_PURCHASE.toString()
+		if(!this.admin && !row.get().broadcast) {
+			player.sendMessage(Messages.SHOP_PURCHASE.toString()
 				.replaceAll("%in", nameOut + " x "+row.get().getItemOut().getAmount())
 				.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
-		);
+			);
+		}
 
 		if(!this.admin) {
 			this.takeItem(row.get().getItemOut().clone());
