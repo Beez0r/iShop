@@ -134,24 +134,24 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		int maxShops = 0;
-		String permPrefix = Permission.SHOP_LIMIT_PREFIX.toString();
-		for(PermissionAttachmentInfo attInfo : player.getEffectivePermissions()) {
-			String perm = attInfo.getPermission();
-			if(perm.startsWith(permPrefix)) {
-				int num;
-				try {
-					num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
-				} catch(Exception e) { num = 0; }
-				if(num > maxShops)
-					maxShops = num;
-			}
-		}
-
 		boolean limitShops;
 		int numShops = Shop.getNumShops(player.getUniqueId());
-		if(iShop.config.getBoolean("usePermissions"))
+		if(iShop.config.getBoolean("usePermissions")) {
+			int maxShops = 0;
+			String permPrefix = Permission.SHOP_LIMIT_PREFIX.toString();
+			for(PermissionAttachmentInfo attInfo : player.getEffectivePermissions()) {
+				String perm = attInfo.getPermission();
+				if(perm.startsWith(permPrefix)) {
+					int num;
+					try {
+						num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
+					} catch(Exception e) { num = 0; }
+					if(num > maxShops)
+						maxShops = num;
+				}
+			}
 			limitShops = numShops >= maxShops;
+		}
 		else {
 			int numConfig = iShop.config.getInt("defaultShopLimit");
 			limitShops = numShops >= numConfig && numConfig >= 0;
