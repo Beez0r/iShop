@@ -69,7 +69,7 @@ publicListCommand: false
 
 # Customizable Messages
 adminShop: "Admin Shop"
-adminShopDisabled: "&cAdmin shops have been disabled, cannot create!"
+adminShopDisabled: "&cAdmin shops have been disabled!"
 broadcastOff: "Broadcast OFF"
 broadcastOn: "Broadcast ON"
 buy: "&7You bought&a %in &7for&c %out&7!"
@@ -108,6 +108,15 @@ shopNotOwned: "&cYou do not own this shop!"
 stockCommandDisabled: "&cThe /shop stock command has been disabled!"
 stockTitle: "Shop Stock Inventory"
 targetMismatch: "&cTargeted block must match set shop block!"
+clickManage: "&6MANAGE"
+clickShop: "&6SHOP"
+listAdminShop: "&6Listing all found admin shops:"
+manageText: "&6Manage this shop!"
+noAdminShopsFound: "No admins shops have been found!"
+noShopBlock: "shopBlock cannot be empty! Reverting to default minecraft:barrel"
+noStockBlock: "stockBlock cannot be empty! Reverting to default minecraft:composter"
+notPlayer: "&cOnly players in the game can use shop commands!"
+shopText: "&6Remotely shop here!"
 
 # Do not edit this!
-configVersion: 1.0
+configVersion: 1.1

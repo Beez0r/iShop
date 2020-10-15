@@ -32,14 +32,15 @@ public class CommandShop implements CommandExecutor {
 				return true;
 			}
 			else {
-				sender.sendMessage(ChatColor.RED + "Only players in the game can use shop commands!");
+				sender.sendMessage(Messages.NOT_A_PLAYER.toString());
 				return false;
 			}
 		}
 		if(!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.RED + "Only players in the game can use shop commands!");
+			sender.sendMessage(Messages.NOT_A_PLAYER.toString());
 			return false;
 		}
+
 		Player player = (Player) sender;
 		if(args.length == 0)
 			listSubCmd(player, label);
@@ -116,6 +117,11 @@ public class CommandShop implements CommandExecutor {
 			if(match == null)
 				match = Material.BARREL;
 		}
+		if(!block.getType().equals(match)) {
+			player.sendMessage(Messages.TARGET_MISMATCH.toString());
+			return;
+		}
+
 		boolean isShopLoc;
 		if(iShop.wgLoader != null)
 			isShopLoc = iShop.wgLoader.checkRegion(block);
@@ -128,11 +134,6 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		if(!block.getType().equals(match)) {
-			player.sendMessage(Messages.TARGET_MISMATCH.toString());
-			return;
-		}
-
 		int maxShops = 0;
 		String permPrefix = Permission.SHOP_LIMIT_PREFIX.toString();
 		for(PermissionAttachmentInfo attInfo : player.getEffectivePermissions()) {
@@ -142,8 +143,8 @@ public class CommandShop implements CommandExecutor {
 				try {
 					num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
 				} catch(Exception e) { num = 0; }
-					if(num > maxShops)
-						maxShops = num;
+				if(num > maxShops)
+					maxShops = num;
 			}
 		}
 
@@ -194,15 +195,15 @@ public class CommandShop implements CommandExecutor {
 		Block block = player.getTargetBlock(null, 5);
 		String shopBlock = iShop.config.getString("shopBlock");
 		Material match = Material.matchMaterial(shopBlock);
-			if(match == null) {
-				try {
-					match = Material.matchMaterial(shopBlock.split("minecraft:")[1].toUpperCase());
-				} catch(Exception ignored) { }
+		if(match == null) {
+			try {
+				match = Material.matchMaterial(shopBlock.split("minecraft:")[1].toUpperCase());
+			} catch(Exception ignored) { }
 
-				if(match == null) {
-					match = Material.BARREL;
-				}
+			if(match == null) {
+				match = Material.BARREL;
 			}
+		}
 
 		if(!block.getType().equals(match)) {
 			player.sendMessage(Messages.TARGET_MISMATCH.toString());
@@ -243,7 +244,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		if(!iShop.config.getBoolean("enableAdminShop")) {
+		if(!EventShop.adminShopEnabled) {
 			player.sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
 			return;
 		}
@@ -285,13 +286,13 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		if(shop.get().isAdmin()) {
-			if(!player.hasPermission(Permission.SHOP_ADMIN.toString())) {
-				player.sendMessage(Messages.NO_PERMISSION.toString());
-				return;
-			}
-		} else if(!shop.get().isOwner(player.getUniqueId()) && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(!shop.get().isOwner(player.getUniqueId()) && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(Messages.SHOP_NO_SELF.toString());
+			return;
+		}
+
+		if(shop.get().isAdmin() && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.NO_PERMISSION.toString());
 			return;
 		}
 
@@ -333,11 +334,9 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		if(shop.get().isAdmin()) {
-			if(!player.hasPermission(Permission.SHOP_ADMIN.toString())) {
-				player.sendMessage(Messages.NO_PERMISSION.toString());
-				return;
-			}
+		if(shop.get().isAdmin() && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.NO_PERMISSION.toString());
+			return;
 		}
 
 		if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
@@ -421,6 +420,17 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.SHOP_RELOAD.toString());
 		else
 			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
+
+		EventShop.adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
+		EventShop.shopBlock = iShop.config.getString("shopBlock");
+		EventShop.stockBlock = iShop.config.getString("stockBlock");
+		EventShop.stockEnabled = iShop.config.getBoolean("enableStockBlock");
+		EventShop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
+		EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
+		EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
+		Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
+		Shop.particleEffects = iShop.config.getBoolean("showParticles");
+		Shop.maxDays = iShop.config.getInt("maxInactiveDays");
 	}
 
 	private static UUID getUUID(String name) throws Exception {
@@ -455,9 +465,15 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		if(shop.get().isAdmin() && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
-			player.sendMessage(Messages.NO_PERMISSION.toString());
-			return;
+		if(shop.get().isAdmin()) {
+			if(!EventShop.adminShopEnabled) {
+				player.sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
+				return;
+			}
+			if(!player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+				player.sendMessage(Messages.NO_PERMISSION.toString());
+				return;
+			}
 		}
 
 		if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
@@ -488,6 +504,11 @@ public class CommandShop implements CommandExecutor {
 		Optional<Shop> shop = Shop.getShopById(sID);
 		if(!shop.isPresent()) {
 			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
+			return;
+		}
+
+		if(shop.get().isAdmin() && !EventShop.adminShopEnabled) {
+			player.sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
 			return;
 		}
 

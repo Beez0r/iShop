@@ -43,11 +43,11 @@ public class iShop extends JavaPlugin {
 
 		if(config.getString("shopBlock") == null) {
 			config.set("shopBlock", "minecraft:barrel");
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] shopBlock cannot be empty! Reverting to default minecraft:barrel");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_SHOP_BLOCK.toString());
 		}
 		if(config.getString("stockBlock") == null) {
 			config.set("stockBlock", "minecraft:composter");
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] stockBlock cannot be empty! Reverting to default minecraft:composter");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_STOCK_BLOCK.toString());
 		}
 
 		getServer().getPluginManager().registerEvents(new EventShop(), this);
@@ -148,6 +148,19 @@ public class iShop extends JavaPlugin {
 			String ver = config.getDouble("configVersion")+"";
 			switch(ver) {
 				case "1.0":
+					config.set("adminShopDisabled", "&cAdmin shops have been disabled!");
+					config.set("clickManage", "&6MANAGE");
+					config.set("clickShop", "&6SHOP");
+					config.set("listAdminShop", "&6Listing all found admin shops:");
+					config.set("manageText", "&6Manage this shop!");
+					config.set("noAdminShopsFound", "&cNo admins shops have been found!");
+					config.set("noShopBlock", "shopBlock cannot be empty! Reverting to default minecraft:barrel");
+					config.set("noStockBlock", "stockBlock cannot be empty! Reverting to default minecraft:composter");
+					config.set("notPlayer", "&cOnly players in the game can use shop commands!");
+					config.set("shopText", "&6Remotely shop here!");
+					config.set("configVersion", 1.1);
+					config.save(configFile);
+				case "1.1":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }
