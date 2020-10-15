@@ -89,7 +89,7 @@ public class Shop {
 	}
 
 	public static void getShopList(Player player, UUID sOwner, String pOwner) {
-		player.sendMessage(ChatColor.GOLD + "Found " + ChatColor.GREEN + getNumShops(sOwner) + ChatColor.GOLD + " shop(s) for player:" + ChatColor.GREEN + pOwner);
+		player.sendMessage(ChatColor.GOLD + "Found " + ChatColor.GREEN + getNumShops(sOwner) + ChatColor.GOLD + " shop(s) for player: " + ChatColor.GREEN + pOwner);
 		shops.parallelStream()
 				.filter(s -> !s.admin && s.isOwner(sOwner))
 				.forEach(s -> {
@@ -368,15 +368,15 @@ public class Shop {
 			Player ownerPlayer = Bukkit.getPlayer(owner);
 			if(ownerPlayer != null && ownerPlayer.isOnline()) {
 				ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
-						.replaceAll("%in", nameOut + " x "+row.get().getItemOut().getAmount())
-						.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
-						.replaceAll("%p", player.getName()));
-			}
-		} else if(row.get().broadcast) {
-			Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
 					.replaceAll("%in", nameOut + " x "+row.get().getItemOut().getAmount())
 					.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
 					.replaceAll("%p", player.getName()));
+			}
+		} else if(row.get().broadcast) {
+			Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+				.replaceAll("%in", nameOut + " x "+row.get().getItemOut().getAmount())
+				.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
+				.replaceAll("%p", player.getName()));
 		}
 	}
 
