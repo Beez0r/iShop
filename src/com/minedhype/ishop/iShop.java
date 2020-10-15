@@ -153,7 +153,7 @@ public class iShop extends JavaPlugin {
 					config.set("clickShop", "&6SHOP");
 					config.set("listAdminShop", "&6Listing all found admin shops:");
 					config.set("manageText", "&6Manage this shop!");
-					config.set("noAdminShopsFound", "&cNo admins shops have been found!");
+					config.set("noAdminShopsFound", "&cNo admin shops have been found!");
 					config.set("noShopBlock", "&cshopBlock cannot be empty! Reverting to default minecraft:barrel");
 					config.set("noStockBlock", "&cstockBlock cannot be empty! Reverting to default minecraft:composter");
 					config.set("notPlayer", "&cOnly players in the game can use shop commands!");
