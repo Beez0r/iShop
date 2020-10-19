@@ -20,6 +20,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -380,49 +381,201 @@ public class Shop {
 			return;
 		}
 
-
 		if(player.getInventory().firstEmpty() != -1) {
-			player.getInventory().removeItem(row.get().getItemIn1().clone());
-			player.getInventory().removeItem(row.get().getItemIn2().clone());
-			player.getInventory().addItem(row.get().getItemOut1().clone());
-			player.getInventory().addItem(row.get().getItemOut2().clone());
+			try {
+				if(row.get().getItemIn1() != null || !row.get().getItemIn1().getType().isAir())
+					player.getInventory().removeItem(row.get().getItemIn1().clone());
+			} catch(Exception ignored) { }
+			try {
+				if(row.get().getItemIn2() != null || !row.get().getItemIn2().getType().isAir())
+					player.getInventory().removeItem(row.get().getItemIn2().clone());
+			} catch(Exception ignored) { }
+			try {
+				if(row.get().getItemOut1() != null || !row.get().getItemOut1().getType().isAir())
+					player.getInventory().addItem(row.get().getItemOut1().clone());
+			} catch(Exception ignored) { }
+			try {
+				if(row.get().getItemOut2() != null || !row.get().getItemOut2().getType().isAir())
+					player.getInventory().addItem(row.get().getItemOut2().clone());
+			} catch(Exception ignored) { }
 		} else {
 			player.sendMessage(Messages.PLAYER_INV_FULL.toString());
 			return;
 		}
 
-		String nameIn1 = row.get().getItemIn1().getItemMeta().hasDisplayName() ? row.get().getItemIn1().getItemMeta().getDisplayName() : row.get().getItemIn1().getType().name().replaceAll("_", " ").toLowerCase();
-		String nameIn2 = row.get().getItemIn2().getItemMeta().hasDisplayName() ? row.get().getItemIn2().getItemMeta().getDisplayName() : row.get().getItemIn2().getType().name().replaceAll("_", " ").toLowerCase();
-		String nameOut1 = row.get().getItemOut1().getItemMeta().hasDisplayName() ? row.get().getItemOut1().getItemMeta().getDisplayName() : row.get().getItemOut1().getType().name().replaceAll("_", " ").toLowerCase();
-		String nameOut2 = row.get().getItemOut2().getItemMeta().hasDisplayName() ? row.get().getItemOut2().getItemMeta().getDisplayName() : row.get().getItemOut2().getType().name().replaceAll("_", " ").toLowerCase();
+		String nameIn1, nameIn2, nameOut1, nameOut2;
+		int inA1 = 0;
+		int inA2 = 0;
+		int outA1 = 0;
+		int outA2 = 0;
 
+		try {
+			nameIn1 = row.get().getItemIn1().getItemMeta().hasDisplayName() ? row.get().getItemIn1().getItemMeta().getDisplayName() : row.get().getItemIn1().getType().name().replaceAll("_", " ").toLowerCase();
+			inA1 = row.get().getItemIn1().getAmount();
+		} catch(Exception e) { nameIn1 = "empty"; inA1 = 0; }
+		try {
+			nameIn2 = row.get().getItemIn2().getItemMeta().hasDisplayName() ? row.get().getItemIn2().getItemMeta().getDisplayName() : row.get().getItemIn2().getType().name().replaceAll("_", " ").toLowerCase();
+			inA2 = row.get().getItemIn2().getAmount();
+		} catch(Exception e) { nameIn2 = "empty"; inA2 = 0; }
+		try {
+			nameOut1 = row.get().getItemOut1().getItemMeta().hasDisplayName() ? row.get().getItemOut1().getItemMeta().getDisplayName() : row.get().getItemOut1().getType().name().replaceAll("_", " ").toLowerCase();
+			outA1 = row.get().getItemOut1().getAmount();
+		} catch(Exception e) { nameOut1 = "empty"; outA1 = 0; }
+		try {
+			nameOut2 = row.get().getItemOut2().getItemMeta().hasDisplayName() ? row.get().getItemOut2().getItemMeta().getDisplayName() : row.get().getItemOut2().getType().name().replaceAll("_", " ").toLowerCase();
+			outA2 = row.get().getItemOut2().getAmount();
+		} catch(Exception e) { nameOut2 = "empty"; outA2 = 0; }
+
+		String i1 = nameIn1 + " x " + inA1;
+		String i2 = nameIn2 + " x " + inA2;
+		String o1 = nameOut1 + " x " + outA1;
+		String o2 = nameOut2 + " x " + outA2;
 		if(!this.admin && !row.get().broadcast) {
-			player.sendMessage(Messages.SHOP_PURCHASE.toString()
-				.replaceAll("%in", nameOut1 + " x "+row.get().getItemOut1().getAmount()) // 				.replaceAll("%in", nameOut + " x "+row.get().getItemOut1().getAmount())
-				.replaceAll("%out", nameIn1 + " x "+row.get().getItemIn1().getAmount()) // 				.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
-				.replaceAll("%in", nameOut2 + " x "+row.get().getItemOut2().getAmount()) // 				.replaceAll("%in", nameOut + " x "+row.get().getItemOut1().getAmount())
-				.replaceAll("%out", nameIn2 + " x "+row.get().getItemIn2().getAmount()) // 				.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
-			);
+			if(inA1 == 0 && outA1 == 0) {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in", o2)
+						.replaceAll("%out", i2));
+			} else if(inA1 == 0 && outA2 == 0) {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in", o1)
+						.replaceAll("%out", i2));
+			} else if(inA2 == 0 && outA1 == 0) {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in",o2)
+						.replaceAll("%out", i1));
+			} else if(inA2 == 0 && outA2 == 0) {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in", o1)
+						.replaceAll("%out", i1));
+			}  else if(inA1 == 0) {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%out", i2));
+			}  else if(inA2 == 0) {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%out", i1));
+			} else if(outA1 == 0) {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in", o2)
+						.replaceAll("%out", i1 + " AND " + i2));
+			} else if(outA2 == 0) {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in", o1)
+						.replaceAll("%out", i1 + " AND " + i2));
+			} else {
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
+						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%out", i1 + " AND " + i2));
+			}
 		}
 
 		if(!this.admin) {
-			this.takeItem(row.get().getItemOut1().clone());
-			this.takeItem(row.get().getItemOut2().clone());
-			this.giveItem(row.get().getItemIn1().clone());
-			this.giveItem(row.get().getItemIn2().clone());
+			if(outA1 > 0 || row.get().getItemOut1() != null || !row.get().getItemOut1().getType().isAir())
+				this.takeItem(row.get().getItemOut1().clone());
+			if(outA2 > 0 || row.get().getItemOut2() != null || !row.get().getItemOut2().getType().isAir())
+				this.takeItem(row.get().getItemOut2().clone());
+			if(inA1 > 0 || row.get().getItemIn1() != null || !row.get().getItemIn1().getType().isAir())
+				this.giveItem(row.get().getItemIn1().clone());
+			if(inA2 > 0 || row.get().getItemIn2() != null || !row.get().getItemIn2().getType().isAir())
+				this.giveItem(row.get().getItemIn2().clone());
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);
 			if(ownerPlayer != null && ownerPlayer.isOnline()) {
-				ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
-					.replaceAll("%in", nameOut1 + " x "+row.get().getItemOut1().getAmount())
-					.replaceAll("%out", nameIn1 + " x "+row.get().getItemIn1().getAmount())
-					.replaceAll("%p", player.getName()));
+				if(inA1 == 0 && outA1 == 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in", o2)
+							.replaceAll("%out", i2)
+							.replaceAll("%p", player.getName()));
+				} else if(inA1 == 0 && outA2 == 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in", o1)
+							.replaceAll("%out", i2)
+							.replaceAll("%p", player.getName()));
+				} else if(inA2 == 0 && outA1 == 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in",o2)
+							.replaceAll("%out", i1)
+							.replaceAll("%p", player.getName()));
+				} else if(inA2 == 0 && outA2 == 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in", o1)
+							.replaceAll("%out", i1)
+							.replaceAll("%p", player.getName()));
+				}  else if(inA1 == 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in", o1 + " AND " + o2)
+							.replaceAll("%out", i2)
+							.replaceAll("%p", player.getName()));
+				}  else if(inA2 == 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in", o1 + " AND " + o2)
+							.replaceAll("%out", i1)
+							.replaceAll("%p", player.getName()));
+				} else if(outA1 == 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in", o2)
+							.replaceAll("%out", i1 + " AND " + i2)
+							.replaceAll("%p", player.getName()));
+				} else if(outA2 == 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in", o1)
+							.replaceAll("%out", i1 + " AND " + i2)
+							.replaceAll("%p", player.getName()));
+				} else {
+					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
+							.replaceAll("%in", o1 + " AND " + o2)
+							.replaceAll("%out", i1 + " AND " + i2)
+							.replaceAll("%p", player.getName()));
+				}
 			}
 		} else if(row.get().broadcast) {
-			Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
-				.replaceAll("%in", nameOut1 + " x "+row.get().getItemOut1().getAmount())
-				.replaceAll("%out", nameIn1 + " x "+row.get().getItemIn1().getAmount())
-				.replaceAll("%p", player.getName()));
+			if(inA1 == 0 && outA1 == 0) {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in", o2)
+						.replaceAll("%out", i2)
+						.replaceAll("%p", player.getName()));
+			} else if(inA1 == 0 && outA2 == 0) {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in", o1)
+						.replaceAll("%out", i2)
+						.replaceAll("%p", player.getName()));
+			} else if(inA2 == 0 && outA1 == 0) {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in",o2)
+						.replaceAll("%out", i1)
+						.replaceAll("%p", player.getName()));
+			} else if(inA2 == 0 && outA2 == 0) {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in", o1)
+						.replaceAll("%out", i1)
+						.replaceAll("%p", player.getName()));
+			}  else if(inA1 == 0) {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%out", i2)
+						.replaceAll("%p", player.getName()));
+			}  else if(inA2 == 0) {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%out", i1)
+						.replaceAll("%p", player.getName()));
+			} else if(outA1 == 0) {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in", o2)
+						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%p", player.getName()));
+			} else if(outA2 == 0) {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in", o1)
+						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%p", player.getName()));
+			} else {
+				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
+						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%p", player.getName()));
+			}
 		}
 	}
 

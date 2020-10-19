@@ -31,7 +31,7 @@ public class InvCreateRow extends GUI {
 			} else if(i == 10 || i == 11) {
 			} else if(i == 13) {
 				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
-					if(itemIn1 == null || itemIn1.getType().equals(Material.AIR)) {
+					/*if(itemIn1 == null || itemIn1.getType().equals(Material.AIR)) {
 						return;
 					}
 					if(itemIn2 == null || itemIn2.getType().equals(Material.AIR)) {
@@ -42,7 +42,7 @@ public class InvCreateRow extends GUI {
 					}
 					if(itemOut2 == null || itemOut2.getType().equals(Material.AIR)) {
 						return;
-					}
+					} */
 					
 					shop.getRows()[index] = new RowStore(itemOut1, itemOut2, itemIn1, itemIn2, false);
 					InvAdminShop inv = new InvAdminShop(shop);
@@ -73,7 +73,7 @@ public class InvCreateRow extends GUI {
 			event.setCancelled(true);
 			
 			if(event.getRawSlot() == 10 || event.getRawSlot() == 11 || event.getRawSlot() == 15 || event.getRawSlot() == 16) {
-				ItemStack item =  Objects.requireNonNull(event.getCursor()).clone();
+				ItemStack item =  event.getCursor().clone();
 				
 				if(event.getClick().isRightClick()) {				
 					item.setAmount(1);
