@@ -20,7 +20,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -346,12 +345,10 @@ public class Shop {
 			return;
 		}
 
-		try {
-			if (!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn1().equals(null) || !row.get().getItemIn1().equals(airItem))) {
+			if (!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn2().equals(null) || !row.get().getItemIn2().equals(airItem))) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 			}
-		} catch (Exception ignored) { }
 
 
 		if(row.get().getItemOut1().equals(row.get().getItemOut2()) && !row.get().getItemOut1().equals(airItem)) {
@@ -445,10 +442,7 @@ public class Shop {
 		}
 
 		String nameIn1, nameIn2, nameOut1, nameOut2;
-		int inA1;
-		int inA2;
-		int outA1;
-		int outA2;
+		int inA1, inA2, outA1, outA2;
 
 		try {
 			nameIn1 = row.get().getItemIn1().getItemMeta().hasDisplayName() ? row.get().getItemIn1().getItemMeta().getDisplayName() : row.get().getItemIn1().getType().name().replaceAll("_", " ").toLowerCase();

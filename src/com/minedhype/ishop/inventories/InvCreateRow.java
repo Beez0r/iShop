@@ -1,6 +1,5 @@
 package com.minedhype.ishop.inventories;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;

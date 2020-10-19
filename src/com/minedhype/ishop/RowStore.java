@@ -1,7 +1,6 @@
 package com.minedhype.ishop;
 
 import java.sql.PreparedStatement;
-
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
