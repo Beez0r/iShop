@@ -32,20 +32,13 @@ public class InvCreateRow extends GUI {
 			} else if(i == 10 || i == 11) {
 			} else if(i == 13) {
 				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
-
 					try {
-						if((itemIn1.getType().equals(Material.AIR) && itemIn2.getType().equals(Material.AIR) && itemOut1.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR))) {
+						if((itemIn1.getType().equals(Material.AIR) && itemIn2.getType().equals(Material.AIR) && itemOut1.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR)))
 							return;
-						}
 					} catch(Exception e) { return; }
 
 					try {
-					if((itemIn1.getType().equals(Material.AIR) && itemIn2.getType().equals(Material.AIR)))
-						return;
-					} catch(Exception e) { return; }
-
-					try {
-					if((itemOut1.getType().equals(Material.AIR) && itemOut1.getType().equals(Material.AIR)))
+					if((itemOut1.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR)) || (itemIn1.getType().equals(Material.AIR) && itemIn1.getType().equals(Material.AIR)))
 						return;
 					} catch(Exception e) { return; }
 

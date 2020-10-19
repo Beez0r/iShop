@@ -272,7 +272,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		Shop newShop = Shop.createShop(block.getLocation(), player.getUniqueId(), true);
+		Shop newShop = Shop.createShop(block.getLocation(), UUID.fromString("00000000-0000-0000-0000-000000000000"), true);
 		player.sendMessage(Messages.SHOP_CREATED.toString());
 		InvAdminShop inv = new InvAdminShop(newShop);
 		inv.open(player, newShop.getOwner());

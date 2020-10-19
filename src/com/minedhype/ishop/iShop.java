@@ -158,10 +158,16 @@ public class iShop extends JavaPlugin {
 					config.set("noStockBlock", "&cstockBlock cannot be empty! Reverting to default minecraft:composter");
 					config.set("notPlayer", "&cOnly players in the game can use shop commands!");
 					config.set("shopText", "&6Remotely shop here!");
-					config.set("configVersion", 1.1);
-					config.save(configFile);
 				case "1.1":
+					config.set("buyTitle","PRICE TO BUY ITEMS [SLOT 1]");
+					config.set("buyTitle2","PRICE TO BUY ITEMS [SLOT 2]");
+					config.set("sellTitle","ITEMS FOR SALE [SLOT 1]");
+					config.set("sellTitle2","ITEMS FOR SALE [SLOT 2]");
+					config.set("configVersion", 1.2);
+					config.save(configFile);
+				case "1.2":
 					break;
+
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }
 	}

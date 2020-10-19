@@ -346,9 +346,11 @@ public class Shop {
 			return;
 		}
 
-		if(!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn1().equals(null) || !row.get().getItemIn1().equals(airItem))) {
-			player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
-			return;
+		if(!this.admin) {
+			if (!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn1().equals(null) || !row.get().getItemIn1().equals(airItem))) {
+				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
+				return;
+			}
 		}
 
 		if(row.get().getItemOut1().equals(row.get().getItemOut2()) && !row.get().getItemOut1().equals(airItem)) {
@@ -511,7 +513,7 @@ public class Shop {
 
 		if(!this.admin) {
 			try {
-				if (outA1 > 0 || row.get().getItemOut1() != null || !row.get().getItemOut1().getType().isAir())
+				if(outA1 > 0 || row.get().getItemOut1() != null || !row.get().getItemOut1().getType().isAir())
 					this.takeItem(row.get().getItemOut1().clone());
 			} catch(Exception ignored) { }
 			try {
