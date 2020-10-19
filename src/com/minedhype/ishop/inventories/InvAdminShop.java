@@ -52,7 +52,7 @@ public class InvAdminShop extends GUI {
 							placeItem(y*9+x, row.get().getItemOut2());
 						}
 					}
-				} else if(x == 5) {
+				} else if(x == 4) {
 					if(y == 0) {
 						placeItem(y*9+x, GUI.createItem(Material.RED_STAINED_GLASS_PANE, ChatColor.RED+ Messages.SHOP_TITLE_BUY.toString()));
 					} else {
@@ -61,7 +61,7 @@ public class InvAdminShop extends GUI {
 							placeItem(y*9+x, row.get().getItemIn1());
 						}
 					}
-				} else if(x == 6) {
+				} else if(x == 5) {
 					if(y == 0) {
 						placeItem(y*9+x, GUI.createItem(Material.RED_STAINED_GLASS_PANE, ChatColor.RED+ Messages.SHOP_TITLE_BUY.toString()));
 					} else {
@@ -73,7 +73,7 @@ public class InvAdminShop extends GUI {
 				} else if(x == 7 && y > 0) {
 					Optional<RowStore> row = shop.getRow(y-1);
 					final int index = y-1;
-					
+
 					if(row.isPresent()) {
 						placeItem(y*9+x, GUI.createItem(Material.TNT, ChatColor.BOLD+ Messages.SHOP_TITLE_DELETE.toString()), p -> {
 							shop.delete(p, index);
