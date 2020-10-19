@@ -40,7 +40,7 @@ public abstract class GUI {
 		if(meta != null)
 			meta.setDisplayName(ChatColor.RESET + number);
 		else
-			meta.setDisplayName("empty");
+			meta.setDisplayName("unnamed");
 		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		meta.addItemFlags(ItemFlag.HIDE_DESTROYS);

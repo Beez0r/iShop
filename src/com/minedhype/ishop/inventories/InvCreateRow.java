@@ -1,5 +1,6 @@
 package com.minedhype.ishop.inventories;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
@@ -31,19 +32,23 @@ public class InvCreateRow extends GUI {
 			} else if(i == 10 || i == 11) {
 			} else if(i == 13) {
 				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
-					/*if(itemIn1 == null || itemIn1.getType().equals(Material.AIR)) {
+
+					try {
+						if((itemIn1.getType().equals(Material.AIR) && itemIn2.getType().equals(Material.AIR) && itemOut1.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR))) {
+							return;
+						}
+					} catch(Exception e) { return; }
+
+					try {
+					if((itemIn1.getType().equals(Material.AIR) && itemIn2.getType().equals(Material.AIR)))
 						return;
-					}
-					if(itemIn2 == null || itemIn2.getType().equals(Material.AIR)) {
+					} catch(Exception e) { return; }
+
+					try {
+					if((itemOut1.getType().equals(Material.AIR) && itemOut1.getType().equals(Material.AIR)))
 						return;
-					}
-					if(itemOut1 == null || itemOut1.getType().equals(Material.AIR)) {
-						return;
-					}
-					if(itemOut2 == null || itemOut2.getType().equals(Material.AIR)) {
-						return;
-					} */
-					
+					} catch(Exception e) { return; }
+
 					shop.getRows()[index] = new RowStore(itemOut1, itemOut2, itemIn1, itemIn2, false);
 					InvAdminShop inv = new InvAdminShop(shop);
 					inv.open(p);
