@@ -37,26 +37,27 @@ public class Shop {
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
 	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
 	private static final List<Shop> shops = new ArrayList<>();
+	private static final long millisecondsPerDay = 86400000;
 	private final Map<Player, Long> cdTime = new HashMap<>();
 	private final UUID owner;
 	private final Location location;
 	private final RowStore[] rows;
 	private final boolean admin;
-	private int idTienda;
+	private int idShop;
 
-	private Shop(int idTienda, UUID owner, Location loc, boolean admin) {
-		this.idTienda = idTienda;
+	private Shop(int idShop, UUID owner, Location loc, boolean admin) {
+		this.idShop = idShop;
 		this.owner = owner;
 		this.location = loc;
-		this.rows = new RowStore[4];
+		this.rows = new RowStore[5];
 		this.admin = admin;
 
-		if(idTienda == -1) {
+		if(idShop == -1) {
 			final Shop shop = this;
 			Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 				PreparedStatement stmt = null;
 				try {
-					stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaTiendas (location, owner, admin) VALUES (?,?,?);", 1);
+					stmt = iShop.getConnection().prepareStatement("INSERT INTO ishopShops (location, owner, admin) VALUES (?,?,?);", 1);
 					String locationRaw = loc.getBlockX()+";"+loc.getBlockY()+";"+loc.getBlockZ()+";"+ loc.getWorld().getName();
 					stmt.setString(1, locationRaw);
 					stmt.setString(2, owner.toString());
@@ -64,7 +65,7 @@ public class Shop {
 					stmt.executeUpdate();
 					ResultSet res = stmt.getGeneratedKeys();
 					if(res.next())
-						shop.idTienda = res.getInt(1);
+						shop.idShop = res.getInt(1);
 				} catch (Exception e) { e.printStackTrace(); }
 				finally {
 					try {
@@ -81,7 +82,7 @@ public class Shop {
 	}
 
 	public static Optional<Shop> getShopById(int id) {
-		return shops.parallelStream().filter(shop -> shop.idTienda == id).findFirst();
+		return shops.parallelStream().filter(shop -> shop.idShop == id).findFirst();
 	}
 
 	public static int getNumShops(UUID owner) {
@@ -94,40 +95,40 @@ public class Shop {
 				.filter(s -> !s.admin && s.isOwner(sOwner))
 				.forEach(s -> {
 					if(s.isOwner(player.getUniqueId()) && iShop.config.getBoolean("remoteManage")) {
-						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idShop + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
-						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
+						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idShop));
 						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_MANAGE_TEXT.toString())));
 						manageMsg.addExtra(manageText);
 						player.spigot().sendMessage(manageMsg);
 					} else if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
-						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idShop + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
-						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
+						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idShop));
 						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_MANAGE_TEXT.toString())));
 						manageMsg.addExtra(manageText);
 						String shopMessage = "";
 						if(!s.isOwner(player.getUniqueId())) {
 							TextComponent shopMsg = new TextComponent(shopMessage);
 							TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_SHOP.toString() + ChatColor.DARK_GRAY + "]");
-							shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
+							shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idShop));
 							shopText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_SHOP_TEXT.toString())));
 							shopMsg.addExtra(shopText);
 							player.spigot().sendMessage(manageMsg, shopMsg);
 						} else
 							player.spigot().sendMessage(manageMsg);
 					} else if(iShop.config.getBoolean("remoteShopping") && !s.isOwner(player.getUniqueId())) {
-						String shopMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						String shopMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idShop + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 						TextComponent shopMsg = new TextComponent(shopMessage);
 						TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_SHOP.toString() + ChatColor.DARK_GRAY + "]");
-						shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
+						shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idShop));
 						shopText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_SHOP_TEXT.toString())));
 						shopMsg.addExtra(shopText);
 						player.spigot().sendMessage(shopMsg);
 					} else
-						player.sendMessage(ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
+						player.sendMessage(ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idShop + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
 				});
 	}
 
@@ -138,10 +139,10 @@ public class Shop {
 			shops.parallelStream()
 					.filter(s -> s.admin)
 					.forEach(s -> {
-						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idShop + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
-						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
+						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idShop));
 						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_MANAGE_TEXT.toString())));
 						manageMsg.addExtra(manageText);
 						player.spigot().sendMessage(manageMsg);
@@ -197,7 +198,7 @@ public class Shop {
 		PreparedStatement loadShops = null;
 
 		try {
-			loadStocks = iShop.getConnection().prepareStatement("SELECT owner, items, pag FROM zooMercaStocks;");
+			loadStocks = iShop.getConnection().prepareStatement("SELECT owner, items, pag FROM ishopStock;");
 			ResultSet dataStocks = loadStocks.executeQuery();
 			while(dataStocks.next()) {
 				String ownerRaw = dataStocks.getString(1);
@@ -221,7 +222,7 @@ public class Shop {
 				stock.getInventory().setContents(itemsList.toArray(new ItemStack[0]));
 			}
 
-			loadShops = iShop.getConnection().prepareStatement("SELECT location, owner, itemIn, itemOut, idTienda, admin, broadcast FROM zooMercaTiendasFilas LEFT JOIN zooMercaTiendas ON id = idTienda ORDER BY idTienda;");
+			loadShops = iShop.getConnection().prepareStatement("SELECT location, owner, itemIn1, itemIn2, itemOut1, itemOut2, idShop, admin, broadcast FROM ishopShopsRows LEFT JOIN ishopShops ON id = idShop ORDER BY idShop;");
 			ResultSet dataStore = loadShops.executeQuery();
 			while(dataStore.next()) {
 				String[] locationRaw = dataStore.getString(1).split(";");
@@ -237,9 +238,9 @@ public class Shop {
 				if(!shop.isPresent()) {
 					String ownerRaw = dataStore.getString(2);
 					UUID owner = UUID.fromString(ownerRaw);
-					int idTienda = dataStore.getInt(5);
-					boolean admin = dataStore.getBoolean(6);
-					shops.add(new Shop(idTienda, owner, location, admin));
+					int idShop = dataStore.getInt(7);
+					boolean admin = dataStore.getBoolean(8);
+					shops.add(new Shop(idShop, owner, location, admin));
 					shop = Shop.getShopByLocation(location);
 				}
 
@@ -253,20 +254,30 @@ public class Shop {
 				if(index >= rows.length)
 					continue;
 
-				String itemInstackRaw = dataStore.getString(3);
-				YamlConfiguration configIn = new YamlConfiguration();
-				String itemOutstackRaw = dataStore.getString(4);
-				YamlConfiguration configOut = new YamlConfiguration();
+				String itemInstack1Raw = dataStore.getString(3);
+				YamlConfiguration configIn1 = new YamlConfiguration();
+				String itemInstack2Raw = dataStore.getString(4);
+				YamlConfiguration configIn2 = new YamlConfiguration();
+				String itemOutstack1Raw = dataStore.getString(5);
+				YamlConfiguration configOut1 = new YamlConfiguration();
+				String itemOutstack2Raw = dataStore.getString(6);
+				YamlConfiguration configOut2 = new YamlConfiguration();
 				try {
-					configIn.loadFromString(itemInstackRaw);
-					configOut.loadFromString(itemOutstackRaw);
+					configIn1.loadFromString(itemInstack1Raw);
+					configIn2.loadFromString(itemInstack2Raw);
+					configOut1.loadFromString(itemOutstack1Raw);
+					configOut2.loadFromString(itemOutstack2Raw);
 				} catch (InvalidConfigurationException e) { e.printStackTrace(); }
-				Map<String, Object> itemInRaw = configIn.getValues(true);
-				ItemStack itemIn = ItemStack.deserialize(itemInRaw);
-				Map<String, Object> itemOutRaw = configOut.getValues(true);
-				ItemStack itemOut = ItemStack.deserialize(itemOutRaw);
-				boolean broadcast = dataStore.getBoolean(7);
-				rows[index] = new RowStore(itemOut, itemIn, broadcast);
+				Map<String, Object> itemIn1Raw = configIn1.getValues(true);
+				ItemStack itemIn1 = ItemStack.deserialize(itemIn1Raw);
+				Map<String, Object> itemIn2Raw = configIn2.getValues(true);
+				ItemStack itemIn2 = ItemStack.deserialize(itemIn2Raw);
+				Map<String, Object> itemOut1Raw = configOut1.getValues(true);
+				ItemStack itemOut1 = ItemStack.deserialize(itemOut1Raw);
+				Map<String, Object> itemOut2Raw = configOut2.getValues(true);
+				ItemStack itemOut2 = ItemStack.deserialize(itemOut2Raw);
+				boolean broadcast = dataStore.getBoolean(9);
+				rows[index] = new RowStore(itemOut1, itemOut2, itemIn1, itemIn2, broadcast);
 			}
 
 		} catch(Exception e) {
@@ -288,7 +299,7 @@ public class Shop {
 		StockShop.saveData();
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("DELETE FROM zooMercaTiendasFilas;");
+			stmt = iShop.getConnection().prepareStatement("DELETE FROM ishopShopsRows;");
 			stmt.execute();
 		} catch (Exception e) { e.printStackTrace(); }
 		finally {
@@ -313,7 +324,7 @@ public class Shop {
 	private void saveDataShop() {
 		for(RowStore row : rows)
 			if(row != null)
-				row.saveData(idTienda);
+				row.saveData(idShop);
 	}
 
 	public void buy(Player player, int index) {
@@ -321,11 +332,15 @@ public class Shop {
 		if(!row.isPresent())
 			return;
 
-		if(!Utils.hasStock(player, row.get().getItemIn())) {
+		if(!Utils.hasStock(player, row.get().getItemIn1())) {
 			player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 			return;
 		}
-		if(!Utils.hasStock(this, row.get().getItemOut())) {
+		if(!Utils.hasStock(player, row.get().getItemIn2())) {
+			player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
+			return;
+		}
+		if(!Utils.hasStock(this, row.get().getItemOut1())) {
 			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);
@@ -333,51 +348,80 @@ public class Shop {
 				int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 				long secondsLeft = ((cdTime.get(ownerPlayer)/1000)+cdTimeInSec) - (System.currentTimeMillis()/1000);
 				if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut1().getType().toString()));
 					cdTime.put(ownerPlayer, System.currentTimeMillis());
 				}
 			} else {
 				cdTime.put(ownerPlayer, System.currentTimeMillis());
 				if(ownerPlayer != null && ownerPlayer.isOnline())
-					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut1().getType().toString()));
 			}
 
 			return;
 		}
 
+		if(!Utils.hasStock(this, row.get().getItemOut2())) {
+			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
+
+			Player ownerPlayer = Bukkit.getPlayer(owner);
+			if(cdTime.containsKey(ownerPlayer)) {
+				int cdTimeInSec = iShop.config.getInt("noStockCooldown");
+				long secondsLeft = ((cdTime.get(ownerPlayer)/1000)+cdTimeInSec) - (System.currentTimeMillis()/1000);
+				if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
+					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
+					cdTime.put(ownerPlayer, System.currentTimeMillis());
+				}
+			} else {
+				cdTime.put(ownerPlayer, System.currentTimeMillis());
+				if(ownerPlayer != null && ownerPlayer.isOnline())
+					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
+			}
+
+			return;
+		}
+
+
 		if(player.getInventory().firstEmpty() != -1) {
-			player.getInventory().removeItem(row.get().getItemIn().clone());
-			player.getInventory().addItem(row.get().getItemOut().clone());
+			player.getInventory().removeItem(row.get().getItemIn1().clone());
+			player.getInventory().removeItem(row.get().getItemIn2().clone());
+			player.getInventory().addItem(row.get().getItemOut1().clone());
+			player.getInventory().addItem(row.get().getItemOut2().clone());
 		} else {
 			player.sendMessage(Messages.PLAYER_INV_FULL.toString());
 			return;
 		}
 
-		String nameIn = row.get().getItemIn().getItemMeta().hasDisplayName() ? row.get().getItemIn().getItemMeta().getDisplayName() : row.get().getItemIn().getType().name().replaceAll("_", " ").toLowerCase();
-		String nameOut = row.get().getItemOut().getItemMeta().hasDisplayName() ? row.get().getItemOut().getItemMeta().getDisplayName() : row.get().getItemOut().getType().name().replaceAll("_", " ").toLowerCase();
+		String nameIn1 = row.get().getItemIn1().getItemMeta().hasDisplayName() ? row.get().getItemIn1().getItemMeta().getDisplayName() : row.get().getItemIn1().getType().name().replaceAll("_", " ").toLowerCase();
+		String nameIn2 = row.get().getItemIn2().getItemMeta().hasDisplayName() ? row.get().getItemIn2().getItemMeta().getDisplayName() : row.get().getItemIn2().getType().name().replaceAll("_", " ").toLowerCase();
+		String nameOut1 = row.get().getItemOut1().getItemMeta().hasDisplayName() ? row.get().getItemOut1().getItemMeta().getDisplayName() : row.get().getItemOut1().getType().name().replaceAll("_", " ").toLowerCase();
+		String nameOut2 = row.get().getItemOut2().getItemMeta().hasDisplayName() ? row.get().getItemOut2().getItemMeta().getDisplayName() : row.get().getItemOut2().getType().name().replaceAll("_", " ").toLowerCase();
 
 		if(!this.admin && !row.get().broadcast) {
 			player.sendMessage(Messages.SHOP_PURCHASE.toString()
-				.replaceAll("%in", nameOut + " x "+row.get().getItemOut().getAmount())
-				.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
+				.replaceAll("%in", nameOut1 + " x "+row.get().getItemOut1().getAmount()) // 				.replaceAll("%in", nameOut + " x "+row.get().getItemOut1().getAmount())
+				.replaceAll("%out", nameIn1 + " x "+row.get().getItemIn1().getAmount()) // 				.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
+				.replaceAll("%in", nameOut2 + " x "+row.get().getItemOut2().getAmount()) // 				.replaceAll("%in", nameOut + " x "+row.get().getItemOut1().getAmount())
+				.replaceAll("%out", nameIn2 + " x "+row.get().getItemIn2().getAmount()) // 				.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
 			);
 		}
 
 		if(!this.admin) {
-			this.takeItem(row.get().getItemOut().clone());
-			this.giveItem(row.get().getItemIn().clone());
+			this.takeItem(row.get().getItemOut1().clone());
+			this.takeItem(row.get().getItemOut2().clone());
+			this.giveItem(row.get().getItemIn1().clone());
+			this.giveItem(row.get().getItemIn2().clone());
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);
 			if(ownerPlayer != null && ownerPlayer.isOnline()) {
 				ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
-					.replaceAll("%in", nameOut + " x "+row.get().getItemOut().getAmount())
-					.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
+					.replaceAll("%in", nameOut1 + " x "+row.get().getItemOut1().getAmount())
+					.replaceAll("%out", nameIn1 + " x "+row.get().getItemIn1().getAmount())
 					.replaceAll("%p", player.getName()));
 			}
 		} else if(row.get().broadcast) {
 			Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
-				.replaceAll("%in", nameOut + " x "+row.get().getItemOut().getAmount())
-				.replaceAll("%out", nameIn + " x "+row.get().getItemIn().getAmount())
+				.replaceAll("%in", nameOut1 + " x "+row.get().getItemOut1().getAmount())
+				.replaceAll("%out", nameIn1 + " x "+row.get().getItemIn1().getAmount())
 				.replaceAll("%p", player.getName()));
 		}
 	}
@@ -392,7 +436,6 @@ public class Shop {
 		OfflinePlayer player = Bukkit.getOfflinePlayer(this.owner);
 		if(player.isOnline())
 			return false;
-		long millisecondsPerDay = 86400000;
 		return ((System.currentTimeMillis() - player.getLastPlayed()) / millisecondsPerDay) >= maxDays;
 	}
 
@@ -452,12 +495,12 @@ public class Shop {
 			PreparedStatement stmt1 = null;
 			PreparedStatement stmt2 = null;
 			try {
-				stmt1 = iShop.getConnection().prepareStatement("DELETE FROM zooMercaTiendasFilas WHERE idTienda = ?;");
-				stmt1.setInt(1, idTienda);
+				stmt1 = iShop.getConnection().prepareStatement("DELETE FROM ishopShopsRows WHERE idShop = ?;");
+				stmt1.setInt(1, idShop);
 				stmt1.execute();
 
-				stmt2 = iShop.getConnection().prepareStatement("DELETE FROM zooMercaTiendas WHERE id = ?;");
-				stmt2.setInt(1, idTienda);
+				stmt2 = iShop.getConnection().prepareStatement("DELETE FROM ishopShops WHERE id = ?;");
+				stmt2.setInt(1, idShop);
 				stmt2.execute();
 			} catch (Exception e) { e.printStackTrace(); }
 			finally {
@@ -474,7 +517,7 @@ public class Shop {
 	}
 
 	public Optional<RowStore> getRow(int index) {
-		if(index < 0 || index > 3)
+		if(index < 0 || index > 4)
 			return Optional.empty();
 
 		return Optional.ofNullable(rows[index]);

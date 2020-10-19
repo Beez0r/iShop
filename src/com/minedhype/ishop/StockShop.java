@@ -42,7 +42,7 @@ public class StockShop {
 
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("DELETE FROM zooMercaStocks;");
+			stmt = iShop.getConnection().prepareStatement("DELETE FROM ishopStock;");
 			stmt.execute();
 		} catch (Exception e) { e.printStackTrace(); }
 			finally {
@@ -63,7 +63,7 @@ public class StockShop {
 	private void saveStockData() {
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaStocks (owner, items, pag) VALUES (?,?,?);");
+			stmt = iShop.getConnection().prepareStatement("INSERT INTO ishopStock (owner, items, pag) VALUES (?,?,?);");
 
 			JsonArray items = new JsonArray();
 			for(ItemStack item : inventory.getContents()) {
