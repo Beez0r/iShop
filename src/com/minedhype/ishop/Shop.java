@@ -581,7 +581,8 @@ public class Shop {
 						.replaceAll("%out", i1 + " AND " + i2)
 						.replaceAll("%p", player.getName()));
 			}
-		} else if(!row.get().broadcast) {
+		}
+		if(!row.get().broadcast) {
 			if(inA1 == 0 && outA1 == 0) {
 				player.sendMessage(Messages.SHOP_SELL.toString()
 						.replaceAll("%in", o2)
