@@ -10,7 +10,7 @@ public class RowStore {
 	private final ItemStack itemOut2;
 	private final ItemStack itemIn;
 	private final ItemStack itemIn2;
-	private final ItemStack airItem = new ItemStack(Material.AIR);
+	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	public boolean broadcast;
 	
 	public RowStore(ItemStack itemOut, ItemStack itemOut2, ItemStack itemIn, ItemStack itemIn2, boolean broadcast) {

@@ -18,7 +18,7 @@ public class InvCreateRow extends GUI {
 	private ItemStack itemIn2;
 	private ItemStack itemOut;
 	private ItemStack itemOut2;
-	private final ItemStack airItem = new ItemStack(Material.AIR);
+	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	
 	public InvCreateRow(Shop shop, int index) {
 		super(9*3, Messages.SHOP_TITLE_CREATESHOP.toString());
@@ -44,9 +44,9 @@ public class InvCreateRow extends GUI {
 					if(itemOut2 == null)
 						itemOut2 = airItem;
 
-					if(itemIn.getType() == Material.AIR && itemIn2.getType() == Material.AIR && itemOut.getType() == Material.AIR && itemOut2.getType() == Material.AIR)
+					if(itemIn == airItem && itemIn2 == airItem && itemOut == airItem && itemOut2 == airItem)
 						return;
-					if((itemOut.getType() == Material.AIR && itemOut2.getType() == Material.AIR) || (itemIn.getType() == Material.AIR && itemIn2.getType() == Material.AIR))
+					if((itemOut == airItem && itemOut2 == airItem) || (itemIn == airItem && itemIn2 == airItem))
 						return;
 
 					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);

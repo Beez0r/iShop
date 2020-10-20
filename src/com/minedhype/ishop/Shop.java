@@ -39,7 +39,7 @@ public class Shop {
 	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
 	private static final List<Shop> shops = new ArrayList<>();
 	private static final long millisecondsPerDay = 86400000;
-	private final ItemStack airItem = new ItemStack(Material.AIR);
+	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	private final Map<Player, Long> cdTime = new HashMap<>();
 	private final UUID owner;
 	private final Location location;
@@ -350,37 +350,28 @@ public class Shop {
 			}
 		}
 
-		if(row.get().getItemOut().isSimilar(row.get().getItemOut2())) {
-			if(!Utils.hasDoubleItemStock(this, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount())) {
+		if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(this, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 				Player ownerPlayer = Bukkit.getPlayer(owner);
 				if(cdTime.containsKey(ownerPlayer)) {
 					int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 					long secondsLeft = ((cdTime.get(ownerPlayer)/1000)+cdTimeInSec) - (System.currentTimeMillis()/1000);
 					if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-						if(row.get().getItemOut().isSimilar(row.get().getItemOut2()))
+						if(row.get().getItemOut().getType().toString() != "AIR")
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-						else {
-								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
-						}
 						cdTime.put(ownerPlayer, System.currentTimeMillis());
 					}
 				} else {
 					if(ownerPlayer != null && ownerPlayer.isOnline()) {
-						if(row.get().getItemOut().isSimilar(row.get().getItemOut2())) {
-							if(!row.get().getItemOut().isSimilar(airItem))
+							if(row.get().getItemOut().getType().toString() != "AIR")
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-						} else {
-								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+							if(row.get().getItemOut2().getType().toString() != "AIR")
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
-						}
 						cdTime.put(ownerPlayer, System.currentTimeMillis());
 					}
 				}
 
 				return;
-			}
 		} else {
 			if(!Utils.hasStock(this, row.get().getItemOut()) || !Utils.hasStock(this, row.get().getItemOut2())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
@@ -389,13 +380,18 @@ public class Shop {
 					int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 					long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
 					if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-						ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-						cdTime.put(ownerPlayer, System.currentTimeMillis());
+						if(row.get().getItemOut().getType().toString() != "AIR")
+							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+						if(row.get().getItemOut2().getType().toString() != "AIR")
+							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
 					}
 				} else {
 					cdTime.put(ownerPlayer, System.currentTimeMillis());
 					if(ownerPlayer != null && ownerPlayer.isOnline())
-						ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+						if(row.get().getItemOut().getType().toString() != "AIR")
+							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+						if(row.get().getItemOut2().getType().toString() != "AIR")
+							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
 				}
 
 				return;
