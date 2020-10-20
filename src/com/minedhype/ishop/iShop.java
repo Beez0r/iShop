@@ -165,9 +165,9 @@ public class iShop extends JavaPlugin {
 					config.set("buyTitle2","PRICE TO BUY ITEMS [SLOT 2]");
 					config.set("sellTitle","ITEMS FOR SALE [SLOT 1]");
 					config.set("sellTitle2","ITEMS FOR SALE [SLOT 2]");
-					config.set("configVersion", 1.2);
+					config.set("configVersion", 2.0);
 					config.save(configFile);
-				case "1.2":
+				case "2.0":
 					break;
 
 			}

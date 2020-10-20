@@ -24,10 +24,14 @@ public class InvCreateRow extends GUI {
 		super(9*3, Messages.SHOP_TITLE_CREATESHOP.toString());
 		
 		for(int i=0; i<9*3; i++) {
-			if(i == 1 || i == 2) {
+			if(i == 1) {
 				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + Messages.SHOP_TITLE_SELL.toString()));
-			} else if(i == 6 || i == 7) {
+			} else if(i == 2) {
+				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + Messages.SHOP_TITLE_SELL2.toString()));
+			} else if(i == 6) {
 				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + Messages.SHOP_TITLE_BUY.toString()));
+			} else if(i == 7) {
+				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + Messages.SHOP_TITLE_BUY2.toString()));
 			} else if(i == 10 || i == 11) {
 			} else if(i == 13) {
 				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
@@ -45,7 +49,7 @@ public class InvCreateRow extends GUI {
 					InvAdminShop inv = new InvAdminShop(shop);
 					inv.open(p);
 				});
-			} else if(i == 15 || i == 16) {	// Item reserve
+			} else if(i == 15 || i == 16) {
 			} else { placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, "")); }
 		}
 	}

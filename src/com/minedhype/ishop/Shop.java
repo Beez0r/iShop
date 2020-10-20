@@ -346,7 +346,7 @@ public class Shop {
 			return;
 		}
 
-			if (!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn2().equals(null) || !row.get().getItemIn2().isSimilar(airItem))) {
+			if(!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn2().equals(null) || !row.get().getItemIn2().isSimilar(airItem))) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 			}
@@ -584,50 +584,41 @@ public class Shop {
 		}
 		if(!row.get().broadcast) {
 			if(inA1 == 0 && outA1 == 0) {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o2)
-						.replaceAll("%out", i2)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i2));
 			} else if(inA1 == 0 && outA2 == 0) {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o1)
-						.replaceAll("%out", i2)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i2));
 			} else if(inA2 == 0 && outA1 == 0) {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in",o2)
-						.replaceAll("%out", i1)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i1));
 			} else if(inA2 == 0 && outA2 == 0) {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o1)
-						.replaceAll("%out", i1)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i1));
 			}  else if(inA1 == 0) {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o1 + " & " + o2)
-						.replaceAll("%out", i2)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i2));
 			}  else if(inA2 == 0) {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o1 + " & " + o2)
-						.replaceAll("%out", i1)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i1));
 			} else if(outA1 == 0) {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o2)
-						.replaceAll("%out", i1 + " & " + i2)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i1 + " & " + i2));
 			} else if(outA2 == 0) {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o1)
-						.replaceAll("%out", i1 + " & " + i2)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i1 + " & " + i2));
 			} else {
-				player.sendMessage(Messages.SHOP_SELL.toString()
+				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o1 + " & " + o2)
-						.replaceAll("%out", i1 + " & " + i2)
-						.replaceAll("%p", player.getName()));
+						.replaceAll("%out", i1 + " & " + i2));
 			}
 		}
 	}

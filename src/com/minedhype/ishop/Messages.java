@@ -63,9 +63,9 @@ public enum Messages {
 
 	@Override
 	public String toString() {
-		String trans = iShop.config.getString(msg);
-		if(trans == null)
-			trans = "&cError retrieving config message!";
-		return ChatColor.translateAlternateColorCodes('&', trans);
+		String translate = iShop.config.getString(msg);
+		if(translate == null)
+			translate = "&cError retrieving config message!";
+		return ChatColor.translateAlternateColorCodes('&', translate);
 	}
 }
