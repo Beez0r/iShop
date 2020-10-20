@@ -509,28 +509,28 @@ public class Shop {
 							.replaceAll("%p", player.getName()));
 				}  else if(inA1 == 0) {
 					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
-							.replaceAll("%in", o1 + " AND " + o2)
+							.replaceAll("%in", o1 + " & " + o2)
 							.replaceAll("%out", i2)
 							.replaceAll("%p", player.getName()));
 				}  else if(inA2 == 0) {
 					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
-							.replaceAll("%in", o1 + " AND " + o2)
+							.replaceAll("%in", o1 + " & " + o2)
 							.replaceAll("%out", i1)
 							.replaceAll("%p", player.getName()));
 				} else if(outA1 == 0) {
 					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
 							.replaceAll("%in", o2)
-							.replaceAll("%out", i1 + " AND " + i2)
+							.replaceAll("%out", i1 + " & " + i2)
 							.replaceAll("%p", player.getName()));
 				} else if(outA2 == 0) {
 					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
 							.replaceAll("%in", o1)
-							.replaceAll("%out", i1 + " AND " + i2)
+							.replaceAll("%out", i1 + " & " + i2)
 							.replaceAll("%p", player.getName()));
 				} else {
 					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
-							.replaceAll("%in", o1 + " AND " + o2)
-							.replaceAll("%out", i1 + " AND " + i2)
+							.replaceAll("%in", o1 + " & " + o2)
+							.replaceAll("%out", i1 + " & " + i2)
 							.replaceAll("%p", player.getName()));
 				}
 			}
@@ -557,28 +557,28 @@ public class Shop {
 						.replaceAll("%p", player.getName()));
 			}  else if(inA1 == 0) {
 				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
-						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%in", o1 + " & " + o2)
 						.replaceAll("%out", i2)
 						.replaceAll("%p", player.getName()));
 			}  else if(inA2 == 0) {
 				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
-						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%in", o1 + " & " + o2)
 						.replaceAll("%out", i1)
 						.replaceAll("%p", player.getName()));
 			} else if(outA1 == 0) {
 				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
 						.replaceAll("%in", o2)
-						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%out", i1 + " & " + i2)
 						.replaceAll("%p", player.getName()));
 			} else if(outA2 == 0) {
 				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
 						.replaceAll("%in", o1)
-						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%out", i1 + " & " + i2)
 						.replaceAll("%p", player.getName()));
 			} else {
 				Bukkit.broadcastMessage(Messages.SHOP_SELL.toString()
-						.replaceAll("%in", o1 + " AND " + o2)
-						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%in", o1 + " & " + o2)
+						.replaceAll("%out", i1 + " & " + i2)
 						.replaceAll("%p", player.getName()));
 			}
 		}
@@ -605,28 +605,28 @@ public class Shop {
 						.replaceAll("%p", player.getName()));
 			}  else if(inA1 == 0) {
 				player.sendMessage(Messages.SHOP_SELL.toString()
-						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%in", o1 + " & " + o2)
 						.replaceAll("%out", i2)
 						.replaceAll("%p", player.getName()));
 			}  else if(inA2 == 0) {
 				player.sendMessage(Messages.SHOP_SELL.toString()
-						.replaceAll("%in", o1 + " AND " + o2)
+						.replaceAll("%in", o1 + " & " + o2)
 						.replaceAll("%out", i1)
 						.replaceAll("%p", player.getName()));
 			} else if(outA1 == 0) {
 				player.sendMessage(Messages.SHOP_SELL.toString()
 						.replaceAll("%in", o2)
-						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%out", i1 + " & " + i2)
 						.replaceAll("%p", player.getName()));
 			} else if(outA2 == 0) {
 				player.sendMessage(Messages.SHOP_SELL.toString()
 						.replaceAll("%in", o1)
-						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%out", i1 + " & " + i2)
 						.replaceAll("%p", player.getName()));
 			} else {
 				player.sendMessage(Messages.SHOP_SELL.toString()
-						.replaceAll("%in", o1 + " AND " + o2)
-						.replaceAll("%out", i1 + " AND " + i2)
+						.replaceAll("%in", o1 + " & " + o2)
+						.replaceAll("%out", i1 + " & " + i2)
 						.replaceAll("%p", player.getName()));
 			}
 		}
