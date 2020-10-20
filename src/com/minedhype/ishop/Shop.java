@@ -361,9 +361,9 @@ public class Shop {
 					int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 					long secondsLeft = ((cdTime.get(ownerPlayer)/1000)+cdTimeInSec) - (System.currentTimeMillis()/1000);
 					if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-						if(row.get().getItemOut().isSimilar(row.get().getItemOut2())) {
+						if(row.get().getItemOut().isSimilar(row.get().getItemOut2()))
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-						} else {
+						else {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
 						}
@@ -399,9 +399,8 @@ public class Shop {
 				}
 			} else {
 				cdTime.put(ownerPlayer, System.currentTimeMillis());
-				if(ownerPlayer != null && ownerPlayer.isOnline()) {
+				if(ownerPlayer != null && ownerPlayer.isOnline())
 					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-				}
 			}
 
 			return;
@@ -420,9 +419,8 @@ public class Shop {
 				}
 			} else {
 				cdTime.put(ownerPlayer, System.currentTimeMillis());
-				if(ownerPlayer != null && ownerPlayer.isOnline()) {
+				if(ownerPlayer != null && ownerPlayer.isOnline())
 					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
-				}
 			}
 
 			return;
@@ -473,16 +471,16 @@ public class Shop {
 					this.takeItem(row.get().getItemOut().clone());
 			} catch(Exception ignored) { }
 			try {
-			if(outA2 > 0 || row.get().getItemOut2() != null || !row.get().getItemOut2().getType().isAir())
-				this.takeItem(row.get().getItemOut2().clone());
+				if(outA2 > 0 || row.get().getItemOut2() != null || !row.get().getItemOut2().getType().isAir())
+					this.takeItem(row.get().getItemOut2().clone());
 			} catch(Exception ignored) { }
 			try {
-			if(inA1 > 0 || row.get().getItemIn() != null || !row.get().getItemIn().getType().isAir())
-				this.giveItem(row.get().getItemIn().clone());
+				if(inA1 > 0 || row.get().getItemIn() != null || !row.get().getItemIn().getType().isAir())
+					this.giveItem(row.get().getItemIn().clone());
 			} catch(Exception ignored) { }
 			try {
-			if(inA2 > 0 || row.get().getItemIn2() != null || !row.get().getItemIn2().getType().isAir())
-				this.giveItem(row.get().getItemIn2().clone());
+				if(inA2 > 0 || row.get().getItemIn2() != null || !row.get().getItemIn2().getType().isAir())
+					this.giveItem(row.get().getItemIn2().clone());
 			} catch(Exception ignored) { }
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);

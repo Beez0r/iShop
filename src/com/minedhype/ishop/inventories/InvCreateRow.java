@@ -70,16 +70,15 @@ public class InvCreateRow extends GUI {
 		
 		event.setCancelled(false);
 		Inventory inv = event.getClickedInventory();
-		if(Objects.requireNonNull(inv).getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString())) {
+		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString())) {
 			event.setCancelled(true);
 			
 			if(event.getRawSlot() == 10 || event.getRawSlot() == 11 || event.getRawSlot() == 15 || event.getRawSlot() == 16) {
 				ItemStack item =  event.getCursor().clone();
 				
-				if(event.getClick().isRightClick()) {				
+				if(event.getClick().isRightClick())
 					item.setAmount(1);
-					placeItem(event.getRawSlot(), item);
-				} else { placeItem(event.getRawSlot(), item); }
+				placeItem(event.getRawSlot(), item);
 
 				if(event.getRawSlot() == 10)
 					itemOut = item;
