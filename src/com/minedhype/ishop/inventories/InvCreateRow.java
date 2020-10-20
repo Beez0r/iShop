@@ -12,13 +12,13 @@ import com.minedhype.ishop.RowStore;
 import com.minedhype.ishop.Messages;
 import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.gui.GUI;
-import java.util.Objects;
 
 public class InvCreateRow extends GUI {
 	private ItemStack itemIn;
 	private ItemStack itemIn2;
 	private ItemStack itemOut;
 	private ItemStack itemOut2;
+	private final ItemStack airItem = new ItemStack(Material.AIR);
 	
 	public InvCreateRow(Shop shop, int index) {
 		super(9*3, Messages.SHOP_TITLE_CREATESHOP.toString());
@@ -35,15 +35,21 @@ public class InvCreateRow extends GUI {
 			} else if(i == 10 || i == 11) {
 			} else if(i == 13) {
 				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
-					try {
-						if((itemIn.getType().equals(Material.AIR) && itemIn2.getType().equals(Material.AIR) && itemOut.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR)))
-							return;
-					} catch(Exception e) { return; }
+					if(itemIn == null)
+						itemIn = airItem;
+					if(itemIn2 == null)
+						itemIn2 = airItem;
+					if(itemOut == null)
+						itemOut = airItem;
+					if(itemOut2 == null)
+						itemOut2 = airItem;
 
-					try {
-					if((itemOut.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR)) || (itemIn.getType().equals(Material.AIR) && itemIn.getType().equals(Material.AIR)))
+					if(itemIn.getType() == Material.AIR && itemIn2.getType() == Material.AIR && itemOut.getType() == Material.AIR && itemOut2.getType() == Material.AIR)
 						return;
-					} catch(Exception e) { return; }
+					if((itemOut.getType() == Material.AIR && itemOut2.getType() == Material.AIR) || (itemIn.getType() == Material.AIR && itemIn.getType() == Material.AIR))
+						return;
+					if((itemIn.getType() == Material.AIR || itemIn2.getType() == Material.AIR) && (itemOut.getType() == Material.AIR || itemOut2.getType() == Material.AIR))
+						return;
 
 					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
 					InvAdminShop inv = new InvAdminShop(shop);

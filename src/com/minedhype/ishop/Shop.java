@@ -92,12 +92,14 @@ public class Shop {
 	}
 
 	public static void getShopList(Player player, UUID sOwner, String pOwner) {
-		player.sendMessage(ChatColor.GOLD + "Found " + ChatColor.GREEN + getNumShops(sOwner) + ChatColor.GOLD + " shop(s) for player: " + ChatColor.GREEN + pOwner);
+		player.sendMessage(Messages.SHOP_FOUND.toString()
+		.replaceAll("%p", pOwner)
+		.replaceAll("%shops", String.valueOf(getNumShops(sOwner))));
 		shops.parallelStream()
 				.filter(s -> !s.admin && s.isOwner(sOwner))
 				.forEach(s -> {
 					if(s.isOwner(player.getUniqueId()) && iShop.config.getBoolean("remoteManage")) {
-						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
 						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
@@ -105,7 +107,7 @@ public class Shop {
 						manageMsg.addExtra(manageText);
 						player.spigot().sendMessage(manageMsg);
 					} else if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
-						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
 						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
@@ -122,7 +124,7 @@ public class Shop {
 						} else
 							player.spigot().sendMessage(manageMsg);
 					} else if(iShop.config.getBoolean("remoteShopping") && !s.isOwner(player.getUniqueId())) {
-						String shopMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						String shopMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 						TextComponent shopMsg = new TextComponent(shopMessage);
 						TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_SHOP.toString() + ChatColor.DARK_GRAY + "]");
 						shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
@@ -130,7 +132,7 @@ public class Shop {
 						shopMsg.addExtra(shopText);
 						player.spigot().sendMessage(shopMsg);
 					} else
-						player.sendMessage(ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
+						player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
 				});
 	}
 
@@ -141,7 +143,7 @@ public class Shop {
 			shops.parallelStream()
 					.filter(s -> s.admin)
 					.forEach(s -> {
-						String manageMessage = ChatColor.GOLD + "Shop id " + ChatColor.GREEN + s.idTienda + ChatColor.GOLD + " Location XYZ: " + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+						String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
 						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
@@ -334,28 +336,23 @@ public class Shop {
 		if(!row.isPresent())
 			return;
 
-		if(row.get().getItemIn().isSimilar(row.get().getItemIn2())) {
-			if(!player.getInventory().containsAtLeast(row.get().getItemIn(), row.get().getItemIn().getAmount() + row.get().getItemIn2().getAmount()) && (!row.get().getItemIn().equals(null) || !row.get().getItemIn().isSimilar(airItem))) {
+		if(row.get().getItemIn().isSimilar(row.get().getItemIn2()) && !Utils.hasDoubleItemStock(player, row.get().getItemIn(), row.get().getItemIn2())) {
+				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
+				return;
+		} else {
+			if(!Utils.hasStock(player, row.get().getItemIn())) {
+				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
+				return;
+			}
+			if(!Utils.hasStock(player, row.get().getItemIn2())) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 			}
 		}
 
-		if(!player.getInventory().containsAtLeast(row.get().getItemIn(), row.get().getItemIn().getAmount()) && (!row.get().getItemIn().equals(null) || !row.get().getItemIn().isSimilar(airItem))) {
-			player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
-			return;
-		}
-
-			if(!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn2().equals(null) || !row.get().getItemIn2().isSimilar(airItem))) {
-				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
-				return;
-			}
-
-
-		if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !row.get().getItemOut().isSimilar(airItem)) {
-			if(!Utils.hasStock(this, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount())) {
+		if(row.get().getItemOut().isSimilar(row.get().getItemOut2())) {
+			if(!Utils.hasDoubleItemStock(this, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
-
 				Player ownerPlayer = Bukkit.getPlayer(owner);
 				if(cdTime.containsKey(ownerPlayer)) {
 					int cdTimeInSec = iShop.config.getInt("noStockCooldown");
@@ -384,46 +381,25 @@ public class Shop {
 
 				return;
 			}
-		}
-
-		if(!Utils.hasStock(this, row.get().getItemOut(), 0) && !row.get().getItemOut().isSimilar(airItem)) {
-			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
-
-			Player ownerPlayer = Bukkit.getPlayer(owner);
-			if(cdTime.containsKey(ownerPlayer)) {
-				int cdTimeInSec = iShop.config.getInt("noStockCooldown");
-				long secondsLeft = ((cdTime.get(ownerPlayer)/1000)+cdTimeInSec) - (System.currentTimeMillis()/1000);
-				if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+		} else {
+			if(!Utils.hasStock(this, row.get().getItemOut()) || !Utils.hasStock(this, row.get().getItemOut2())) {
+				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
+				Player ownerPlayer = Bukkit.getPlayer(owner);
+				if(cdTime.containsKey(ownerPlayer)) {
+					int cdTimeInSec = iShop.config.getInt("noStockCooldown");
+					long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
+					if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
+						ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+						cdTime.put(ownerPlayer, System.currentTimeMillis());
+					}
+				} else {
 					cdTime.put(ownerPlayer, System.currentTimeMillis());
+					if(ownerPlayer != null && ownerPlayer.isOnline())
+						ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
 				}
-			} else {
-				cdTime.put(ownerPlayer, System.currentTimeMillis());
-				if(ownerPlayer != null && ownerPlayer.isOnline())
-					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+
+				return;
 			}
-
-			return;
-		}
-
-		if(!Utils.hasStock(this, row.get().getItemOut2(), 0) && !row.get().getItemOut2().isSimilar(airItem)) {
-			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
-
-			Player ownerPlayer = Bukkit.getPlayer(owner);
-			if(cdTime.containsKey(ownerPlayer)) {
-				int cdTimeInSec = iShop.config.getInt("noStockCooldown");
-				long secondsLeft = ((cdTime.get(ownerPlayer)/1000)+cdTimeInSec) - (System.currentTimeMillis()/1000);
-				if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
-					cdTime.put(ownerPlayer, System.currentTimeMillis());
-				}
-			} else {
-				cdTime.put(ownerPlayer, System.currentTimeMillis());
-				if(ownerPlayer != null && ownerPlayer.isOnline())
-					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
-			}
-
-			return;
 		}
 
 		if(player.getInventory().firstEmpty() != -1) {
@@ -466,22 +442,14 @@ public class Shop {
 		String o2 = nameOut2 + " x " + outA2;
 
 		if(!this.admin) {
-			try {
-				if(outA1 > 0 || row.get().getItemOut() != null || !row.get().getItemOut().getType().isAir())
+				if(row.get().getItemOut() != null || !row.get().getItemOut().getType().isAir())
 					this.takeItem(row.get().getItemOut().clone());
-			} catch(Exception ignored) { }
-			try {
-				if(outA2 > 0 || row.get().getItemOut2() != null || !row.get().getItemOut2().getType().isAir())
+				if(row.get().getItemOut2() != null || !row.get().getItemOut2().getType().isAir())
 					this.takeItem(row.get().getItemOut2().clone());
-			} catch(Exception ignored) { }
-			try {
-				if(inA1 > 0 || row.get().getItemIn() != null || !row.get().getItemIn().getType().isAir())
+				if(row.get().getItemIn() != null || !row.get().getItemIn().getType().isAir())
 					this.giveItem(row.get().getItemIn().clone());
-			} catch(Exception ignored) { }
-			try {
-				if(inA2 > 0 || row.get().getItemIn2() != null || !row.get().getItemIn2().getType().isAir())
+				if(row.get().getItemIn2() != null || !row.get().getItemIn2().getType().isAir())
 					this.giveItem(row.get().getItemIn2().clone());
-			} catch(Exception ignored) { }
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);
 			if(ownerPlayer != null && ownerPlayer.isOnline()) {
