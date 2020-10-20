@@ -46,9 +46,7 @@ public class InvCreateRow extends GUI {
 
 					if(itemIn.getType() == Material.AIR && itemIn2.getType() == Material.AIR && itemOut.getType() == Material.AIR && itemOut2.getType() == Material.AIR)
 						return;
-					if((itemOut.getType() == Material.AIR && itemOut2.getType() == Material.AIR) || (itemIn.getType() == Material.AIR && itemIn.getType() == Material.AIR))
-						return;
-					if((itemIn.getType() == Material.AIR || itemIn2.getType() == Material.AIR) && (itemOut.getType() == Material.AIR || itemOut2.getType() == Material.AIR))
+					if((itemOut.getType() == Material.AIR && itemOut2.getType() == Material.AIR) || (itemIn.getType() == Material.AIR && itemIn2.getType() == Material.AIR))
 						return;
 
 					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
