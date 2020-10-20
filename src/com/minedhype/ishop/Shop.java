@@ -2,6 +2,7 @@ package com.minedhype.ishop;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class Shop {
 			Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 				PreparedStatement stmt = null;
 				try {
-					stmt = iShop.getConnection().prepareStatement("INSERT INTO ishopShops (location, owner, admin) VALUES (?,?,?);", 1);
+					stmt = iShop.getConnection().prepareStatement("INSERT INTO ishopShops (location, owner, admin) VALUES (?,?,?);", Statement.RETURN_GENERATED_KEYS);
 					String locationRaw = loc.getBlockX()+";"+loc.getBlockY()+";"+loc.getBlockZ()+";"+ loc.getWorld().getName();
 					stmt.setString(1, locationRaw);
 					stmt.setString(2, owner.toString());
@@ -334,25 +335,25 @@ public class Shop {
 			return;
 
 		if(row.get().getItemIn1().equals(row.get().getItemIn2())) {
-			if(!player.getInventory().containsAtLeast(row.get().getItemIn1(), row.get().getItemIn1().getAmount() + row.get().getItemIn2().getAmount()) && (!row.get().getItemIn1().equals(null) || !row.get().getItemIn1().equals(Material.AIR))) {
+			if(!player.getInventory().containsAtLeast(row.get().getItemIn1(), row.get().getItemIn1().getAmount() + row.get().getItemIn2().getAmount()) && (!row.get().getItemIn1().equals(null) || !row.get().getItemIn1().isSimilar(airItem))) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 			}
 		}
 
-		if(!player.getInventory().containsAtLeast(row.get().getItemIn1(), row.get().getItemIn1().getAmount()) && (!row.get().getItemIn1().equals(null) || !row.get().getItemIn1().equals(airItem))) {
+		if(!player.getInventory().containsAtLeast(row.get().getItemIn1(), row.get().getItemIn1().getAmount()) && (!row.get().getItemIn1().equals(null) || !row.get().getItemIn1().isSimilar(airItem))) {
 			player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 			return;
 		}
 
-			if (!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn2().equals(null) || !row.get().getItemIn2().equals(airItem))) {
+			if (!player.getInventory().containsAtLeast(row.get().getItemIn2(), row.get().getItemIn2().getAmount()) && (!row.get().getItemIn2().equals(null) || !row.get().getItemIn2().isSimilar(airItem))) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 			}
 
 
 		if(row.get().getItemOut1().equals(row.get().getItemOut2()) && !row.get().getItemOut1().equals(airItem)) {
-			if(!Utils.hasDoubleStock(this, row.get().getItemOut1(), row.get().getItemOut1().getAmount() + row.get().getItemOut2().getAmount())) {
+			if(!Utils.hasStock(this, row.get().getItemOut1(), row.get().getItemOut1().getAmount() + row.get().getItemOut2().getAmount())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 
 				Player ownerPlayer = Bukkit.getPlayer(owner);
@@ -385,7 +386,7 @@ public class Shop {
 			}
 		}
 
-		if(!Utils.hasStock(this, row.get().getItemOut1()) && !row.get().getItemOut1().equals(airItem)) {
+		if(!Utils.hasStock(this, row.get().getItemOut1(), 0) && !row.get().getItemOut1().equals(airItem)) {
 			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);
@@ -406,7 +407,7 @@ public class Shop {
 			return;
 		}
 
-		if(!Utils.hasStock(this, row.get().getItemOut2()) && !row.get().getItemOut2().equals(airItem)) {
+		if(!Utils.hasStock(this, row.get().getItemOut2(), 0) && !row.get().getItemOut2().equals(airItem)) {
 			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);

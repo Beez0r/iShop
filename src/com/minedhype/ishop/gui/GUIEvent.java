@@ -46,9 +46,7 @@ public class GUIEvent implements Listener {
 		if(gui != null)
 			gui.onClose(e);
 
-		Bukkit.getServer().getScheduler().runTaskLater(iShop.getPlugin(), () -> {
-			player.updateInventory();
-		}, 1);
+		Bukkit.getServer().getScheduler().runTaskLater(iShop.getPlugin(), player::updateInventory, 1);
 
 		GUI.inventoriesOpen.remove(player.getName());
 		InvStock.inShopInv.remove(player);
