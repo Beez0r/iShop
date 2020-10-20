@@ -334,7 +334,7 @@ public class Shop {
 		if(!row.isPresent())
 			return;
 
-		if(row.get().getItemIn1().equals(row.get().getItemIn2())) {
+		if(row.get().getItemIn1().isSimilar(row.get().getItemIn2())) {
 			if(!player.getInventory().containsAtLeast(row.get().getItemIn1(), row.get().getItemIn1().getAmount() + row.get().getItemIn2().getAmount()) && (!row.get().getItemIn1().equals(null) || !row.get().getItemIn1().isSimilar(airItem))) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
@@ -352,7 +352,7 @@ public class Shop {
 			}
 
 
-		if(row.get().getItemOut1().equals(row.get().getItemOut2()) && !row.get().getItemOut1().equals(airItem)) {
+		if(row.get().getItemOut1().isSimilar(row.get().getItemOut2()) && !row.get().getItemOut1().isSimilar(airItem)) {
 			if(!Utils.hasStock(this, row.get().getItemOut1(), row.get().getItemOut1().getAmount() + row.get().getItemOut2().getAmount())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 
@@ -361,7 +361,7 @@ public class Shop {
 					int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 					long secondsLeft = ((cdTime.get(ownerPlayer)/1000)+cdTimeInSec) - (System.currentTimeMillis()/1000);
 					if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-						if(row.get().getItemOut1().equals(row.get().getItemOut2())) {
+						if(row.get().getItemOut1().isSimilar(row.get().getItemOut2())) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut1().getType().toString()));
 						} else {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut1().getType().toString()));
@@ -371,8 +371,8 @@ public class Shop {
 					}
 				} else {
 					if(ownerPlayer != null && ownerPlayer.isOnline()) {
-						if(row.get().getItemOut1().equals(row.get().getItemOut2())) {
-							if(!row.get().getItemOut1().equals(airItem))
+						if(row.get().getItemOut1().isSimilar(row.get().getItemOut2())) {
+							if(!row.get().getItemOut1().isSimilar(airItem))
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut1().getType().toString()));
 						} else {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut1().getType().toString()));
@@ -386,7 +386,7 @@ public class Shop {
 			}
 		}
 
-		if(!Utils.hasStock(this, row.get().getItemOut1(), 0) && !row.get().getItemOut1().equals(airItem)) {
+		if(!Utils.hasStock(this, row.get().getItemOut1(), 0) && !row.get().getItemOut1().isSimilar(airItem)) {
 			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);
@@ -407,7 +407,7 @@ public class Shop {
 			return;
 		}
 
-		if(!Utils.hasStock(this, row.get().getItemOut2(), 0) && !row.get().getItemOut2().equals(airItem)) {
+		if(!Utils.hasStock(this, row.get().getItemOut2(), 0) && !row.get().getItemOut2().isSimilar(airItem)) {
 			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);
@@ -429,13 +429,13 @@ public class Shop {
 		}
 
 		if(player.getInventory().firstEmpty() != -1) {
-			if(!row.get().getItemIn1().equals(airItem))
+			if(!row.get().getItemIn1().isSimilar(airItem))
 				player.getInventory().removeItem(row.get().getItemIn1().clone());
-			if(!row.get().getItemIn2().equals(airItem))
+			if(!row.get().getItemIn2().isSimilar(airItem))
 				player.getInventory().removeItem(row.get().getItemIn2().clone());
-			if(!row.get().getItemOut1().equals(airItem))
+			if(!row.get().getItemOut1().isSimilar(airItem))
 				player.getInventory().addItem(row.get().getItemOut1().clone());
-			if(!row.get().getItemOut2().equals(airItem))
+			if(!row.get().getItemOut2().isSimilar(airItem))
 				player.getInventory().addItem(row.get().getItemOut2().clone());
 		} else {
 			player.sendMessage(Messages.PLAYER_INV_FULL.toString());
