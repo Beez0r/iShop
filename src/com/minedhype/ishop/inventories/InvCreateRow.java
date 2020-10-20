@@ -15,9 +15,9 @@ import com.minedhype.ishop.gui.GUI;
 import java.util.Objects;
 
 public class InvCreateRow extends GUI {
-	private ItemStack itemIn1;
+	private ItemStack itemIn;
 	private ItemStack itemIn2;
-	private ItemStack itemOut1;
+	private ItemStack itemOut;
 	private ItemStack itemOut2;
 	
 	public InvCreateRow(Shop shop, int index) {
@@ -32,16 +32,16 @@ public class InvCreateRow extends GUI {
 			} else if(i == 13) {
 				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
 					try {
-						if((itemIn1.getType().equals(Material.AIR) && itemIn2.getType().equals(Material.AIR) && itemOut1.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR)))
+						if((itemIn.getType().equals(Material.AIR) && itemIn2.getType().equals(Material.AIR) && itemOut.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR)))
 							return;
 					} catch(Exception e) { return; }
 
 					try {
-					if((itemOut1.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR)) || (itemIn1.getType().equals(Material.AIR) && itemIn1.getType().equals(Material.AIR)))
+					if((itemOut.getType().equals(Material.AIR) && itemOut2.getType().equals(Material.AIR)) || (itemIn.getType().equals(Material.AIR) && itemIn.getType().equals(Material.AIR)))
 						return;
 					} catch(Exception e) { return; }
 
-					shop.getRows()[index] = new RowStore(itemOut1, itemOut2, itemIn1, itemIn2, false);
+					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
 					InvAdminShop inv = new InvAdminShop(shop);
 					inv.open(p);
 				});
@@ -78,11 +78,11 @@ public class InvCreateRow extends GUI {
 				} else { placeItem(event.getRawSlot(), item); }
 
 				if(event.getRawSlot() == 10)
-					itemOut1 = item;
+					itemOut = item;
 				else if(event.getRawSlot() == 11)
 					itemOut2 = item;
 				else if(event.getRawSlot() == 15)
-					itemIn1 = item;
+					itemIn = item;
 				else if(event.getRawSlot() == 16)
 					itemIn2 = item;
 

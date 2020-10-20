@@ -37,7 +37,7 @@ public class iShop extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		chainConnect = "jdbc:sqlite:"+getDataFolder().getAbsolutePath()+"/ishop.db";
+		chainConnect = "jdbc:sqlite:"+getDataFolder().getAbsolutePath()+"/shops.db";
 		this.setupEconomy();
 		this.createConfig();
 
@@ -80,9 +80,9 @@ public class iShop extends JavaPlugin {
 		PreparedStatement[] stmts = new PreparedStatement[] {};
 		try {
 			stmts = new PreparedStatement[] {
-					connection.prepareStatement("CREATE TABLE IF NOT EXISTS ishopShops(id INTEGER PRIMARY KEY autoincrement, location varchar(64), owner varchar(64));"),
-					connection.prepareStatement("CREATE TABLE IF NOT EXISTS ishopShopsRows(itemIn1 text, itemIn2 text, itemOut1 text, itemOut2 text, idShop INTEGER);"),
-					connection.prepareStatement("CREATE TABLE IF NOT EXISTS ishopStock(owner varchar(64), items JSON);")
+					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaTiendas(id INTEGER PRIMARY KEY autoincrement, location varchar(64), owner varchar(64));"),
+					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaTiendasFilas(itemIn text, itemOut text, idTienda INTEGER);"),
+					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaStocks(owner varchar(64), items JSON);")
 			};
 		} catch(Exception e) { e.printStackTrace(); }
 
@@ -95,9 +95,11 @@ public class iShop extends JavaPlugin {
 
 		List<PreparedStatement> stmtsPatches = new ArrayList<>();
 		try {
-			stmtsPatches.add(connection.prepareStatement("ALTER TABLE ishopShopsRows ADD COLUMN broadcast BOOLEAN DEFAULT 0"));
-			stmtsPatches.add(connection.prepareStatement("ALTER TABLE ishopStock ADD COLUMN pag INTEGER DEFAULT 0"));
-			stmtsPatches.add(connection.prepareStatement("ALTER TABLE ishopShops ADD COLUMN admin BOOLEAN DEFAULT FALSE;"));
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemIn2 text NULL DEFAULT 'v: 2580\ntype: AIR\namount: 0' "));
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemOut2 text NULL DEFAULT 'v: 2580\ntype: AIR\namount: 0' "));
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN broadcast BOOLEAN DEFAULT 0"));
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaStocks ADD COLUMN pag INTEGER DEFAULT 0"));
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendas ADD COLUMN admin BOOLEAN DEFAULT FALSE;"));
 		} catch(Exception ignored) { }
 
 		for(PreparedStatement stmtsPatch : stmtsPatches) {

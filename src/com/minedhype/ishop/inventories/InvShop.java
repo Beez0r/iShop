@@ -22,7 +22,7 @@ public class InvShop extends GUI {
 					} else {
 						Optional<RowStore> row = shop.getRow(y-1);
 						if(row.isPresent()) {
-							placeItem(y*9+x, row.get().getItemOut1());
+							placeItem(y*9+x, row.get().getItemOut());
 						}
 					}
 				} else if(x == 2) {
@@ -40,7 +40,7 @@ public class InvShop extends GUI {
 					} else {
 						Optional<RowStore> row = shop.getRow(y-1);
 						if(row.isPresent()) {
-							placeItem(y*9+x, row.get().getItemIn1());
+							placeItem(y*9+x, row.get().getItemIn());
 						}
 					}
 				} else if(x == 6) {
