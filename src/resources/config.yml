@@ -32,6 +32,9 @@ enableOutOfStockMessages: true
 # Time in seconds before shop owner receives another message about being out of stock when someone tries to buy item(s)
 noStockCooldown: 300
 
+# Require player to own at least 1 shop to access stock
+mustOwnShopForStock: true
+
 # Amount of money needed to create a shop
 # Set to 0 to disable
 createCost: 0.0
@@ -87,7 +90,7 @@ createTitle: "CREATE"
 deleteTitle: "DELETE"
 disabledShopBlock: "&cCannot create shop location when shop blocks are disabled!"
 existingShop: "&cCannot create shop where existing shop is already located!"
-foundShops: "&6Found&a %shops &6shops for player:&a %p"
+foundShops: "&6Found&a %shops &6shop(s) for player:&a %p"
 location: "&6Shop&a %id &6location XYZ: "
 noItems: "&cYou do not have enough item(s) to buy from this shop!"
 noMoney: "&cYou do not have enough money to create a shop! You need at least &o$"

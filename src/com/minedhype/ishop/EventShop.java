@@ -15,6 +15,7 @@ public class EventShop implements Listener {
 	public static boolean adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
 	public static boolean stockEnabled = iShop.config.getBoolean("enableStockBlock");
 	public static boolean shopEnabled = iShop.config.getBoolean("enableShopBlock");
+	public static boolean noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
 	public static String shopBlock = iShop.config.getString("shopBlock");
 	public static String stockBlock = iShop.config.getString("stockBlock");
 	public static Material shopBlk = Material.matchMaterial(shopBlock);
@@ -56,7 +57,7 @@ public class EventShop implements Listener {
 
 			event.setCancelled(true);
 			if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
-				if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1) {
+				if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1 && noShopNoStock) {
 					event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
 					return;
 				}

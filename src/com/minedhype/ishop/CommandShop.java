@@ -392,7 +392,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		if(Shop.getNumShops(player.getUniqueId()) < 1) {
+		if(Shop.getNumShops(player.getUniqueId()) < 1 && iShop.config.getBoolean("mustOwnShopForStock")) {
 			player.sendMessage(Messages.NO_SHOP_STOCK.toString());
 			return;
 		}
@@ -422,6 +422,7 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
 
 		EventShop.adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
+		EventShop.noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
 		EventShop.shopBlock = iShop.config.getString("shopBlock");
 		EventShop.stockBlock = iShop.config.getString("stockBlock");
 		EventShop.stockEnabled = iShop.config.getBoolean("enableStockBlock");
