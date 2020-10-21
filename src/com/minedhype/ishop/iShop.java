@@ -165,7 +165,7 @@ public class iShop extends JavaPlugin {
 					config.set("buyTitle2","PRICE TO BUY ITEMS [SLOT 2]");
 					config.set("sellTitle","ITEMS FOR SALE [SLOT 1]");
 					config.set("sellTitle2","ITEMS FOR SALE [SLOT 2]");
-					config.set("foundShops", "&6Found&a %shops &6for player:&a %p");
+					config.set("foundShops", "&6Found&a %shops &6shops for player:&a %p");
 					config.set("location", "&6Shop&a %id &6location XYZ: ");
 					config.set("enableShopNotifications", true);
 					config.set("enableOutOfStockMessages", true);
