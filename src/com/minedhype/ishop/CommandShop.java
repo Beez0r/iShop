@@ -403,6 +403,7 @@ public class CommandShop implements CommandExecutor {
 		} else { InvStock.inShopInv.put(player, player.getUniqueId()); }
 
 		InvStock inv = InvStock.getInvStock(player.getUniqueId());
+		inv.setPag(0);
 		inv.open(player);
 	}
 
