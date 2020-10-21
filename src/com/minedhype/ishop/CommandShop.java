@@ -429,6 +429,8 @@ public class CommandShop implements CommandExecutor {
 		EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
 		EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
 		Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
+		Shop.shopNotifications = iShop.config.getBoolean("enableShopNotifications");
+		Shop.shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
 		Shop.particleEffects = iShop.config.getBoolean("showParticles");
 		Shop.maxDays = iShop.config.getInt("maxInactiveDays");
 	}

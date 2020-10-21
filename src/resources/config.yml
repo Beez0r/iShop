@@ -23,6 +23,12 @@ enableStockCommand: true
 # Number of pages to have in the stock GUI
 stockPages: 5
 
+# Enable sending of messages when players have purchased or sold item(s) from shops
+enableShopNotifications: true
+
+# Enable sending of messages to shop owners if item(s) are out of stock when players try to purchase
+enableOutOfStockMessages: true
+
 # Time in seconds before shop owner receives another message about being out of stock when someone tries to buy item(s)
 noStockCooldown: 300
 

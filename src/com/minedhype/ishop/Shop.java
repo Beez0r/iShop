@@ -33,7 +33,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class Shop {
+	public static boolean shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
 	public static boolean shopEnabled = iShop.config.getBoolean("enableShopBlock");
+	public static boolean shopNotifications = iShop.config.getBoolean("enableShopNotifications");
 	public static boolean particleEffects = iShop.config.getBoolean("showParticles");
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
 	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
@@ -376,24 +378,25 @@ public class Shop {
 			if(!Utils.hasStock(this, row.get().getItemOut()) || !Utils.hasStock(this, row.get().getItemOut2())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 				Player ownerPlayer = Bukkit.getPlayer(owner);
-				if(cdTime.containsKey(ownerPlayer)) {
-					int cdTimeInSec = iShop.config.getInt("noStockCooldown");
-					long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
-					if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-						if(!row.get().getItemOut().getType().toString().equals("AIR"))
-							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+				if(shopOutStock) {
+					if(cdTime.containsKey(ownerPlayer)) {
+						int cdTimeInSec = iShop.config.getInt("noStockCooldown");
+						long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
+						if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
+							if(!row.get().getItemOut().getType().toString().equals("AIR"))
+								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
+							if(!row.get().getItemOut2().getType().toString().equals("AIR"))
+								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
+						}
+					} else {
+						cdTime.put(ownerPlayer, System.currentTimeMillis());
+						if(ownerPlayer != null && ownerPlayer.isOnline() && shopNotifications)
+							if(!row.get().getItemOut().getType().toString().equals("AIR"))
+								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
 						if(!row.get().getItemOut2().getType().toString().equals("AIR"))
 							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
 					}
-				} else {
-					cdTime.put(ownerPlayer, System.currentTimeMillis());
-					if(ownerPlayer != null && ownerPlayer.isOnline())
-						if(!row.get().getItemOut().getType().toString().equals("AIR"))
-							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-						if(!row.get().getItemOut2().getType().toString().equals("AIR"))
-							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
 				}
-
 				return;
 			}
 		}
@@ -448,7 +451,7 @@ public class Shop {
 					this.giveItem(row.get().getItemIn2().clone());
 
 			Player ownerPlayer = Bukkit.getPlayer(owner);
-			if(ownerPlayer != null && ownerPlayer.isOnline()) {
+			if(ownerPlayer != null && ownerPlayer.isOnline() && shopNotifications) {
 				if(inA1 == 0 && outA1 == 0) {
 					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString()
 							.replaceAll("%in", o2)
@@ -544,7 +547,7 @@ public class Shop {
 						.replaceAll("%p", player.getName()));
 			}
 		}
-		if(!row.get().broadcast) {
+		if(!row.get().broadcast && shopNotifications) {
 			if(inA1 == 0 && outA1 == 0) {
 				player.sendMessage(Messages.SHOP_PURCHASE.toString()
 						.replaceAll("%in", o2)
