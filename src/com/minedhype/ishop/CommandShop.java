@@ -272,7 +272,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		Shop newShop = Shop.createShop(block.getLocation(), player.getUniqueId(), true);
+		Shop newShop = Shop.createShop(block.getLocation(), UUID.fromString("00000000-0000-0000-0000-000000000000"), true);
 		player.sendMessage(Messages.SHOP_CREATED.toString());
 		InvAdminShop inv = new InvAdminShop(newShop);
 		inv.open(player, newShop.getOwner());
@@ -392,7 +392,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		if(Shop.getNumShops(player.getUniqueId()) < 1) {
+		if(Shop.getNumShops(player.getUniqueId()) < 1 && iShop.config.getBoolean("mustOwnShopForStock")) {
 			player.sendMessage(Messages.NO_SHOP_STOCK.toString());
 			return;
 		}
@@ -403,6 +403,7 @@ public class CommandShop implements CommandExecutor {
 		} else { InvStock.inShopInv.put(player, player.getUniqueId()); }
 
 		InvStock inv = InvStock.getInvStock(player.getUniqueId());
+		inv.setPag(0);
 		inv.open(player);
 	}
 
@@ -422,6 +423,7 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
 
 		EventShop.adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
+		EventShop.noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
 		EventShop.shopBlock = iShop.config.getString("shopBlock");
 		EventShop.stockBlock = iShop.config.getString("stockBlock");
 		EventShop.stockEnabled = iShop.config.getBoolean("enableStockBlock");
@@ -429,6 +431,8 @@ public class CommandShop implements CommandExecutor {
 		EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
 		EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
 		Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
+		Shop.shopNotifications = iShop.config.getBoolean("enableShopNotifications");
+		Shop.shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
 		Shop.particleEffects = iShop.config.getBoolean("showParticles");
 		Shop.maxDays = iShop.config.getInt("maxInactiveDays");
 	}
@@ -558,6 +562,7 @@ public class CommandShop implements CommandExecutor {
 		} else { InvStock.inShopInv.put(player, sOwner); }
 
 		InvStock inv = InvStock.getInvStock(sOwner);
+		inv.setPag(0);
 		inv.open(player);
 	}
 }

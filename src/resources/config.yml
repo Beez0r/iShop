@@ -23,8 +23,17 @@ enableStockCommand: true
 # Number of pages to have in the stock GUI
 stockPages: 5
 
+# Enable sending of messages when players have purchased or sold item(s) from shops
+enableShopNotifications: true
+
+# Enable sending of messages to shop owners if item(s) are out of stock when players try to purchase
+enableOutOfStockMessages: true
+
 # Time in seconds before shop owner receives another message about being out of stock when someone tries to buy item(s)
 noStockCooldown: 300
+
+# Require player to own at least 1 shop to access stock
+mustOwnShopForStock: true
 
 # Amount of money needed to create a shop
 # Set to 0 to disable
@@ -74,12 +83,15 @@ broadcastOff: "Broadcast OFF"
 broadcastOn: "Broadcast ON"
 buy: "&7You bought&a %in &7for&c %out&7!"
 buyAction: "BUY"
-buyTitle: "PRICE TO BUY ITEMS"
+buyTitle: "PRICE TO BUY ITEMS [SLOT 1]"
+buyTitle2: "PRICE TO BUY ITEMS [SLOT 2]"
 createShopTitle: "Create shop trades!"
 createTitle: "CREATE"
 deleteTitle: "DELETE"
 disabledShopBlock: "&cCannot create shop location when shop blocks are disabled!"
 existingShop: "&cCannot create shop where existing shop is already located!"
+foundShops: "&6Found&a %shops &6shop(s) for player:&a %p"
+location: "&6Shop&a %id &6location XYZ: "
 noItems: "&cYou do not have enough item(s) to buy from this shop!"
 noMoney: "&cYou do not have enough money to create a shop! You need at least &o$"
 noPermissions: "&cYou do not have permission for this command!"
@@ -97,7 +109,8 @@ playerInventoryFull: "&cYour inventory is FULL! Cannot buy any items!"
 playerShopCreated: "&7Shop has been &aCREATED&7 for&a %p &7!"
 reload: "&7Configuration file reloaded."
 sell: "&7%p has bought&7&c %in &7for&a %out&7!"
-sellTitle: "ITEMS FOR SALE"
+sellTitle: "ITEMS FOR SALE [SLOT 1]"
+sellTitle2: "ITEMS FOR SALE [SLOT 2]"
 shopBusy: "&6Shop is currently busy, try again soon!"
 shopCreated: "&7Targeted shop has been &aCREATED&7!"
 shopDeleted: "&7Targeted shop has been &cDELETED&7!"
@@ -119,4 +132,4 @@ notPlayer: "&cOnly players in the game can use shop commands!"
 shopText: "&6Remotely shop here!"
 
 # Do not edit this!
-configVersion: 1.1
+configVersion: 2.0

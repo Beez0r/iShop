@@ -23,9 +23,11 @@ public enum Messages {
 	SHOP_CREATED("shopCreated"),
 	SHOP_CREATE_NO_MONEY("noMoney"),
 	SHOP_DELETED("shopDeleted"),
+	SHOP_FOUND("foundShops"),
 	SHOP_IDDELETED("shopIDDeleted"),
 	SHOP_ID_INTEGER("shopIntegerError"),
 	SHOP_LIST_ADMINSHOPS("listAdminShop"),
+	SHOP_LOCATION("location"),
 	SHOP_MAX("shopLimit"),
 	SHOP_NOT_FOUND("noShopFound"),
 	SHOP_NO_ADMINSHOPS_FOUND("noAdminShopsFound"),
@@ -43,12 +45,14 @@ public enum Messages {
 	SHOP_TITLE_BROADCAST_OFF("broadcastOff"),
 	SHOP_TITLE_BROADCAST_ON("broadcastOn"),
 	SHOP_TITLE_BUY("buyTitle"),
+	SHOP_TITLE_BUY2("buyTitle2"),
 	SHOP_TITLE_BUYACTION("buyAction"),
 	SHOP_TITLE_CREATE("createTitle"),
 	SHOP_TITLE_CREATESHOP("createShopTitle"),
 	SHOP_TITLE_DELETE("deleteTitle"),
 	SHOP_TITLE_NORMAL_SHOP("normalShop"),
 	SHOP_TITLE_SELL("sellTitle"),
+	SHOP_TITLE_SELL2("sellTitle2"),
 	SHOP_TITLE_STOCK("stockTitle"),
 	STOCK_COMMAND_DISABLED("stockCommandDisabled"),
 	TARGET_MISMATCH("targetMismatch");
@@ -61,9 +65,9 @@ public enum Messages {
 
 	@Override
 	public String toString() {
-		String trans = iShop.config.getString(msg);
-		if(trans == null)
-			trans = "&cError retrieving config message!";
-		return ChatColor.translateAlternateColorCodes('&', trans);
+		String translate = iShop.config.getString(msg);
+		if(translate == null)
+			translate = "&cError retrieving config message!";
+		return ChatColor.translateAlternateColorCodes('&', translate);
 	}
 }

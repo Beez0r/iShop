@@ -1,5 +1,7 @@
 package com.minedhype.ishop.gui;
 
+import com.minedhype.ishop.iShop;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,6 +48,7 @@ public class GUIEvent implements Listener {
 		if(gui != null)
 			gui.onClose(e);
 
+		Bukkit.getServer().getScheduler().runTaskLater(iShop.getPlugin(), player::updateInventory, 1);
 		GUI.inventoriesOpen.remove(player.getName());
 		InvStock.inShopInv.remove(player);
 	}

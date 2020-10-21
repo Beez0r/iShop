@@ -95,6 +95,8 @@ public class iShop extends JavaPlugin {
 
 		List<PreparedStatement> stmtsPatches = new ArrayList<>();
 		try {
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemIn2 text NULL DEFAULT 'v: 2580\ntype: AIR\namount: 0' "));
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemOut2 text NULL DEFAULT 'v: 2580\ntype: AIR\namount: 0' "));
 			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN broadcast BOOLEAN DEFAULT 0"));
 			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaStocks ADD COLUMN pag INTEGER DEFAULT 0"));
 			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendas ADD COLUMN admin BOOLEAN DEFAULT FALSE;"));
@@ -158,9 +160,19 @@ public class iShop extends JavaPlugin {
 					config.set("noStockBlock", "&cstockBlock cannot be empty! Reverting to default minecraft:composter");
 					config.set("notPlayer", "&cOnly players in the game can use shop commands!");
 					config.set("shopText", "&6Remotely shop here!");
-					config.set("configVersion", 1.1);
-					config.save(configFile);
 				case "1.1":
+					config.set("buyTitle","PRICE TO BUY ITEMS [SLOT 1]");
+					config.set("buyTitle2","PRICE TO BUY ITEMS [SLOT 2]");
+					config.set("sellTitle","ITEMS FOR SALE [SLOT 1]");
+					config.set("sellTitle2","ITEMS FOR SALE [SLOT 2]");
+					config.set("foundShops", "&6Found&a %shops &6shops(s) for player:&a %p");
+					config.set("location", "&6Shop&a %id &6location XYZ: ");
+					config.set("enableShopNotifications", true);
+					config.set("enableOutOfStockMessages", true);
+					config.set("mustOwnShopForStock", true);
+					config.set("configVersion", 2.0);
+					config.save(configFile);
+				case "2.0":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

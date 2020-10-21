@@ -17,7 +17,7 @@ public class InvShop extends GUI {
 		for(int x=0; x<9; x++) {
 			for(int y=0; y<6; y++) {
 				if(x == 1) {
-					if(y == 0 || y == 5) {
+					if(y == 0) {
 						placeItem(y*9+x, GUI.createItem(Material.GREEN_STAINED_GLASS_PANE, ChatColor.GREEN+ Messages.SHOP_TITLE_SELL.toString()));
 					} else {
 						Optional<RowStore> row = shop.getRow(y-1);
@@ -25,16 +25,34 @@ public class InvShop extends GUI {
 							placeItem(y*9+x, row.get().getItemOut());
 						}
 					}
-				} else if(x == 4) {
-					if(y == 0 || y == 5) {
-						placeItem(y*9+x, GUI.createItem(Material.RED_STAINED_GLASS_PANE, ChatColor.RED+ Messages.SHOP_TITLE_BUY.toString()));
+				} else if(x == 2) {
+					if(y == 0) {
+						placeItem(y*9+x, GUI.createItem(Material.GREEN_STAINED_GLASS_PANE, ChatColor.GREEN+ Messages.SHOP_TITLE_SELL2.toString()));
+					} else {
+						Optional<RowStore> row = shop.getRow(y-1);
+						if(row.isPresent()) {
+							placeItem(y*9+x, row.get().getItemOut2());
+						}
+					}
+				} else if(x == 5) {
+					if(y == 0) {
+						placeItem(x, GUI.createItem(Material.RED_STAINED_GLASS_PANE, ChatColor.RED+ Messages.SHOP_TITLE_BUY.toString()));
 					} else {
 						Optional<RowStore> row = shop.getRow(y-1);
 						if(row.isPresent()) {
 							placeItem(y*9+x, row.get().getItemIn());
 						}
 					}
-				} else if(x == 7 && y >= 1 && y <= 4) {
+				} else if(x == 6) {
+					if(y == 0) {
+						placeItem(y*9+x, GUI.createItem(Material.RED_STAINED_GLASS_PANE, ChatColor.RED+ Messages.SHOP_TITLE_BUY2.toString()));
+					} else {
+						Optional<RowStore> row = shop.getRow(y-1);
+						if(row.isPresent()) {
+							placeItem(y*9+x, row.get().getItemIn2());
+						}
+					}
+				} else if(x == 8 && y >= 1) {
 					Optional<RowStore> row = shop.getRow(y-1);
 					if(row.isPresent()) {
 						final int index = y-1;

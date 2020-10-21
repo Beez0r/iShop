@@ -12,35 +12,48 @@ import com.minedhype.ishop.RowStore;
 import com.minedhype.ishop.Messages;
 import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.gui.GUI;
-import java.util.Objects;
 
 public class InvCreateRow extends GUI {
 	private ItemStack itemIn;
+	private ItemStack itemIn2;
 	private ItemStack itemOut;
+	private ItemStack itemOut2;
+	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	
 	public InvCreateRow(Shop shop, int index) {
 		super(9*3, Messages.SHOP_TITLE_CREATESHOP.toString());
 		
 		for(int i=0; i<9*3; i++) {
-			if(i == 2) {
+			if(i == 1) {
 				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + Messages.SHOP_TITLE_SELL.toString()));
+			} else if(i == 2) {
+				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + Messages.SHOP_TITLE_SELL2.toString()));
 			} else if(i == 6) {
 				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + Messages.SHOP_TITLE_BUY.toString()));
-			} else if(i == 11) {	// Item reserve
+			} else if(i == 7) {
+				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + Messages.SHOP_TITLE_BUY2.toString()));
+			} else if(i == 10 || i == 11) {
 			} else if(i == 13) {
 				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
-					if(itemIn == null || itemIn.getType().equals(Material.AIR)) {
+					if(itemIn == null)
+						itemIn = airItem;
+					if(itemIn2 == null)
+						itemIn2 = airItem;
+					if(itemOut == null)
+						itemOut = airItem;
+					if(itemOut2 == null)
+						itemOut2 = airItem;
+
+					if(itemIn == airItem && itemIn2 == airItem && itemOut == airItem && itemOut2 == airItem)
 						return;
-					}
-					if(itemOut == null || itemOut.getType().equals(Material.AIR)) {
+					if((itemOut == airItem && itemOut2 == airItem) || (itemIn == airItem && itemIn2 == airItem))
 						return;
-					}
-					
-					shop.getRows()[index] = new RowStore(itemOut, itemIn, false);
+
+					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
 					InvAdminShop inv = new InvAdminShop(shop);
 					inv.open(p);
 				});
-			} else if(i == 15) {	// Item reserve
+			} else if(i == 15 || i == 16) {
 			} else { placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, "")); }
 		}
 	}
@@ -61,21 +74,25 @@ public class InvCreateRow extends GUI {
 		
 		event.setCancelled(false);
 		Inventory inv = event.getClickedInventory();
-		if(Objects.requireNonNull(inv).getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString())) {
+		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString())) {
 			event.setCancelled(true);
 			
-			if(event.getRawSlot() == 11 || event.getRawSlot() == 15) {				
-				ItemStack item =  Objects.requireNonNull(event.getCursor()).clone();
+			if(event.getRawSlot() == 10 || event.getRawSlot() == 11 || event.getRawSlot() == 15 || event.getRawSlot() == 16) {
+				ItemStack item =  event.getCursor().clone();
 				
-				if(event.getClick().isRightClick()) {				
+				if(event.getClick().isRightClick())
 					item.setAmount(1);
-					placeItem(event.getRawSlot(), item);
-				} else { placeItem(event.getRawSlot(), item); }
+				placeItem(event.getRawSlot(), item);
 
-				if(event.getRawSlot() == 11)
+				if(event.getRawSlot() == 10)
 					itemOut = item;
+				else if(event.getRawSlot() == 11)
+					itemOut2 = item;
 				else if(event.getRawSlot() == 15)
 					itemIn = item;
+				else if(event.getRawSlot() == 16)
+					itemIn2 = item;
+
 			}			
 		}
 	}
