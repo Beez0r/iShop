@@ -562,6 +562,7 @@ public class CommandShop implements CommandExecutor {
 		} else { InvStock.inShopInv.put(player, sOwner); }
 
 		InvStock inv = InvStock.getInvStock(sOwner);
+		inv.setPag(0);
 		inv.open(player);
 	}
 }
