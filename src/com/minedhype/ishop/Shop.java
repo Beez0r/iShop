@@ -342,11 +342,7 @@ public class Shop {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 		} else {
-			if(!Utils.hasStock(player, row.get().getItemIn())) {
-				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
-				return;
-			}
-			if(!Utils.hasStock(player, row.get().getItemIn2())) {
+			if(!Utils.hasStock(player, row.get().getItemIn()) || !Utils.hasStock(player, row.get().getItemIn2())) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 			}
@@ -391,11 +387,12 @@ public class Shop {
 						}
 					} else {
 						cdTime.put(ownerPlayer, System.currentTimeMillis());
-						if(ownerPlayer != null && ownerPlayer.isOnline() && shopNotifications)
+						if(ownerPlayer != null && ownerPlayer.isOnline()) {
 							if(!row.get().getItemOut().getType().toString().equals("AIR"))
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-						if(!row.get().getItemOut2().getType().toString().equals("AIR"))
-							ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
+							if(!row.get().getItemOut2().getType().toString().equals("AIR"))
+								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
+						}
 					}
 				}
 				return;
