@@ -350,8 +350,8 @@ public class Shop {
 
 		if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(this, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
-				Player ownerPlayer = Bukkit.getPlayer(owner);
 				if(shopOutStock) {
+					Player ownerPlayer = Bukkit.getPlayer(owner);
 					if(cdTime.containsKey(ownerPlayer)) {
 						int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 						long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
@@ -372,20 +372,16 @@ public class Shop {
 				}
 				return;
 		} else {
-			if(!Utils.hasStock(this, row.get().getItemOut()) || !Utils.hasStock(this, row.get().getItemOut2())) {
+			if(!Utils.hasStock(this, row.get().getItemOut())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
-				Player ownerPlayer = Bukkit.getPlayer(owner);
 				if(shopOutStock) {
+					Player ownerPlayer = Bukkit.getPlayer(owner);
 					if(cdTime.containsKey(ownerPlayer)) {
 						int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 						long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
 						if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
 							if(!row.get().getItemOut().getType().toString().equals("AIR")) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-								cdTime.put(ownerPlayer, System.currentTimeMillis());
-							}
-							if(!row.get().getItemOut2().getType().toString().equals("AIR")) {
-								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
 								cdTime.put(ownerPlayer, System.currentTimeMillis());
 							}
 						}
@@ -395,6 +391,26 @@ public class Shop {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
 								cdTime.put(ownerPlayer, System.currentTimeMillis());
 							}
+						}
+					}
+				}
+				return;
+			}
+			if(!Utils.hasStock(this, row.get().getItemOut2())) {
+				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
+				Player ownerPlayer = Bukkit.getPlayer(owner);
+				if(shopOutStock) {
+					if(cdTime.containsKey(ownerPlayer)) {
+						int cdTimeInSec = iShop.config.getInt("noStockCooldown");
+						long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
+						if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
+							if(!row.get().getItemOut2().getType().toString().equals("AIR")) {
+								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
+								cdTime.put(ownerPlayer, System.currentTimeMillis());
+							}
+						}
+					} else {
+						if(ownerPlayer != null && ownerPlayer.isOnline()) {
 							if(!row.get().getItemOut2().getType().toString().equals("AIR")) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
 								cdTime.put(ownerPlayer, System.currentTimeMillis());
