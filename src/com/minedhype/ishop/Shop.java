@@ -364,8 +364,6 @@ public class Shop {
 						if(ownerPlayer != null && ownerPlayer.isOnline()) {
 							if(!row.get().getItemOut().getType().toString().equals("AIR"))
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-							if(!row.get().getItemOut2().getType().toString().equals("AIR"))
-								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
 							cdTime.put(ownerPlayer, System.currentTimeMillis());
 						}
 					}
