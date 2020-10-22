@@ -356,15 +356,17 @@ public class Shop {
 						int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 						long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
 						if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-							if(!row.get().getItemOut().getType().toString().equals("AIR"))
+							if(!row.get().getItemOut().getType().toString().equals("AIR")) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-							cdTime.put(ownerPlayer, System.currentTimeMillis());
+								cdTime.put(ownerPlayer, System.currentTimeMillis());
+							}
 						}
 					} else {
 						if(ownerPlayer != null && ownerPlayer.isOnline()) {
-							if(!row.get().getItemOut().getType().toString().equals("AIR"))
+							if(!row.get().getItemOut().getType().toString().equals("AIR")) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-							cdTime.put(ownerPlayer, System.currentTimeMillis());
+								cdTime.put(ownerPlayer, System.currentTimeMillis());
+							}
 						}
 					}
 				}
@@ -378,18 +380,25 @@ public class Shop {
 						int cdTimeInSec = iShop.config.getInt("noStockCooldown");
 						long secondsLeft = ((cdTime.get(ownerPlayer) / 1000) + cdTimeInSec) - (System.currentTimeMillis() / 1000);
 						if(ownerPlayer != null && ownerPlayer.isOnline() && secondsLeft < 0) {
-							if(!row.get().getItemOut().getType().toString().equals("AIR"))
+							if(!row.get().getItemOut().getType().toString().equals("AIR")) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-							if(!row.get().getItemOut2().getType().toString().equals("AIR"))
+								cdTime.put(ownerPlayer, System.currentTimeMillis());
+							}
+							if(!row.get().getItemOut2().getType().toString().equals("AIR")) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
+								cdTime.put(ownerPlayer, System.currentTimeMillis());
+							}
 						}
 					} else {
-						cdTime.put(ownerPlayer, System.currentTimeMillis());
 						if(ownerPlayer != null && ownerPlayer.isOnline()) {
-							if(!row.get().getItemOut().getType().toString().equals("AIR"))
+							if(!row.get().getItemOut().getType().toString().equals("AIR")) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut().getType().toString()));
-							if(!row.get().getItemOut2().getType().toString().equals("AIR"))
+								cdTime.put(ownerPlayer, System.currentTimeMillis());
+							}
+							if(!row.get().getItemOut2().getType().toString().equals("AIR")) {
 								ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", row.get().getItemOut2().getType().toString()));
+								cdTime.put(ownerPlayer, System.currentTimeMillis());
+							}
 						}
 					}
 				}
