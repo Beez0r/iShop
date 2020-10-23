@@ -409,7 +409,7 @@ public class CommandShop implements CommandExecutor {
 
 	private void listAllShops(Player player) {
 		if(!InvShop.listAllShops && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
-			player.sendMessage(Messages.DISABLED_SHOP_BLOCK.toString());
+			player.sendMessage(Messages.SHOP_LIST_DISABLED.toString());
 			return;
 		}
 

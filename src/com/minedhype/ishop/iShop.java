@@ -177,9 +177,11 @@ public class iShop extends JavaPlugin {
 					config.set("shopNumber", " shop #");
 					config.set("normalShop", "%player%'s Shop #");
 					config.set("adminShop", "Admin Shop #");
-					config.set("configVersion", 2.1);
-					config.save(configFile);
 				case "2.1":
+					config.set("shopListDisabled", "&cShops list has been disabled!");
+					config.set("configVersion", 2.2);
+					config.save(configFile);
+				case "2.2":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

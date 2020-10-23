@@ -28,6 +28,7 @@ public enum Messages {
 	SHOP_ID_INTEGER("shopIntegerError"),
 	SHOP_LIST_ADMINSHOPS("listAdminShop"),
 	SHOP_LIST_ALL("shopListTitle"),
+	SHOP_LIST_DISABLED("shopListDisabled"),
 	SHOP_LOCATION("location"),
 	SHOP_MAX("shopLimit"),
 	SHOP_NOT_FOUND("noShopFound"),
