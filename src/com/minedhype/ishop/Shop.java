@@ -95,9 +95,14 @@ public class Shop {
 	}
 
 	public static void getPlayersShopList() {
-		shops.parallelStream()
-				.filter (s -> !s.admin)
-				.forEach(s ->  shopList.putIfAbsent(s.idTienda, s.owner));
+		if(iShop.config.getBoolean("adminShopPublic")) {
+			shops.parallelStream()
+					.forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
+		} else {
+			shops.parallelStream()
+					.filter(s -> !s.admin)
+					.forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
+		}
 	}
 
 	public static void getShopList(Player player, UUID sOwner, String pOwner) {

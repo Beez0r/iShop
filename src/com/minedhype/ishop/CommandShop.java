@@ -408,6 +408,11 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private void listAllShops(Player player) {
+		if(!InvShop.listAllShops && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.DISABLED_SHOP_BLOCK.toString());
+			return;
+		}
+
 		InvShopList inv = InvShopList.setShopTitle(Messages.SHOP_LIST_ALL.toString());
 		inv.setPag(0);
 		inv.open(player);
