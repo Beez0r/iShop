@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,7 +41,7 @@ public class Shop {
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
 	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
 	private static final List<Shop> shops = new ArrayList<>();
-	public static final Map<Integer, UUID> shopList = new HashMap<>();
+	public static final ConcurrentHashMap<Integer, UUID> shopList = new ConcurrentHashMap<>();
 	private static final long millisecondsPerDay = 86400000;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	private final Map<Player, Long> cdTime = new HashMap<>();
@@ -96,8 +97,7 @@ public class Shop {
 
 	public static void getPlayersShopList() {
 		if(iShop.config.getBoolean("adminShopPublic")) {
-			shops.parallelStream()
-					.forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
+			shops.parallelStream().forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
 		} else {
 			shops.parallelStream()
 					.filter(s -> !s.admin)
