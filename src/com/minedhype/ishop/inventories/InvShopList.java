@@ -52,7 +52,6 @@ public class InvShopList extends GUI {
 	public void PlayerShopList() {
 		int index = pag * 45;
 		for(int i = 0; i < 45; i++) {
-			System.out.println(index);
 			if(index <= shopslist.size()-1) {
 				placeItem(i, shopslist.get(index));
 				index++;
@@ -108,7 +107,10 @@ public class InvShopList extends GUI {
 				SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
 				skullMeta.setOwningPlayer(offlinePlayer);
-				skullMeta.setDisplayName(offlinePlayer.getName() + Messages.SHOP_NUMBER.toString() + id);
+				if(Shop.shopList.get(id).equals(UUID.fromString("00000000-0000-0000-0000-000000000000")))
+					skullMeta.setDisplayName("Admin" + Messages.SHOP_NUMBER.toString() + id);
+				else
+					skullMeta.setDisplayName(offlinePlayer.getName() + Messages.SHOP_NUMBER.toString() + id);
 				List<String> skullLore = new ArrayList<>();
 				skullLore.add(id.toString());
 				skullMeta.setLore(skullLore);

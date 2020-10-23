@@ -175,6 +175,8 @@ public class iShop extends JavaPlugin {
 					config.set("publicShopListCommand", true);
 					config.set("shopListTitle", "Shops List");
 					config.set("shopNumber", " shop #");
+					config.set("normalShop", "&l%player%'s Shop #%p");
+					config.set("adminShop", "&lAdmin Shop #%p");
 					config.set("configVersion", 2.1);
 					config.save(configFile);
 				case "2.1":

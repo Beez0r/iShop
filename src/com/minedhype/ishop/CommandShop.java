@@ -67,7 +67,7 @@ public class CommandShop implements CommandExecutor {
 			manageStock(player, args[1]);
 		else if(args[0].equalsIgnoreCase("reload"))
 			reloadShop(player);
-		else if(args[0].equalsIgnoreCase("listshops"))
+		else if(args[0].equalsIgnoreCase("shops"))
 			listAllShops(player);
 		else if(args[0].equalsIgnoreCase("stock"))
 			stockShop(player);
@@ -88,7 +88,7 @@ public class CommandShop implements CommandExecutor {
 		if(iShop.config.getBoolean("publicListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " list <player>");
 		if(iShop.config.getBoolean("publicShopListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
-			player.sendMessage(ChatColor.GRAY + "/" + label + " listshops");
+			player.sendMessage(ChatColor.GRAY + "/" + label + " shops");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " manage <id>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " stock");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " view <id>");

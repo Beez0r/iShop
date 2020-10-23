@@ -21,9 +21,9 @@ public class InvAdminShop extends GUI {
 
 	private static String getShopName(Shop shop) {
 		if(shop.isAdmin())
-			return Messages.SHOP_TITLE_ADMIN_SHOP.toString();
+			return Messages.SHOP_TITLE_ADMIN_SHOP.toString() + shop.shopId();
 
-		String msg = Messages.SHOP_TITLE_NORMAL_SHOP.toString();
+		String msg = Messages.SHOP_TITLE_NORMAL_SHOP.toString() + shop.shopId();
 		OfflinePlayer pl = Bukkit.getOfflinePlayer(shop.getOwner());
 		if(pl == null)
 			return msg.replaceAll("%player%", "<unknown>");
