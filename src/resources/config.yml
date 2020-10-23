@@ -83,7 +83,7 @@ publicShopListCommand: true
 adminShopPublic: true
 
 # Customizable Messages
-adminShop: "&lAdmin Shop #"
+adminShop: "Admin Shop #"
 adminShopDisabled: "&cAdmin shops have been disabled!"
 broadcastOff: "Broadcast OFF"
 broadcastOn: "Broadcast ON"
@@ -105,7 +105,7 @@ noPlayerFound: "&cPlayer cannot be found!"
 noPlayerShop: "&cPlayer name does not exist! Cannot list player shop!"
 noRemoteManage: "&cRemote management of shops has been disabled!"
 noRemoteShops: "&cRemote shopping has been disabled!"
-normalShop: "&l%player%'s Shop #"
+normalShop: "%player%'s Shop #"
 noShopFound: "&cNo shop can be found!"
 noShopStock: "&cCannot access stock because you do not have any shops!"
 noStock: "&cThis shop is currently out of stock of that item(s)!"
