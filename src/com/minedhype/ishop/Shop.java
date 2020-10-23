@@ -39,9 +39,9 @@ public class Shop {
 	public static boolean shopNotifications = iShop.config.getBoolean("enableShopNotifications");
 	public static boolean particleEffects = iShop.config.getBoolean("showParticles");
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
-	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
-	private static final List<Shop> shops = new ArrayList<>();
 	public static final ConcurrentHashMap<Integer, UUID> shopList = new ConcurrentHashMap<>();
+	private static final List<Shop> shops = new ArrayList<>();
+	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
 	private static final long millisecondsPerDay = 86400000;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	private final Map<Player, Long> cdTime = new HashMap<>();
