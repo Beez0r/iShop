@@ -21,6 +21,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import com.minedhype.ishop.inventories.InvAdminShop;
+import com.minedhype.ishop.inventories.InvShopList;
 import com.minedhype.ishop.inventories.InvStock;
 
 public class CommandShop implements CommandExecutor {
@@ -66,6 +67,8 @@ public class CommandShop implements CommandExecutor {
 			manageStock(player, args[1]);
 		else if(args[0].equalsIgnoreCase("reload"))
 			reloadShop(player);
+		else if(args[0].equalsIgnoreCase("listshops"))
+			listAllShops(player);
 		else if(args[0].equalsIgnoreCase("stock"))
 			stockShop(player);
 		else if(args[0].equalsIgnoreCase("view") && args.length >= 2)
@@ -84,6 +87,8 @@ public class CommandShop implements CommandExecutor {
 		player.sendMessage(ChatColor.GRAY + "/" + label + " list");
 		if(iShop.config.getBoolean("publicListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " list <player>");
+		if(iShop.config.getBoolean("publicShopListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
+			player.sendMessage(ChatColor.GRAY + "/" + label + " listshops");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " manage <id>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " stock");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " view <id>");
@@ -178,6 +183,10 @@ public class CommandShop implements CommandExecutor {
 
 		Shop newShop = Shop.createShop(block.getLocation(), player.getUniqueId());
 		player.sendMessage(Messages.SHOP_CREATED.toString());
+		Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
+			Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
+			Shop.shopList.put(shops.get().shopId(), player.getUniqueId());
+		}, 20);
 		InvAdminShop inv = new InvAdminShop(newShop);
 		inv.open(player, newShop.getOwner());
 	}
@@ -235,6 +244,10 @@ public class CommandShop implements CommandExecutor {
 			Shop.createShop(block.getLocation(), shopOwner);
 			player.sendMessage(Messages.PLAYER_SHOP_CREATED.toString()
 					.replaceAll("%p", playerShop));
+			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
+				Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
+				Shop.shopList.put(shops.get().shopId(), shopOwner);
+			}, 20);
 		} else { player.sendMessage(Messages.EXISTING_SHOP.toString()); }
 	}
 
@@ -274,6 +287,12 @@ public class CommandShop implements CommandExecutor {
 
 		Shop newShop = Shop.createShop(block.getLocation(), UUID.fromString("00000000-0000-0000-0000-000000000000"), true);
 		player.sendMessage(Messages.SHOP_CREATED.toString());
+		if(iShop.config.getBoolean("adminShopPublic")) {
+			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
+				Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
+				Shop.shopList.put(shops.get().shopId(), UUID.fromString("00000000-0000-0000-0000-000000000000"));
+			}, 20);
+		}
 		InvAdminShop inv = new InvAdminShop(newShop);
 		inv.open(player, newShop.getOwner());
 	}
@@ -308,6 +327,7 @@ public class CommandShop implements CommandExecutor {
 			economy.get().depositPlayer(offPlayer, cost);
 		}
 
+		Shop.shopList.remove(shop.get().shopId());
 		shop.get().deleteShop();
 		player.sendMessage(Messages.SHOP_DELETED.toString());
 	}
@@ -351,6 +371,7 @@ public class CommandShop implements CommandExecutor {
 			economy.get().depositPlayer(offPlayer, cost);
 		}
 
+		Shop.shopList.remove(shop.get().shopId());
 		shop.get().deleteShop();
 		player.sendMessage(Messages.SHOP_IDDELETED.toString()
 				.replaceAll("%id", shopId));
@@ -384,6 +405,12 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 		Shop.getAdminShopList(player);
+	}
+
+	private void listAllShops(Player player) {
+		InvShopList inv = InvShopList.setShopTitle(Messages.SHOP_LIST_ALL.toString());
+		inv.setPag(0);
+		inv.open(player);
 	}
 
 	private void stockShop(Player player) {
@@ -430,6 +457,7 @@ public class CommandShop implements CommandExecutor {
 		EventShop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
 		EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
 		EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
+		InvShop.listAllShops = iShop.config.getBoolean("publicShopListCommand");
 		Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
 		Shop.shopNotifications = iShop.config.getBoolean("enableShopNotifications");
 		Shop.shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");

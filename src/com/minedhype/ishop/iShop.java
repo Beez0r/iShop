@@ -63,6 +63,7 @@ public class iShop extends JavaPlugin {
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 50, 50);
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 3000, 3000);
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 6000, 6000);
+		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 100);
 	}
 
 	@Override
@@ -170,9 +171,13 @@ public class iShop extends JavaPlugin {
 					config.set("enableShopNotifications", true);
 					config.set("enableOutOfStockMessages", true);
 					config.set("mustOwnShopForStock", true);
-					config.set("configVersion", 2.0);
-					config.save(configFile);
 				case "2.0":
+					config.set("publicShopListCommand", true);
+					config.set("shopListTitle", "Shops List");
+					config.set("shopNumber", " shop #");
+					config.set("configVersion", 2.1);
+					config.save(configFile);
+				case "2.1":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

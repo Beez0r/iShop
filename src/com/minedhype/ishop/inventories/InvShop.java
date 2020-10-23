@@ -5,12 +5,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import com.minedhype.ishop.iShop;
 import com.minedhype.ishop.RowStore;
 import com.minedhype.ishop.Messages;
-import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.gui.GUI;
+import com.minedhype.ishop.Shop;
 
 public class InvShop extends GUI {
+	public static boolean listAllShops = iShop.config.getBoolean("publicShopListCommand");
+
 	public InvShop(Shop shop) {
 		super(54, getShopName(shop));
 		
@@ -52,6 +55,14 @@ public class InvShop extends GUI {
 							placeItem(y*9+x, row.get().getItemIn2());
 						}
 					}
+				}  else if(x == 8 && y == 0) {
+					if(listAllShops) {
+						placeItem(y*9+x, GUI.createItem(Material.END_CRYSTAL, Messages.SHOP_LIST_ALL.toString()), p -> {
+							p.closeInventory();
+							p.performCommand("shop listshops");
+						});
+					} else
+						placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 				} else if(x == 8 && y >= 1) {
 					Optional<RowStore> row = shop.getRow(y-1);
 					if(row.isPresent()) {

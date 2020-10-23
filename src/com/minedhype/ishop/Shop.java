@@ -40,6 +40,7 @@ public class Shop {
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
 	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
 	private static final List<Shop> shops = new ArrayList<>();
+	public static final Map<Integer, UUID> shopList = new HashMap<>();
 	private static final long millisecondsPerDay = 86400000;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	private final Map<Player, Long> cdTime = new HashMap<>();
@@ -91,6 +92,12 @@ public class Shop {
 
 	public static int getNumShops(UUID owner) {
 		return (int) shops.parallelStream().filter(t -> !t.admin && t.owner.equals(owner)).count();
+	}
+
+	public static void getPlayersShopList() {
+		shops.parallelStream()
+				.filter (s -> !s.admin)
+				.forEach(s ->  shopList.putIfAbsent(s.idTienda, s.owner));
 	}
 
 	public static void getShopList(Player player, UUID sOwner, String pOwner) {
@@ -720,6 +727,10 @@ public class Shop {
 
 	public UUID getOwner() {
 		return owner;
+	}
+
+	public int shopId() {
+		return this.idTienda;
 	}
 
 	public Location getLocation() {
