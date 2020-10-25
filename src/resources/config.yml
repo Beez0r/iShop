@@ -73,7 +73,7 @@ remoteManage: true
 # Allow everyone to use "/shop view <id>" command to view other players shop remotely
 remoteShopping: false
 
-# Allow everyone to use "/shop list <player>" command to view full list of given players shops
+# Allow everyone to use "/shop list <player>" command to view full list of given players shops with location
 publicListCommand: false
 
 # Allow everyone to use "/shop shops" command to view all found player shops
@@ -82,8 +82,8 @@ publicShopListCommand: true
 # This will show admin shops when using "/shop shops" -- Requires server restart if config option changed!
 adminShopPublic: true
 
-# Setting this to true will show shops that player owns when using command "/shop shops"
-publicShopListShowsOwned: false
+# Setting this to false will hide shops that player owns when using command "/shop shops"
+publicShopListShowsOwned: true
 
 # Customizable Messages
 adminShop: "Admin Shop #"

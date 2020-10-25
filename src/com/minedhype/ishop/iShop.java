@@ -61,10 +61,10 @@ public class iShop extends JavaPlugin {
 			Shop.loadData();
 		} catch(Exception e) { e.printStackTrace(); }
 
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 200, 50);
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 20, 3000);
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 1000, 6000);
-		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 100);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 10, 3000);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 500, 6000);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 100, 50);
+		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 60);
 		MetricsLite metrics = new MetricsLite(this, 9189);
 	}
 
