@@ -18,6 +18,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import com.minedhype.ishop.gui.GUIEvent;
+import com.minedhype.ishop.MetricsLite;
 import net.milkbowl.vault.economy.Economy;
 
 public class iShop extends JavaPlugin {
@@ -64,6 +65,7 @@ public class iShop extends JavaPlugin {
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 100, 3000);
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 300, 6000);
 		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 600);
+		MetricsLite metrics = new MetricsLite(this, 9189);
 	}
 
 	@Override
