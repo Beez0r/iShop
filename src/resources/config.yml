@@ -71,7 +71,7 @@ defaultShopLimit: 5
 remoteManage: true
 
 # Allow everyone to use "/shop view <id>" command to view other players shop remotely
-remoteShopping: false
+remoteShopping: true
 
 # Allow everyone to use "/shop list <player>" command to view full list of given players shops with location
 publicListCommand: false
