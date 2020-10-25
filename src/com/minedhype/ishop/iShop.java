@@ -180,11 +180,12 @@ public class iShop extends JavaPlugin {
 					config.set("normalShop", "%player%'s Shop #");
 					config.set("adminShop", "Admin Shop #");
 				case "2.1":
+				case "2.2":
 					config.set("publicShopListShowsOwned", true);
 					config.set("shopListDisabled", "&cShops list has been disabled!");
-					config.set("configVersion", 2.2);
+					config.set("configVersion", 2.3);
 					config.save(configFile);
-				case "2.2":
+				case "2.3":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }
