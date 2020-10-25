@@ -453,7 +453,6 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.SHOP_RELOAD.toString());
 		else
 			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
-
 		EventShop.adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
 		EventShop.noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
 		EventShop.shopBlock = iShop.config.getString("shopBlock");
@@ -462,7 +461,9 @@ public class CommandShop implements CommandExecutor {
 		EventShop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
 		EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
 		EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
+		InvAdminShop.remoteManage = iShop.config.getBoolean("remoteManage");
 		InvShop.listAllShops = iShop.config.getBoolean("publicShopListCommand");
+		InvShopList.showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
 		Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
 		Shop.shopNotifications = iShop.config.getBoolean("enableShopNotifications");
 		Shop.shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
@@ -481,7 +482,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private static void shopManage(Player player, String shopID) {
-		if(!iShop.config.getBoolean("remoteManage") && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(!InvAdminShop.remoteManage && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(Messages.SHOP_REMOTE.toString());
 			return;
 		}
@@ -541,6 +542,11 @@ public class CommandShop implements CommandExecutor {
 		Optional<Shop> shop = Shop.getShopById(sID);
 		if(!shop.isPresent()) {
 			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
+			return;
+		}
+
+		if(shop.get().getOwner().equals(player.getUniqueId()) && !InvAdminShop.remoteManage && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.SHOP_REMOTE.toString());
 			return;
 		}
 

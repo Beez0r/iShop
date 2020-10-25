@@ -61,10 +61,10 @@ public class iShop extends JavaPlugin {
 			Shop.loadData();
 		} catch(Exception e) { e.printStackTrace(); }
 
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 50, 50);
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 100, 3000);
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 300, 6000);
-		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 600);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 200, 50);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 20, 3000);
+		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 1000, 6000);
+		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 100);
 		MetricsLite metrics = new MetricsLite(this, 9189);
 	}
 
@@ -181,6 +181,7 @@ public class iShop extends JavaPlugin {
 					config.set("adminShop", "Admin Shop #");
 				case "2.1":
 					config.set("shopListDisabled", "&cShops list has been disabled!");
+					config.set("publicShopListShowsOwned", false);
 					config.set("configVersion", 2.2);
 					config.save(configFile);
 				case "2.2":

@@ -1,6 +1,7 @@
 package com.minedhype.ishop.inventories;
 
 import java.util.Optional;
+import com.minedhype.ishop.iShop;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,6 +12,7 @@ import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.gui.GUI;
 
 public class InvAdminShop extends GUI {
+	public static boolean remoteManage = iShop.config.getBoolean("remoteManage");
 	private final Shop shop;
 
 	public InvAdminShop(Shop shop) {
@@ -86,6 +88,14 @@ public class InvAdminShop extends GUI {
 							inv.open(p);
 						});
 					}
+				} else if(x == 7 && y == 0) {
+					if(InvShop.listAllShops && InvShopList.showOwnedShops && remoteManage) {
+						placeItem(y*9+x, GUI.createItem(Material.END_CRYSTAL, Messages.SHOP_LIST_ALL.toString()), p -> {
+							p.closeInventory();
+							p.performCommand("shop shops");
+						});
+					} else
+						placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 				} else if(x == 8 && y >= 1 && shop.isAdmin()) {
 					final Optional<RowStore> row = shop.getRow(y-1);
 					if(row.isPresent()) {

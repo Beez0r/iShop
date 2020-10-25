@@ -55,7 +55,7 @@ public class InvShop extends GUI {
 							placeItem(y*9+x, row.get().getItemIn2());
 						}
 					}
-				}  else if(x == 8 && y == 0) {
+				} else if(x == 8 && y == 0) {
 					if(listAllShops) {
 						placeItem(y*9+x, GUI.createItem(Material.END_CRYSTAL, Messages.SHOP_LIST_ALL.toString()), p -> {
 							p.closeInventory();

@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import com.minedhype.ishop.iShop;
 import com.minedhype.ishop.Messages;
 import com.minedhype.ishop.gui.GUI;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class InvShopList extends GUI {
 	private final ArrayList<ItemStack> shopslist = new ArrayList<>();
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	private final ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD,1);
+	public static boolean showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
 	private int pag;
 
 	private InvShopList(String shopTitle) {
@@ -102,20 +104,24 @@ public class InvShopList extends GUI {
 
 	private void getShopList(UUID uuid) {
 		for(Integer id : Shop.shopList.keySet()) {
-			if(Shop.shopList.get(id) != null && !Shop.shopList.get(id).equals(uuid)) {
-				ItemStack item = new ItemStack(playerHead);
-				SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
-				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
-				skullMeta.setOwningPlayer(offlinePlayer);
-				if(Shop.shopList.get(id).equals(UUID.fromString("00000000-0000-0000-0000-000000000000")))
-					skullMeta.setDisplayName("Admin" + Messages.SHOP_NUMBER.toString() + id);
-				else
-					skullMeta.setDisplayName(offlinePlayer.getName() + Messages.SHOP_NUMBER.toString() + id);
-				List<String> skullLore = new ArrayList<>();
-				skullLore.add(id.toString());
-				skullMeta.setLore(skullLore);
-				item.setItemMeta(skullMeta);
-				shopslist.add(item);
+			if(Shop.shopList.get(id) != null) {
+				if(Shop.shopList.get(id).equals(uuid) && !showOwnedShops)
+					continue;
+				else {
+					ItemStack item = new ItemStack(playerHead);
+					SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
+					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
+					skullMeta.setOwningPlayer(offlinePlayer);
+					if(Shop.shopList.get(id).equals(UUID.fromString("00000000-0000-0000-0000-000000000000")))
+						skullMeta.setDisplayName("Admin" + Messages.SHOP_NUMBER.toString() + id);
+					else
+						skullMeta.setDisplayName(offlinePlayer.getName() + Messages.SHOP_NUMBER.toString() + id);
+					List<String> skullLore = new ArrayList<>();
+					skullLore.add(id.toString());
+					skullMeta.setLore(skullLore);
+					item.setItemMeta(skullMeta);
+					shopslist.add(item);
+				}
 			}
 		}
 	}

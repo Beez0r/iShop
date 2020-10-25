@@ -79,8 +79,11 @@ publicListCommand: false
 # Allow everyone to use "/shop shops" command to view all found player shops
 publicShopListCommand: true
 
-# This will show admin shops when using "/shop shops"
+# This will show admin shops when using "/shop shops" -- Requires server restart if config option changed!
 adminShopPublic: true
+
+# Setting this to true will show shops that player owns when using command "/shop shops"
+publicShopListShowsOwned: false
 
 # Customizable Messages
 adminShop: "Admin Shop #"
