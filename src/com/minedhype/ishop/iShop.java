@@ -181,7 +181,7 @@ public class iShop extends JavaPlugin {
 					config.set("adminShop", "Admin Shop #");
 				case "2.1":
 					config.set("shopListDisabled", "&cShops list has been disabled!");
-					config.set("publicShopListShowsOwned", false);
+					config.set("publicShopListShowsOwned", true);
 					config.set("configVersion", 2.2);
 					config.save(configFile);
 				case "2.2":
