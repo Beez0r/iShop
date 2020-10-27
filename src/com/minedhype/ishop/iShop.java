@@ -183,9 +183,11 @@ public class iShop extends JavaPlugin {
 				case "2.2":
 					config.set("publicShopListShowsOwned", true);
 					config.set("shopListDisabled", "&cShops list has been disabled!");
-					config.set("configVersion", 2.3);
-					config.save(configFile);
 				case "2.3":
+					config.set("enableStockAccessFromShopGUI", true);
+					config.set("configVersion", 2.4);
+					config.save(configFile);
+				case "2.4":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

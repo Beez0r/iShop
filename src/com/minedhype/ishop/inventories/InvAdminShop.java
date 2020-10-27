@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import com.minedhype.ishop.RowStore;
 import com.minedhype.ishop.Messages;
 import com.minedhype.ishop.Shop;
@@ -13,12 +14,14 @@ import com.minedhype.ishop.gui.GUI;
 
 public class InvAdminShop extends GUI {
 	public static boolean remoteManage = iShop.config.getBoolean("remoteManage");
+	public static boolean stockGUIShop = iShop.config.getBoolean("enableStockAccessFromShopGUI");
+	public static boolean stockCommandEnabled = iShop.config.getBoolean("enableStockCommand");
 	private final Shop shop;
 
-	public InvAdminShop(Shop shop) {
+	public InvAdminShop(Shop shop, Player player) {
 		super(54, getShopName(shop));
 		this.shop = shop;
-		updateItems();
+		updateItems(player);
 	}
 
 	private static String getShopName(Shop shop) {
@@ -33,7 +36,7 @@ public class InvAdminShop extends GUI {
 		return msg.replaceAll("%player%", pl.getName());
 	}
 
-	private void updateItems() {
+	private void updateItems(Player player) {
 		for(int x=0; x<9; x++) {
 			for(int y=0; y<6; y++) {
 				if(x == 1) {
@@ -79,7 +82,7 @@ public class InvAdminShop extends GUI {
 					if(row.isPresent()) {
 						placeItem(y*9+x, GUI.createItem(Material.TNT, ChatColor.BOLD+ Messages.SHOP_TITLE_DELETE.toString()), p -> {
 							shop.delete(p, index);
-							InvAdminShop inv = new InvAdminShop(shop);
+							InvAdminShop inv = new InvAdminShop(shop, p.getPlayer());
 							inv.open(p);
 						});
 					} else {
@@ -89,6 +92,28 @@ public class InvAdminShop extends GUI {
 						});
 					}
 				} else if(x == 7 && y == 0) {
+					if(stockGUIShop) {
+						if(stockCommandEnabled) {
+							placeItem(y * 9 + x, GUI.createItem(Material.CHEST, Messages.SHOP_TITLE_STOCK.toString()), p -> {
+								p.closeInventory();
+								p.performCommand("shop stock");
+							});
+						} else {
+							placeItem(y * 9 + x, GUI.createItem(Material.CHEST, Messages.SHOP_TITLE_STOCK.toString()), p -> {
+								p.closeInventory();
+								if(InvStock.inShopInv.containsValue(player.getUniqueId())) {
+									player.sendMessage(Messages.SHOP_BUSY.toString());
+									return;
+								} else { InvStock.inShopInv.put(player, player.getUniqueId()); }
+
+								InvStock inv = InvStock.getInvStock(player.getUniqueId());
+								inv.setPag(0);
+								inv.open(player);
+							});
+						}
+					} else
+						placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
+				} else if(x == 8 && y == 0) {
 					if(InvShop.listAllShops && InvShopList.showOwnedShops && remoteManage) {
 						placeItem(y*9+x, GUI.createItem(Material.END_CRYSTAL, Messages.SHOP_LIST_ALL.toString()), p -> {
 							p.closeInventory();
@@ -102,12 +127,12 @@ public class InvAdminShop extends GUI {
 						if(row.get().broadcast) {
 							placeItem(y*9+x, GUI.createItem(Material.REDSTONE_TORCH, Messages.SHOP_TITLE_BROADCAST_ON.toString(), (short) 15), p -> {
 								row.get().toggleBroadcast();
-								updateItems();
+								updateItems(player);
 							});
 						} else {
 							placeItem(y*9+x, GUI.createItem(Material.LEVER, Messages.SHOP_TITLE_BROADCAST_OFF.toString(), (short) 15), p -> {
 								row.get().toggleBroadcast();
-								updateItems();
+								updateItems(player);
 							});
 						}
 					} else {

@@ -16,6 +16,9 @@ enableStockBlock: true
 # This enables admin shops that don't need stock. Created by typing /shop adminshop, requires ishop.admin permission
 enableAdminShop: true
 
+# Enable clickable chest item in self owned shop gui that will access stock
+enableStockAccessFromShopGUI: true
+
 # Allows players to access the stock GUI by typing /shop stock
 # Players with ishop.stock permission will bypass if disabled
 enableStockCommand: true
@@ -144,4 +147,4 @@ shopNumber: " shop #"
 shopListDisabled: "&cShops list has been disabled!"
 
 # Do not edit this!
-configVersion: 2.3
+configVersion: 2.4

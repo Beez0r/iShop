@@ -187,7 +187,7 @@ public class CommandShop implements CommandExecutor {
 			Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
 			Shop.shopList.put(shops.get().shopId(), player.getUniqueId());
 		}, 20);
-		InvAdminShop inv = new InvAdminShop(newShop);
+		InvAdminShop inv = new InvAdminShop(newShop, player);
 		inv.open(player, newShop.getOwner());
 	}
 
@@ -293,7 +293,7 @@ public class CommandShop implements CommandExecutor {
 				Shop.shopList.put(shops.get().shopId(), UUID.fromString("00000000-0000-0000-0000-000000000000"));
 			}, 20);
 		}
-		InvAdminShop inv = new InvAdminShop(newShop);
+		InvAdminShop inv = new InvAdminShop(newShop, player);
 		inv.open(player, newShop.getOwner());
 	}
 
@@ -419,7 +419,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private void stockShop(Player player) {
-		if(!iShop.config.getBoolean("enableStockCommand") && !player.hasPermission(Permission.SHOP_ADMIN.toString()) && !player.hasPermission(Permission.SHOP_STOCK.toString())) {
+		if(!InvAdminShop.stockCommandEnabled && !player.hasPermission(Permission.SHOP_ADMIN.toString()) && !player.hasPermission(Permission.SHOP_STOCK.toString())) {
 			player.sendMessage(Messages.STOCK_COMMAND_DISABLED.toString());
 			return;
 		}
@@ -462,6 +462,8 @@ public class CommandShop implements CommandExecutor {
 		EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
 		EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
 		InvAdminShop.remoteManage = iShop.config.getBoolean("remoteManage");
+		InvAdminShop.stockCommandEnabled = iShop.config.getBoolean("enableStockCommand");
+		InvAdminShop.stockGUIShop = iShop.config.getBoolean("enableStockAccessFromShopGUI");
 		InvShop.listAllShops = iShop.config.getBoolean("publicShopListCommand");
 		InvShopList.showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
 		Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
@@ -519,7 +521,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		InvAdminShop inv = new InvAdminShop(shop.get());
+		InvAdminShop inv = new InvAdminShop(shop.get(), player);
 		inv.open(player, shop.get().getOwner());
 	}
 
@@ -561,7 +563,7 @@ public class CommandShop implements CommandExecutor {
 		}
 
 		if((shop.get().isAdmin() && player.hasPermission(Permission.SHOP_ADMIN.toString())) || shop.get().isOwner(player.getUniqueId())) {
-			InvAdminShop inv = new InvAdminShop(shop.get());
+			InvAdminShop inv = new InvAdminShop(shop.get(), player);
 			inv.open(player, shop.get().getOwner());
 		} else {
 			InvShop inv = new InvShop(shop.get());

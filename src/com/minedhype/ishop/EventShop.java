@@ -45,6 +45,37 @@ public class EventShop implements Listener {
 		if(!block.getType().equals(stockBlk) && !block.getType().equals(shopBlk))
 			return;
 
+		if(block.getType().equals(stockBlk) && block.getType().equals(shopBlk) && shopEnabled) {
+			boolean isShopLoc;
+			if(iShop.wgLoader != null)
+				isShopLoc = iShop.wgLoader.checkRegion(block);
+			else
+				isShopLoc = true;
+
+			Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
+			if(!shop.isPresent() || !isShopLoc)
+				return;
+
+			if(shop.get().isAdmin() && !adminShopEnabled) {
+				event.setCancelled(true);
+				event.getPlayer().sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
+				return;
+			}
+			event.setCancelled(true);
+			if(InvStock.inShopInv.containsValue(shop.get().getOwner()) && (event.getAction().equals(Action.LEFT_CLICK_BLOCK) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
+				event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
+				return;
+			}
+
+			if((shop.get().isAdmin() && event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) || shop.get().isOwner(event.getPlayer().getUniqueId())) {
+				InvAdminShop inv = new InvAdminShop(shop.get(), event.getPlayer());
+				inv.open(event.getPlayer(), shop.get().getOwner());
+			} else {
+				InvShop inv = new InvShop(shop.get());
+				inv.open(event.getPlayer(), shop.get().getOwner());
+			}
+		}
+
 		if(block.getType().equals(stockBlk) && stockEnabled) {
 			boolean isShopLoc;
 			if(iShop.wgLoader != null)
@@ -96,7 +127,7 @@ public class EventShop implements Listener {
 			}
 
 			if((shop.get().isAdmin() && event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) || shop.get().isOwner(event.getPlayer().getUniqueId())) {
-				InvAdminShop inv = new InvAdminShop(shop.get());
+				InvAdminShop inv = new InvAdminShop(shop.get(), event.getPlayer());
 				inv.open(event.getPlayer(), shop.get().getOwner());
 			} else {
 				InvShop inv = new InvShop(shop.get());

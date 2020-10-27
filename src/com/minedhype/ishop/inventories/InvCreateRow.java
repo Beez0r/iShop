@@ -50,7 +50,7 @@ public class InvCreateRow extends GUI {
 						return;
 
 					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
-					InvAdminShop inv = new InvAdminShop(shop);
+					InvAdminShop inv = new InvAdminShop(shop, p.getPlayer());
 					inv.open(p);
 				});
 			} else if(i == 15 || i == 16) {
