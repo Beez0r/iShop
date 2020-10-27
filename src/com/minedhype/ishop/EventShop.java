@@ -74,6 +74,7 @@ public class EventShop implements Listener {
 				InvShop inv = new InvShop(shop.get());
 				inv.open(event.getPlayer(), shop.get().getOwner());
 			}
+			return;
 		}
 
 		if(block.getType().equals(stockBlk) && stockEnabled) {
