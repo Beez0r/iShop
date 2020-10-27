@@ -92,7 +92,7 @@ public class InvAdminShop extends GUI {
 						});
 					}
 				} else if(x == 7 && y == 0) {
-					if(stockGUIShop) {
+					if(stockGUIShop && !shop.isAdmin()) {
 						if(stockCommandEnabled) {
 							placeItem(y * 9 + x, GUI.createItem(Material.CHEST, Messages.SHOP_TITLE_STOCK.toString()), p -> {
 								p.closeInventory();
