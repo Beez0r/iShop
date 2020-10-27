@@ -92,25 +92,14 @@ public class InvAdminShop extends GUI {
 						});
 					}
 				} else if(x == 7 && y == 0) {
-					if(stockGUIShop && !shop.isAdmin()) {
-						if(stockCommandEnabled) {
-							placeItem(y * 9 + x, GUI.createItem(Material.CHEST, Messages.SHOP_TITLE_STOCK.toString()), p -> {
-								p.closeInventory();
-								p.performCommand("shop stock");
-							});
-						} else {
-							placeItem(y * 9 + x, GUI.createItem(Material.CHEST, Messages.SHOP_TITLE_STOCK.toString()), p -> {
-								p.closeInventory();
-								if(InvStock.inShopInv.containsValue(player.getUniqueId())) {
-									player.sendMessage(Messages.SHOP_BUSY.toString());
-									return;
-								} else { InvStock.inShopInv.put(player, player.getUniqueId()); }
-
-								InvStock inv = InvStock.getInvStock(player.getUniqueId());
-								inv.setPag(0);
-								inv.open(player);
-							});
-						}
+					if(stockGUIShop && !shop.isAdmin() && shop.getOwner().equals(player.getUniqueId())) {
+						placeItem(y * 9 + x, GUI.createItem(Material.CHEST, Messages.SHOP_TITLE_STOCK.toString()), p -> {
+							p.closeInventory();
+							InvStock inv = InvStock.getInvStock(player.getUniqueId());
+							inv.setPag(0);
+							InvStock.inShopInv.put(player, player.getUniqueId());
+							inv.open(player);
+						});
 					} else
 						placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 				} else if(x == 8 && y == 0) {
