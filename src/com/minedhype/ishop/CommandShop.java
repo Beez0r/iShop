@@ -111,7 +111,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		Block block = player.getTargetBlock(null, 5);
+		Block block = player.getTargetBlockExact(5);
 		String shopBlock = iShop.config.getString("shopBlock");
 		Material match = Material.matchMaterial(shopBlock);
 		if(match == null) {
@@ -201,7 +201,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		Block block = player.getTargetBlock(null, 5);
+		Block block = player.getTargetBlockExact(5);
 		String shopBlock = iShop.config.getString("shopBlock");
 		Material match = Material.matchMaterial(shopBlock);
 		if(match == null) {
@@ -262,7 +262,7 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		Block block = player.getTargetBlock(null, 5);
+		Block block = player.getTargetBlockExact(5);
 		String shopBlock = iShop.config.getString("shopBlock");
 		Material match = Material.matchMaterial(shopBlock);
 		if(match == null) {
@@ -298,7 +298,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private void deleteShop(Player player) {
-		Block block = player.getTargetBlock(null, 5);
+		Block block = player.getTargetBlockExact(5);
 		Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
 		if(!shop.isPresent()) {
 			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
