@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
@@ -66,6 +67,10 @@ public class iShop extends JavaPlugin {
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 100, 50);
 		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 60);
 		MetricsLite metrics = new MetricsLite(this, 9189);
+		new UpdateChecker(this, 84555).getVersion(version -> {
+			if(!this.getDescription().getVersion().equalsIgnoreCase(version))
+				getServer().getConsoleSender().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "[iShop] There is a new update available! - https://www.spigotmc.org/resources/ishop.84555/");
+		});
 	}
 
 	@Override
