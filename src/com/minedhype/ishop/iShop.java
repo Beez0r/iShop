@@ -68,7 +68,7 @@ public class iShop extends JavaPlugin {
 		MetricsLite metrics = new MetricsLite(this, 9189);
 		new UpdateChecker(this, 84555).getVersion(version -> {
 			if(!this.getDescription().getVersion().equalsIgnoreCase(version))
-				getServer().getConsoleSender().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "[iShop] There is a new update available! - https://www.spigotmc.org/resources/ishop.84555/");
+				getServer().getConsoleSender().sendMessage(ChatColor.RED + "[iShop] There is a new update available! - https://www.spigotmc.org/resources/ishop.84555/");
 		});
 	}
 

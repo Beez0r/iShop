@@ -44,7 +44,7 @@ public class CommandShop implements CommandExecutor {
 
 		Player player = (Player) sender;
 		if(args.length == 0)
-			listSubCmd(player, label);
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () ->listSubCmd(player, label));
 		else if(args[0].equalsIgnoreCase("adminshop"))
 			adminShop(player);
 		else if(args[0].equalsIgnoreCase("create"))
@@ -74,7 +74,7 @@ public class CommandShop implements CommandExecutor {
 		else if(args[0].equalsIgnoreCase("view") && args.length >= 2)
 			viewShop(player, args[1]);
 		else
-			listSubCmd(player, label);
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> listSubCmd(player, label));
 
 		return true;
 	}
@@ -473,6 +473,7 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.SHOP_RELOAD.toString());
 		else
 			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
+
 		EventShop.adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
 		EventShop.noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
 		EventShop.shopBlock = iShop.config.getString("shopBlock");
