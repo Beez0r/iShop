@@ -1,5 +1,6 @@
 name: iShop
 main: com.minedhype.ishop.iShop
+description: Item trading shops with unique GUI!
 author: Beez0r
 website: https://minedhype.com
 version: "${project.version}"
