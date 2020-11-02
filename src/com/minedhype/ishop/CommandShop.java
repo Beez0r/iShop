@@ -191,7 +191,7 @@ public class CommandShop implements CommandExecutor {
 		Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
 			Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
 			Shop.shopList.put(shops.get().shopId(), player.getUniqueId());
-		}, 20);
+		}, 10);
 		InvAdminShop inv = new InvAdminShop(newShop, player);
 		inv.open(player, newShop.getOwner());
 	}
@@ -244,7 +244,7 @@ public class CommandShop implements CommandExecutor {
 		}
 
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(shopOwner);
-		if(!offlinePlayer.hasPlayedBefore()) {
+		if(!offlinePlayer.hasPlayedBefore() || offlinePlayer == null) {
 			player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
 			return;
 		}
@@ -257,7 +257,7 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
 				Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
 				Shop.shopList.put(shops.get().shopId(), shopOwner);
-			}, 20);
+			}, 10);
 		} else { player.sendMessage(Messages.EXISTING_SHOP.toString()); }
 	}
 
@@ -306,7 +306,7 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
 				Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
 				Shop.shopList.put(shops.get().shopId(), UUID.fromString("00000000-0000-0000-0000-000000000000"));
-			}, 20);
+			}, 10);
 		}
 		InvAdminShop inv = new InvAdminShop(newShop, player);
 		inv.open(player, newShop.getOwner());
@@ -613,7 +613,7 @@ public class CommandShop implements CommandExecutor {
 		}
 
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(sOwner);
-		if(!offlinePlayer.hasPlayedBefore()) {
+		if(!offlinePlayer.hasPlayedBefore() || offlinePlayer == null) {
 			player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
 			return;
 		}
