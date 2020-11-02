@@ -618,12 +618,12 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 
-		if(InvStock.inShopInv.containsValue(sOwner)) {
-			player.sendMessage(Messages.SHOP_BUSY.toString());
-			return;
-		} else { InvStock.inShopInv.put(player, sOwner); }
-
 		Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> {
+			if(InvStock.inShopInv.containsValue(sOwner)) {
+				player.sendMessage(Messages.SHOP_BUSY.toString());
+				return;
+			} else { InvStock.inShopInv.put(player, sOwner); }
+
 			InvStock inv = InvStock.getInvStock(sOwner);
 			inv.setPag(0);
 			inv.open(player);
