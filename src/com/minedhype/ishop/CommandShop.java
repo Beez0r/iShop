@@ -244,7 +244,7 @@ public class CommandShop implements CommandExecutor {
 		}
 
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(shopOwner);
-		if(!offlinePlayer.hasPlayedBefore() || offlinePlayer == null) {
+		if(offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
 			player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
 			return;
 		}
@@ -613,7 +613,7 @@ public class CommandShop implements CommandExecutor {
 		}
 
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(sOwner);
-		if(!offlinePlayer.hasPlayedBefore() || offlinePlayer == null) {
+		if(offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
 			player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
 			return;
 		}
