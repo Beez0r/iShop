@@ -44,13 +44,13 @@ public class CommandShop implements CommandExecutor {
 
 		Player player = (Player) sender;
 		if(args.length == 0)
-			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () ->listSubCmd(player, label));
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> listSubCmd(player, label));
 		else if(args[0].equalsIgnoreCase("adminshop"))
 			adminShop(player);
 		else if(args[0].equalsIgnoreCase("create"))
 			createStore(player);
 		else if(args[0].equalsIgnoreCase("createshop") && args.length >= 2)
-			createShop(player, args[1]);
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> createShop(player, args[1]));
 		else if(args[0].equalsIgnoreCase("delete"))
 			deleteShop(player);
 		else if(args[0].equalsIgnoreCase("deleteid") && args.length >= 2)
@@ -64,7 +64,7 @@ public class CommandShop implements CommandExecutor {
 		else if(args[0].equalsIgnoreCase("manage") && args.length >= 2)
 			shopManage(player, args[1]);
 		else if(args[0].equalsIgnoreCase("managestock") && args.length >= 2)
-			manageStock(player, args[1]);
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> manageStock(player, args[1]));
 		else if(args[0].equalsIgnoreCase("reload"))
 			reloadShop(player);
 		else if(args[0].equalsIgnoreCase("shops"))
@@ -623,8 +623,10 @@ public class CommandShop implements CommandExecutor {
 			return;
 		} else { InvStock.inShopInv.put(player, sOwner); }
 
-		InvStock inv = InvStock.getInvStock(sOwner);
-		inv.setPag(0);
-		inv.open(player);
+		Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> {
+			InvStock inv = InvStock.getInvStock(sOwner);
+			inv.setPag(0);
+			inv.open(player);
+		});
 	}
 }
