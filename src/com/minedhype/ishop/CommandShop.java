@@ -63,7 +63,7 @@ public class CommandShop implements CommandExecutor {
 		else if(args[0].equalsIgnoreCase("manage") && args.length >= 2)
 			shopManage(player, args[1]);
 		else if(args[0].equalsIgnoreCase("managestock") && args.length == 2)
-			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> manageStock(player, args[1], "0"));
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> manageStock(player, args[1], "1"));
 		else if(args[0].equalsIgnoreCase("managestock") && args.length >= 3)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> manageStock(player, args[1], args[2]));
 		else if(args[0].equalsIgnoreCase("reload"))
@@ -71,7 +71,7 @@ public class CommandShop implements CommandExecutor {
 		else if(args[0].equalsIgnoreCase("shops"))
 			listAllShops(player);
 		else if(args[0].equalsIgnoreCase("stock") && args.length == 1)
-			stockShop(player, "0");
+			stockShop(player, "1");
 		else if(args[0].equalsIgnoreCase("stock") && args.length >= 2)
 			stockShop(player, args[1]);
 		else if(args[0].equalsIgnoreCase("view") && args.length >= 2)
@@ -408,10 +408,6 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.NO_SHOP_STOCK.toString());
 			return;
 		}
-		if(InvStock.inShopInv.containsValue(player.getUniqueId())) {
-			player.sendMessage(Messages.SHOP_BUSY.toString());
-			return;
-		} else { InvStock.inShopInv.put(player, player.getUniqueId()); }
 		int openPage;
 		try { openPage = Integer.parseInt(page); }
 		catch(Exception e) { openPage = 1; }
@@ -423,6 +419,10 @@ public class CommandShop implements CommandExecutor {
 		int stockPages = iShop.config.getInt("stockPages");
 		if(openPage > 0 && openPage > stockPages-1)
 			openPage = stockPages-1;
+		if(InvStock.inShopInv.containsValue(player.getUniqueId())) {
+			player.sendMessage(Messages.SHOP_BUSY.toString());
+			return;
+		} else { InvStock.inShopInv.put(player, player.getUniqueId()); }
 		InvStock inv = InvStock.getInvStock(player.getUniqueId());
 		inv.setPag(openPage);
 		inv.open(player);
