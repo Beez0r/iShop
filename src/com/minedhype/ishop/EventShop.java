@@ -38,20 +38,20 @@ public class EventShop implements Listener {
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		if(!stockEnabled && !shopEnabled)
+		if(!shopEnabled && !stockEnabled)
 			return;
 		Block block = event.getClickedBlock();
 		if(block == null)
 			return;
-		if(stockBlk == null) {
-			try {
-				stockBlk = Material.matchMaterial(stockBlock.split("minecraft:")[1].toUpperCase());
-			} catch (Exception e) { stockBlk = Material.COMPOSTER; }
-		}
 		if(shopBlk == null) {
 			try {
 				shopBlk = Material.matchMaterial(shopBlock.split("minecraft:")[1].toUpperCase());
 			} catch (Exception e) { shopBlk = Material.BARREL; }
+		}
+		if(stockBlk == null) {
+			try {
+				stockBlk = Material.matchMaterial(stockBlock.split("minecraft:")[1].toUpperCase());
+			} catch (Exception e) { stockBlk = Material.COMPOSTER; }
 		}
 		if(!block.getType().equals(stockBlk) && !block.getType().equals(shopBlk))
 			return;
@@ -64,10 +64,9 @@ public class EventShop implements Listener {
 			Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
 			if(!shop.isPresent() || !isShopLoc)
 				return;
-			if(placeFrameSign) {
+			if(placeFrameSign)
 				if(event.getPlayer().isSneaking() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && (shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) && (event.getPlayer().getInventory().getItemInMainHand().getType().toString().endsWith("_SIGN") || event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.ITEM_FRAME)))
 					return;
-			}
 			if(shop.get().isAdmin() && !adminShopEnabled) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
@@ -172,24 +171,21 @@ public class EventShop implements Listener {
 
 	@EventHandler
 	public void protectFromWitherDamage(EntityChangeBlockEvent event) {
-		if(protectShopFromExplosion && shopEnabled) {
+		if(protectShopFromExplosion && shopEnabled)
 			if(event.getEntity() instanceof Wither && checkShopLoc(event.getBlock().getLocation()))
 				event.setCancelled(true);
-		}
 	}
 
 	@EventHandler
 	public void itemFrameItem(EntityDamageByEntityEvent event) {
-		if(placeFrameSign && shopEnabled) {
-			if(event.getEntity() instanceof ItemFrame) {
-				BlockFace blockFace = event.getEntity().getFacing();
-				Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace.getOppositeFace());
-				Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
-				if(!shop.isPresent() || shop.get().isOwner(event.getDamager().getUniqueId()) || event.getDamager().hasPermission(Permission.SHOP_ADMIN.toString()))
-					return;
-				else
-					event.setCancelled(true);
-			}
+		if(placeFrameSign && shopEnabled && event.getEntity() instanceof ItemFrame) {
+			BlockFace blockFace = event.getEntity().getFacing();
+			Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace.getOppositeFace());
+			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
+			if(!shop.isPresent() || shop.get().isOwner(event.getDamager().getUniqueId()) || event.getDamager().hasPermission(Permission.SHOP_ADMIN.toString()))
+				return;
+			else
+				event.setCancelled(true);
 		}
 	}
 
@@ -209,46 +205,40 @@ public class EventShop implements Listener {
 
 	@EventHandler
 	public void HangingBreakItemFrameEntity(HangingBreakByEntityEvent event) {
-		if(placeFrameSign && shopEnabled) {
-			if(event.getEntity() instanceof ItemFrame) {
-				BlockFace blockFace = event.getEntity().getAttachedFace();
-				Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace);
-				Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
-				if(!shop.isPresent() || shop.get().isOwner(event.getRemover().getUniqueId()) || event.getRemover().hasPermission(Permission.SHOP_ADMIN.toString()))
-					return;
-				else
-					event.setCancelled(true);
-			}
+		if(placeFrameSign && shopEnabled && event.getEntity() instanceof ItemFrame) {
+			BlockFace blockFace = event.getEntity().getAttachedFace();
+			Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace);
+			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
+			if(!shop.isPresent() || shop.get().isOwner(event.getRemover().getUniqueId()) || event.getRemover().hasPermission(Permission.SHOP_ADMIN.toString()))
+				return;
+			else
+				event.setCancelled(true);
 		}
 	}
 
 	@EventHandler
 	public void HangingBreakItemFrame(HangingBreakEvent event) {
-		if(!event.getCause().equals(HangingBreakEvent.RemoveCause.ENTITY) && placeFrameSign && shopEnabled) {
-			if(event.getEntity() instanceof ItemFrame) {
-				BlockFace blockFace = event.getEntity().getAttachedFace();
-				Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace);
-				Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
-				if(!shop.isPresent())
-					return;
-				else
-					event.setCancelled(true);
-			}
+		if(placeFrameSign && shopEnabled && !event.getCause().equals(HangingBreakEvent.RemoveCause.ENTITY) && event.getEntity() instanceof ItemFrame) {
+			BlockFace blockFace = event.getEntity().getAttachedFace();
+			Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace);
+			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
+			if(!shop.isPresent())
+				return;
+			else
+				event.setCancelled(true);
 		}
 	}
 
 	@EventHandler
 	public void itemFrameItemRotate(PlayerInteractEntityEvent event) {
-		if(placeFrameSign && shopEnabled) {
-			if(event.getRightClicked() instanceof ItemFrame) {
-				BlockFace blockFace = event.getRightClicked().getFacing();
-				Block attachedBlock = event.getRightClicked().getLocation().getBlock().getRelative(blockFace.getOppositeFace());
-				Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
-				if(!shop.isPresent() || shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString()))
-					return;
-				else
-					event.setCancelled(true);
-			}
+		if(placeFrameSign && shopEnabled && event.getRightClicked() instanceof ItemFrame) {
+			BlockFace blockFace = event.getRightClicked().getFacing();
+			Block attachedBlock = event.getRightClicked().getLocation().getBlock().getRelative(blockFace.getOppositeFace());
+			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
+			if(!shop.isPresent() || shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString()))
+				return;
+			else
+				event.setCancelled(true);
 		}
 	}
 
