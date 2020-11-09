@@ -16,12 +16,10 @@ public class GUIEvent implements Listener {
 	public void onClick(InventoryClickEvent e) {
 		if(!(e.getWhoClicked() instanceof Player))
 			return;
-
 		Player player = (Player) e.getWhoClicked();
 		GUI gui = GUI.inventoriesOpen.get(player.getName());
 		if(gui == null)
 			return;
-
 		GUIAction action = gui.getActions().get(e.getRawSlot());
 		gui.onClick(e);
 		if(action != null)
@@ -32,12 +30,10 @@ public class GUIEvent implements Listener {
 	public void onDrag(InventoryDragEvent e) {
 		if(!(e.getWhoClicked() instanceof Player))
 			return;
-
 		Player player = (Player) e.getWhoClicked();
 		GUI gui = GUI.inventoriesOpen.get(player.getName());
 		if(gui == null)
 			return;
-		
 		gui.onDrag(e);
 	}
 	
@@ -47,7 +43,6 @@ public class GUIEvent implements Listener {
 		GUI gui = GUI.inventoriesOpen.get(player.getName());
 		if(gui != null)
 			gui.onClose(e);
-
 		Bukkit.getServer().getScheduler().runTaskLater(iShop.getPlugin(), player::updateInventory, 1);
 		GUI.inventoriesOpen.remove(player.getName());
 		InvStock.inShopInv.remove(player);

@@ -88,8 +88,14 @@ adminShopPublic: true
 # Setting this to false will hide shops that player owns when using command "/shop shops"
 publicShopListShowsOwned: true
 
+# Allow shop owners and admins to place item frames and signs on shop blocks when sneaking
+placeItemFrameSigns: false
+
+# Setting to true will protect shop blocks from explosions
+protectShopBlocksFromExplosions: false
+
 # Customizable Messages
-adminShop: "Admin Shop #"
+adminShop: "Admin Shop #%id"
 adminShopDisabled: "&cAdmin shops have been disabled!"
 broadcastOff: "Broadcast OFF"
 broadcastOn: "Broadcast ON"
@@ -111,7 +117,7 @@ noPlayerFound: "&cPlayer cannot be found!"
 noPlayerShop: "&cPlayer name does not exist! Cannot list player shop!"
 noRemoteManage: "&cRemote management of shops has been disabled!"
 noRemoteShops: "&cRemote shopping has been disabled!"
-normalShop: "%player%'s Shop #"
+normalShop: "%player%'s Shop #%id"
 noShopFound: "&cNo shop can be found!"
 noShopStock: "&cCannot access stock because you do not have any shops!"
 noStock: "&cThis shop is currently out of stock of that item(s)!"
@@ -145,6 +151,7 @@ shopText: "&6Remotely shop here!"
 shopListTitle: "Shops List"
 shopNumber: " shop #"
 shopListDisabled: "&cShops list has been disabled!"
+stockIntegerError: "&cStock page must be an integer greater than 0!"
 
 # Do not edit this!
-configVersion: 2.4
+configVersion: 2.5

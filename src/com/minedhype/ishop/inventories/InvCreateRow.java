@@ -22,18 +22,17 @@ public class InvCreateRow extends GUI {
 	
 	public InvCreateRow(Shop shop, int index) {
 		super(9*3, Messages.SHOP_TITLE_CREATESHOP.toString());
-		
 		for(int i=0; i<9*3; i++) {
-			if(i == 1) {
+			if(i == 1)
 				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + Messages.SHOP_TITLE_SELL.toString()));
-			} else if(i == 2) {
+			else if(i == 2)
 				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.GREEN + Messages.SHOP_TITLE_SELL2.toString()));
-			} else if(i == 6) {
+			else if(i == 6)
 				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + Messages.SHOP_TITLE_BUY.toString()));
-			} else if(i == 7) {
+			else if(i == 7)
 				placeItem(i, GUI.createItem(Material.OAK_SIGN, ChatColor.RED + Messages.SHOP_TITLE_BUY2.toString()));
-			} else if(i == 10 || i == 11) {
-			} else if(i == 13) {
+			else if(i == 10 || i == 11) { }
+			else if(i == 13) {
 				placeItem(i, GUI.createItem(Material.LIME_DYE, ChatColor.BOLD + Messages.SHOP_TITLE_CREATE.toString()), p -> {
 					if(itemIn == null)
 						itemIn = airItem;
@@ -43,24 +42,23 @@ public class InvCreateRow extends GUI {
 						itemOut = airItem;
 					if(itemOut2 == null)
 						itemOut2 = airItem;
-
 					if(itemIn == airItem && itemIn2 == airItem && itemOut == airItem && itemOut2 == airItem)
 						return;
 					if((itemOut == airItem && itemOut2 == airItem) || (itemIn == airItem && itemIn2 == airItem))
 						return;
-
 					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
 					InvAdminShop inv = new InvAdminShop(shop, p.getPlayer());
 					inv.open(p);
 				});
-			} else if(i == 15 || i == 16) {
-			} else { placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, "")); }
+			}
+			else if(i == 15 || i == 16) { }
+			else
+				placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 		}
 	}
 	
 	public void onDrag(InventoryDragEvent event) {		
 		super.onDrag(event);
-		
 		Inventory inv = event.getInventory();
 		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString()))
 			event.setCancelled(true);
@@ -71,19 +69,15 @@ public class InvCreateRow extends GUI {
 		super.onClick(event);
 		if(!event.getAction().equals(InventoryAction.PLACE_ALL) && !event.getAction().equals(InventoryAction.PICKUP_ALL))
 			return;
-		
 		event.setCancelled(false);
 		Inventory inv = event.getClickedInventory();
 		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString())) {
 			event.setCancelled(true);
-			
 			if(event.getRawSlot() == 10 || event.getRawSlot() == 11 || event.getRawSlot() == 15 || event.getRawSlot() == 16) {
 				ItemStack item =  event.getCursor().clone();
-				
 				if(event.getClick().isRightClick())
 					item.setAmount(1);
 				placeItem(event.getRawSlot(), item);
-
 				if(event.getRawSlot() == 10)
 					itemOut = item;
 				else if(event.getRawSlot() == 11)
@@ -92,7 +86,6 @@ public class InvCreateRow extends GUI {
 					itemIn = item;
 				else if(event.getRawSlot() == 16)
 					itemIn2 = item;
-
 			}			
 		}
 	}

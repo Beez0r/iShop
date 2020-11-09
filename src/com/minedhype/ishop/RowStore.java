@@ -25,7 +25,6 @@ public class RowStore {
 		PreparedStatement stmt = null;
 		try {
 			stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaTiendasFilas (itemIn, itemIn2, itemOut, itemOut2, idTienda, broadcast) VALUES (?,?,?,?,?,?);");
-
 			YamlConfiguration configIn1 = new YamlConfiguration();
 			if(itemIn != null) {
 				itemIn.serialize().forEach(configIn1::set);
@@ -36,7 +35,6 @@ public class RowStore {
 				String itemInRaw = configIn1.saveToString();
 				stmt.setString(1, itemInRaw);
 			}
-
 			YamlConfiguration configIn2 = new YamlConfiguration();
 			if(itemIn2 != null) {
 				itemIn2.serialize().forEach(configIn2::set);
@@ -47,7 +45,6 @@ public class RowStore {
 				String itemIn2Raw = configIn2.saveToString();
 				stmt.setString(2, itemIn2Raw);
 			}
-
 			YamlConfiguration configOut1 = new YamlConfiguration();
 			if(itemOut != null) {
 				itemOut.serialize().forEach(configOut1::set);
@@ -58,7 +55,6 @@ public class RowStore {
 				String itemOutRaw = configOut1.saveToString();
 				stmt.setString(3, itemOutRaw);
 			}
-
 			YamlConfiguration configOut2 = new YamlConfiguration();
 			if(itemOut2 != null) {
 				itemOut2.serialize().forEach(configOut2::set);
@@ -69,7 +65,6 @@ public class RowStore {
 				String itemOut2Raw = configOut2.saveToString();
 				stmt.setString(4, itemOut2Raw);
 			}
-
 			stmt.setInt(5, idTienda);
 			stmt.setBoolean(6, broadcast);
 			stmt.execute();
@@ -85,7 +80,6 @@ public class RowStore {
 	public void toggleBroadcast() {
 		this.broadcast = !this.broadcast;
 	}
-
 	public ItemStack getItemIn() {
 		return itemIn;
 	}

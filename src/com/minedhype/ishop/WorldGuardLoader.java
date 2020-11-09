@@ -27,7 +27,6 @@ public class WorldGuardLoader {
 	
 	public boolean checkRegion(Block block) {
 		AtomicBoolean isShopLoc = new AtomicBoolean(false);
-		
 		if(FLAG_TRADE != null && iShop.config.getBoolean("enableWorldGuardFlag")) {
 			RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 			RegionManager regions = container.get(new BukkitWorld(block.getWorld()));
@@ -41,10 +40,8 @@ public class WorldGuardLoader {
 			}
 		} else
 			isShopLoc.set(true);
-		
 		return isShopLoc.get();
 	}
-	
 	public Optional<StateFlag> getFlagTrade() {
 		return Optional.ofNullable(FLAG_TRADE);
 	}

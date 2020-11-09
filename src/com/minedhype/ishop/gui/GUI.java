@@ -29,9 +29,7 @@ public abstract class GUI {
 	public void onClick(InventoryClickEvent e) {
 		e.setCancelled(true);
 	}
-	
 	public void onDrag(InventoryDragEvent e) { }
-
 	public void onClose(InventoryCloseEvent e) { }
 	
 	public static ItemStack createItem(Material material, String number, short data) {
@@ -48,13 +46,10 @@ public abstract class GUI {
 		meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
 		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 		item.setItemMeta(meta);
-		
 		return item;
 	}
 	
-	public static ItemStack createItem(Material material, String number) {
-		return createItem(material, number, (short) 0);
-	}
+	public static ItemStack createItem(Material material, String number) { return createItem(material, number, (short) 0); }
 	
 	public void placeItem(int slot, ItemStack item, GUIAction action) {
 		inventory.setItem(slot, item);
@@ -78,11 +73,9 @@ public abstract class GUI {
 	}
 
 	public void open(Player player) { open(player, null); }
-	
 	public Inventory getInventory() {
 		return inventory;
 	}
-
 	public Map<Integer, GUIAction> getActions() {
 		return actions;
 	}

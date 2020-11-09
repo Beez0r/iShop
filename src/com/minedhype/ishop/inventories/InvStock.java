@@ -30,16 +30,13 @@ public class InvStock extends GUI {
 		this.pag = 0;
 	}
 	
-	public static InvStock getInvStock(UUID owner) {
-		return inventories.parallelStream().filter(inv -> inv.owner.equals(owner)).findFirst().orElse(new InvStock(owner));
-	}
+	public static InvStock getInvStock(UUID owner) { return inventories.parallelStream().filter(inv -> inv.owner.equals(owner)).findFirst().orElse(new InvStock(owner)); }
 	
 	@Override
 	public void onClick(InventoryClickEvent event) {
 		super.onClick(event);
 		if(event.getRawSlot() >= 45 && event.getRawSlot() < 54)
 			return;
-
 		event.setCancelled(false);
 	}
 	
@@ -48,12 +45,10 @@ public class InvStock extends GUI {
 		StockShop stock;
 		stock = stockOpt.orElseGet(() -> new StockShop(owner, pag));
 		Inventory inv = stock.getInventory();
-
 		for(int i=0; i<45; i++) {
 			ItemStack item = inv.getItem(i);
 			placeItem(i, item);
 		}
-
 		for(int i=45; i<54; i++) {
 			if(i == 47 && pag > 0) {
 				ItemStack item = GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag));
@@ -71,7 +66,6 @@ public class InvStock extends GUI {
 	private void openPage(Player player, int pag) {
 		for(int i=45; i<54; i++)
 			placeItem(i, new ItemStack(Material.AIR));
-
 		player.closeInventory();
 		this.pag = pag;
 		this.open(player);
@@ -89,7 +83,6 @@ public class InvStock extends GUI {
 		Optional<StockShop> stock = StockShop.getStockShopByOwner(owner, pag);
 		if(!stock.isPresent())
 			return;
-		
 		stock.get().setInventory(inventory);
 	}
 	

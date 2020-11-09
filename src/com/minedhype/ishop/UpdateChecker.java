@@ -9,8 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 public class UpdateChecker {
-	private Plugin plugin;
-	private int resourceId;
+	private final Plugin plugin;
+	private final int resourceId;
 
 	public UpdateChecker(Plugin plugin, int resourceId) {
 		this.plugin = plugin;

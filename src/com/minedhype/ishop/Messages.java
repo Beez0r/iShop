@@ -58,6 +58,7 @@ public enum Messages {
 	SHOP_TITLE_SELL2("sellTitle2"),
 	SHOP_TITLE_STOCK("stockTitle"),
 	STOCK_COMMAND_DISABLED("stockCommandDisabled"),
+	STOCK_INTEGER("stockIntegerError"),
 	TARGET_MISMATCH("targetMismatch");
 
 	private final String msg;

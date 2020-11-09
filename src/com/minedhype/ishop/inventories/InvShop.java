@@ -14,46 +14,52 @@ import com.minedhype.ishop.Shop;
 public class InvShop extends GUI {
 	public static boolean listAllShops = iShop.config.getBoolean("publicShopListCommand");
 
+	private static String getShopName(Shop shop) {
+		String shopId = String.valueOf(shop.shopId());
+		if(shop.isAdmin())
+			return Messages.SHOP_TITLE_ADMIN_SHOP.toString().replaceAll("%id", shopId);
+		String msg = Messages.SHOP_TITLE_NORMAL_SHOP.toString();
+		OfflinePlayer pl = Bukkit.getOfflinePlayer(shop.getOwner());
+		if(pl == null)
+			return msg.replaceAll("%player%", "<unknown>");
+		return msg.replaceAll("%player%", pl.getName()).replaceAll("%id", shopId);
+	}
+
 	public InvShop(Shop shop) {
 		super(54, getShopName(shop));
-		
 		for(int x=0; x<9; x++) {
 			for(int y=0; y<6; y++) {
 				if(x == 1) {
-					if(y == 0) {
+					if(y == 0)
 						placeItem(y*9+x, GUI.createItem(Material.GREEN_STAINED_GLASS_PANE, ChatColor.GREEN+ Messages.SHOP_TITLE_SELL.toString()));
-					} else {
+					else {
 						Optional<RowStore> row = shop.getRow(y-1);
-						if(row.isPresent()) {
+						if(row.isPresent())
 							placeItem(y*9+x, row.get().getItemOut());
-						}
 					}
 				} else if(x == 2) {
-					if(y == 0) {
+					if(y == 0)
 						placeItem(y*9+x, GUI.createItem(Material.GREEN_STAINED_GLASS_PANE, ChatColor.GREEN+ Messages.SHOP_TITLE_SELL2.toString()));
-					} else {
+					else {
 						Optional<RowStore> row = shop.getRow(y-1);
-						if(row.isPresent()) {
+						if(row.isPresent())
 							placeItem(y*9+x, row.get().getItemOut2());
-						}
 					}
 				} else if(x == 5) {
-					if(y == 0) {
+					if(y == 0)
 						placeItem(x, GUI.createItem(Material.RED_STAINED_GLASS_PANE, ChatColor.RED+ Messages.SHOP_TITLE_BUY.toString()));
-					} else {
+					else {
 						Optional<RowStore> row = shop.getRow(y-1);
-						if(row.isPresent()) {
+						if(row.isPresent())
 							placeItem(y*9+x, row.get().getItemIn());
-						}
 					}
 				} else if(x == 6) {
-					if(y == 0) {
+					if(y == 0)
 						placeItem(y*9+x, GUI.createItem(Material.RED_STAINED_GLASS_PANE, ChatColor.RED+ Messages.SHOP_TITLE_BUY2.toString()));
-					} else {
+					else {
 						Optional<RowStore> row = shop.getRow(y-1);
-						if(row.isPresent()) {
+						if(row.isPresent())
 							placeItem(y*9+x, row.get().getItemIn2());
-						}
 					}
 				} else if(x == 8 && y == 0) {
 					if(listAllShops) {
@@ -71,25 +77,11 @@ public class InvShop extends GUI {
 							p.closeInventory();
 							shop.buy(p, index);
 						});
-					} else {
+					} else
 						placeItem(y*9+x, GUI.createItem(Material.GRAY_DYE, ""));
-					}
-				} else {
+				} else
 					placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
-				}
 			}
 		}
-	}
-	
-	private static String getShopName(Shop shop) {
-		if(shop.isAdmin())
-			return Messages.SHOP_TITLE_ADMIN_SHOP.toString() + shop.shopId();
-		
-		String msg = Messages.SHOP_TITLE_NORMAL_SHOP.toString() + shop.shopId();
-		OfflinePlayer pl = Bukkit.getOfflinePlayer(shop.getOwner());
-		if(pl == null)
-			return msg.replaceAll("%player%", "<unknown>");
-		
-		return msg.replaceAll("%player%", pl.getName());
 	}
 }

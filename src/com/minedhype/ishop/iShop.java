@@ -20,14 +20,16 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import com.minedhype.ishop.gui.GUIEvent;
 import com.minedhype.ishop.MetricsLite;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.scheduler.BukkitTask;
 
 public class iShop extends JavaPlugin {
 	File configFile;
 	public static FileConfiguration config;
 	public static WorldGuardLoader wgLoader = null;
-	private static String chainConnect;
-	private static Economy economy = null;
+	private static BukkitTask expiredTaskId, saveTaskId, tickTaskId;
 	private static Connection connection = null;
+	private static Economy economy = null;
+	private static String chainConnect;
 
 	@Override
 	public void onLoad() {
@@ -41,7 +43,6 @@ public class iShop extends JavaPlugin {
 		chainConnect = "jdbc:sqlite:"+getDataFolder().getAbsolutePath()+"/shops.db";
 		this.setupEconomy();
 		this.createConfig();
-
 		if(config.getString("shopBlock") == null) {
 			config.set("shopBlock", "minecraft:barrel");
 			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_SHOP_BLOCK.toString());
@@ -50,20 +51,17 @@ public class iShop extends JavaPlugin {
 			config.set("stockBlock", "minecraft:composter");
 			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_STOCK_BLOCK.toString());
 		}
-
 		getServer().getPluginManager().registerEvents(new EventShop(), this);
 		getServer().getPluginManager().registerEvents(new GUIEvent(), this);
 		getCommand("ishop").setExecutor(new CommandShop());
-
 		try {
 			connection = DriverManager.getConnection(chainConnect);
 			this.createTables();
 			Shop.loadData();
 		} catch(Exception e) { e.printStackTrace(); }
-
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 10, 3000);
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 500, 6000);
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 100, 50);
+		expiredTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 5, 20000);
+		saveTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 500, 6000);
+		tickTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 100, 50);
 		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 60);
 		MetricsLite metrics = new MetricsLite(this, 9189);
 		new UpdateChecker(this, 84555).getVersion(version -> {
@@ -74,12 +72,21 @@ public class iShop extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		Shop.saveData();
-
+		tickTaskId.cancel();
+		expiredTaskId.cancel();
+		if(Bukkit.getScheduler().isCurrentlyRunning(saveTaskId.getTaskId()))
+			while(Bukkit.getScheduler().isCurrentlyRunning(saveTaskId.getTaskId()))
+				;
+		else {
+			saveTaskId.cancel();
+			Shop.saveData();
+		}
 		if(connection != null) {
 			try {
 				connection.close();
-			} catch (SQLException e) { e.printStackTrace(); }
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -92,14 +99,12 @@ public class iShop extends JavaPlugin {
 					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaStocks(owner varchar(64), items JSON);")
 			};
 		} catch(Exception e) { e.printStackTrace(); }
-
 		for(PreparedStatement stmt : stmts) {
 			try {
 				stmt.execute();
 				stmt.close();
 			} catch(Exception e) { e.printStackTrace(); }
 		}
-
 		List<PreparedStatement> stmtsPatches = new ArrayList<>();
 		try {
 			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemIn2 text NULL DEFAULT 'v: 2580\ntype: AIR\namount: 0' "));
@@ -108,7 +113,6 @@ public class iShop extends JavaPlugin {
 			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaStocks ADD COLUMN pag INTEGER DEFAULT 0"));
 			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendas ADD COLUMN admin BOOLEAN DEFAULT FALSE;"));
 		} catch(Exception ignored) { }
-
 		for(PreparedStatement stmtsPatch : stmtsPatches) {
 			try {
 				stmtsPatch.execute();
@@ -132,11 +136,9 @@ public class iShop extends JavaPlugin {
 	private void setupEconomy() {
 		if(getServer().getPluginManager().getPlugin("Vault") == null)
 			return;
-
 		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
 		if(rsp == null)
 			return;
-
 		economy = rsp.getProvider();
 	}
 
@@ -150,7 +152,6 @@ public class iShop extends JavaPlugin {
 			this.configFile.getParentFile().mkdirs();
 			saveResource("config.yml", false);
 		}
-
 		config = new YamlConfiguration();
 		try {
 			config.load(this.configFile);
@@ -189,9 +190,14 @@ public class iShop extends JavaPlugin {
 					config.set("shopListDisabled", "&cShops list has been disabled!");
 				case "2.3":
 					config.set("enableStockAccessFromShopGUI", true);
-					config.set("configVersion", 2.4);
+				case"2.4":
+					config.set("placeItemFrameSigns", false);
+					config.set("protectShopBlocksFromExplosions", false);
+					config.set("normalShop", "%player%'s Shop #%id");
+					config.set("stockIntegerError", "&cStock page must be an integer greater than 0!");
+					config.set("configVersion", 2.5);
 					config.save(configFile);
-				case "2.4":
+				case "2.5":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

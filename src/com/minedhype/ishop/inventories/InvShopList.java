@@ -1,33 +1,27 @@
 package com.minedhype.ishop.inventories;
 
 import com.minedhype.ishop.Shop;
+import com.minedhype.ishop.iShop;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
-import com.minedhype.ishop.iShop;
 import com.minedhype.ishop.Messages;
 import com.minedhype.ishop.gui.GUI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class InvShopList extends GUI {
-	private final ArrayList<ItemStack> shopslist = new ArrayList<>();
+	public final static ArrayList<ItemStack> shopslist = new ArrayList<>();
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
-	private final ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD,1);
-	public static boolean showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
 	private int pag;
 
 	private InvShopList(String shopTitle) {
 		super(54, shopTitle);
 	}
-
 	public static InvShopList setShopTitle(String shopTitle) {
 		return new InvShopList(shopTitle);
 	}
@@ -41,12 +35,12 @@ public class InvShopList extends GUI {
 			return;
 		if(event.getCurrentItem() == null || event.getCurrentItem().getType().isAir())
 			return;
-
 		if(event.isLeftClick() && event.getCurrentItem().getItemMeta().hasLore() && event.getCurrentItem().getType().equals(Material.PLAYER_HEAD)) {
 			event.setCancelled(true);
 			Player player = (Player) event.getWhoClicked();
 			List<String> itemLore = event.getCurrentItem().getItemMeta().getLore();
 			player.closeInventory();
+			Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), shopslist::clear);
 			player.performCommand("shop view " + itemLore.get(0));
 		}
 	}
@@ -57,9 +51,9 @@ public class InvShopList extends GUI {
 			if(index <= shopslist.size()-1) {
 				placeItem(i, shopslist.get(index));
 				index++;
-			} else placeItem(i, airItem);
+			} else
+				placeItem(i, airItem);
 		}
-
 		int shopListPages = (int)Math.ceil(shopslist.size()-1)/44;
 		for(int i=45; i<54; i++) {
 			if(i == 47 && pag > 0) {
@@ -78,7 +72,6 @@ public class InvShopList extends GUI {
 	private void openPage(Player player, int pag) {
 		for(int i=45; i<54; i++)
 			placeItem(i, new ItemStack(airItem));
-
 		player.closeInventory();
 		shopslist.clear();
 		this.pag = pag;
@@ -87,9 +80,13 @@ public class InvShopList extends GUI {
 
 	@Override
 	public void open(Player player) {
-		getShopList(player.getUniqueId());
-		PlayerShopList();
-		super.open(player);
+		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () ->  {
+			Shop.getShopList(player.getUniqueId());
+			Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> {
+				PlayerShopList();
+				super.open(player);
+			});
+		});
 	}
 
 	@Override
@@ -98,31 +95,5 @@ public class InvShopList extends GUI {
 		event.setCancelled(true);
 	}
 
-	public void setPag(int pag) {
-		this.pag = pag;
-	}
-
-	private void getShopList(UUID uuid) {
-		for(Integer id : Shop.shopList.keySet()) {
-			if(Shop.shopList.get(id) != null) {
-				if(Shop.shopList.get(id).equals(uuid) && !showOwnedShops)
-					continue;
-				else {
-					ItemStack item = new ItemStack(playerHead);
-					SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
-					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
-					skullMeta.setOwningPlayer(offlinePlayer);
-					if(Shop.shopList.get(id).equals(UUID.fromString("00000000-0000-0000-0000-000000000000")))
-						skullMeta.setDisplayName("Admin" + Messages.SHOP_NUMBER.toString() + id);
-					else
-						skullMeta.setDisplayName(offlinePlayer.getName() + Messages.SHOP_NUMBER.toString() + id);
-					List<String> skullLore = new ArrayList<>();
-					skullLore.add(id.toString());
-					skullMeta.setLore(skullLore);
-					item.setItemMeta(skullMeta);
-					shopslist.add(item);
-				}
-			}
-		}
-	}
+	public void setPag(int pag) { this.pag = pag; }
 }
