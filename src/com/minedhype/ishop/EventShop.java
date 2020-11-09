@@ -142,23 +142,49 @@ public class EventShop implements Listener {
 				InvShop inv = new InvShop(shop.get());
 				inv.open(event.getPlayer(), shop.get().getOwner());
 			}
-			return;
 		}
 	}
 
 	@EventHandler
-	public void HangingBreakItemFrame(HangingBreakByEntityEvent event) {
+	public void shopSignBreak(BlockBreakEvent event) {
 		if(!placeFrameSign || !shopEnabled)
 			return;
-		if(event.getEntity() instanceof ItemFrame) {
-			BlockFace blockFace = event.getEntity().getAttachedFace();
-			Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace);
-			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
-			if(!shop.isPresent() || shop.get().isOwner(event.getRemover().getUniqueId()) || event.getRemover().hasPermission(Permission.SHOP_ADMIN.toString()) && ((Player) event.getRemover()).isSneaking())
+		Location attachedBlock;
+		if(event.getBlock().getBlockData() instanceof WallSign) {
+			WallSign wallSign = (WallSign)event.getBlock().getBlockData();
+			BlockFace blockFace = wallSign.getFacing();
+			Block block = event.getBlock().getRelative(blockFace.getOppositeFace());
+			attachedBlock = block.getLocation();
+		} else if(event.getBlock().getBlockData() instanceof org.bukkit.block.data.type.Sign)
+			attachedBlock = event.getBlock().getLocation().subtract(0,1,0);
+		else
+			return;
+		Optional<Shop> shop = Shop.getShopByLocation(attachedBlock);
+		if(!shop.isPresent() || shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString()) && event.getPlayer().isSneaking())
+			return;
+		else
+			event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void shopSignPlace(BlockPlaceEvent event) {
+		if(!placeFrameSign || !shopEnabled)
+			return;
+		if((event.getBlock().getBlockData() instanceof WallSign || event.getBlock().getBlockData() instanceof org.bukkit.block.data.type.Sign) && placeFrameSign && shopEnabled) {
+			Optional<Shop> shop = Shop.getShopByLocation(event.getBlockAgainst().getLocation());
+			if(!shop.isPresent() || shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString()) && event.getPlayer().isSneaking())
 				return;
 			else
 				event.setCancelled(true);
 		}
+	}
+
+	@EventHandler
+	public void protectFromWitherDamage(EntityChangeBlockEvent event) {
+		if(!protectShopFromExplosion || !shopEnabled)
+			return;
+		if(event.getEntity() instanceof Wither && checkShopLoc(event.getBlock().getLocation()))
+			event.setCancelled(true);
 	}
 
 	@EventHandler
@@ -191,53 +217,6 @@ public class EventShop implements Listener {
 	}
 
 	@EventHandler
-	public void itemFrameItemRotate(PlayerInteractEntityEvent event) {
-		if(!placeFrameSign || !shopEnabled)
-			return;
-		if(event.getRightClicked() instanceof ItemFrame) {
-			BlockFace blockFace = event.getRightClicked().getFacing();
-			Block attachedBlock = event.getRightClicked().getLocation().getBlock().getRelative(blockFace.getOppositeFace());
-			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
-			if(!shop.isPresent() || shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString()) && event.getPlayer().isSneaking())
-				return;
-			else
-				event.setCancelled(true);
-		}
-	}
-
-	@EventHandler
-	public void shopSignPlace(BlockPlaceEvent event) {
-		if((event.getBlock().getBlockData() instanceof WallSign || event.getBlock().getBlockData() instanceof org.bukkit.block.data.type.Sign) && placeFrameSign && shopEnabled) {
-			Optional<Shop> shop = Shop.getShopByLocation(event.getBlockAgainst().getLocation());
-			if(!shop.isPresent() || shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString()) && event.getPlayer().isSneaking())
-				return;
-			else
-				event.setCancelled(true);
-		}
-	}
-
-	@EventHandler
-	public void shopSignBreak(BlockBreakEvent event) {
-		if(!placeFrameSign || !shopEnabled)
-			return;
-		Location attachedBlock;
-		if(event.getBlock().getBlockData() instanceof WallSign) {
-			WallSign wallSign = (WallSign)event.getBlock().getBlockData();
-			BlockFace blockFace = wallSign.getFacing();
-			Block block = event.getBlock().getRelative(blockFace.getOppositeFace());
-			attachedBlock = block.getLocation();
-		} else if(event.getBlock().getBlockData() instanceof org.bukkit.block.data.type.Sign)
-			attachedBlock = event.getBlock().getLocation().subtract(0,1,0);
-		else
-			return;
-		Optional<Shop> shop = Shop.getShopByLocation(attachedBlock);
-		if(!shop.isPresent() || shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString()) && event.getPlayer().isSneaking())
-			return;
-		else
-			event.setCancelled(true);
-	}
-
-	@EventHandler
 	public void entityExplosion(EntityExplodeEvent event) {
 		if(!protectShopFromExplosion || !shopEnabled)
 			return;
@@ -250,11 +229,33 @@ public class EventShop implements Listener {
 	}
 
 	@EventHandler
-	public void protectFromWitherDamage(EntityChangeBlockEvent event) {
-		if(!protectShopFromExplosion || !shopEnabled)
+	public void HangingBreakItemFrame(HangingBreakByEntityEvent event) {
+		if(!placeFrameSign || !shopEnabled)
 			return;
-		if(event.getEntity() instanceof Wither && checkShopLoc(event.getBlock().getLocation()))
-			event.setCancelled(true);
+		if(event.getEntity() instanceof ItemFrame) {
+			BlockFace blockFace = event.getEntity().getAttachedFace();
+			Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace);
+			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
+			if(!shop.isPresent() || shop.get().isOwner(event.getRemover().getUniqueId()) || event.getRemover().hasPermission(Permission.SHOP_ADMIN.toString()) && ((Player) event.getRemover()).isSneaking())
+				return;
+			else
+				event.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void itemFrameItemRotate(PlayerInteractEntityEvent event) {
+		if(!placeFrameSign || !shopEnabled)
+			return;
+		if(event.getRightClicked() instanceof ItemFrame) {
+			BlockFace blockFace = event.getRightClicked().getFacing();
+			Block attachedBlock = event.getRightClicked().getLocation().getBlock().getRelative(blockFace.getOppositeFace());
+			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
+			if(!shop.isPresent() || shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString()) && event.getPlayer().isSneaking())
+				return;
+			else
+				event.setCancelled(true);
+		}
 	}
 
 	private boolean checkShopLoc(Location location) {

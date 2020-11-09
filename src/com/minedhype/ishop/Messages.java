@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 
 public enum Messages {
 	ADMIN_SHOP_DISABLED("adminShopDisabled"),
+	ADMIN_SHOP_NUMBER("adminShopNumber"),
 	DISABLED_SHOP_BLOCK("disabledShopBlock"),
 	EXISTING_SHOP("existingShop"),
 	NOT_A_PLAYER("notPlayer"),

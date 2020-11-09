@@ -181,7 +181,7 @@ public class iShop extends JavaPlugin {
 				case "2.0":
 					config.set("publicShopListCommand", true);
 					config.set("shopListTitle", "Shops List");
-					config.set("shopNumber", " shop #");
+					config.set("shopNumber", "%player shop #%id");
 					config.set("normalShop", "%player%'s Shop #");
 					config.set("adminShop", "Admin Shop #");
 				case "2.1":
@@ -194,6 +194,8 @@ public class iShop extends JavaPlugin {
 					config.set("placeItemFrameSigns", false);
 					config.set("protectShopBlocksFromExplosions", false);
 					config.set("normalShop", "%player%'s Shop #%id");
+					config.set("shopNumber", "%player's shop #%id");
+					config.set("adminShopNumber", "Admin shop #%id");
 					config.set("stockIntegerError", "&cStock page must be an integer greater than 0!");
 					config.set("configVersion", 2.5);
 					config.save(configFile);

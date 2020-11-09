@@ -512,9 +512,9 @@ public class Shop {
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
 					skullMeta.setOwningPlayer(offlinePlayer);
 					if(Shop.shopList.get(id).equals(UUID.fromString("00000000-0000-0000-0000-000000000000")))
-						skullMeta.setDisplayName("Admin" + Messages.SHOP_NUMBER.toString() + id);
+						skullMeta.setDisplayName(Messages.ADMIN_SHOP_NUMBER.toString().replaceAll("%id", id.toString()));
 					else
-						skullMeta.setDisplayName(offlinePlayer.getName() + Messages.SHOP_NUMBER.toString() + id);
+						skullMeta.setDisplayName(Messages.SHOP_NUMBER.toString().replaceAll("%player", offlinePlayer.getName()).replaceAll("%id", id.toString()));
 					List<String> skullLore = new ArrayList<>();
 					skullLore.add(id.toString());
 					skullMeta.setLore(skullLore);
