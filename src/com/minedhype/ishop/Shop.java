@@ -351,24 +351,25 @@ public class Shop {
 					Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
 				}
 				return;
-		}
-		if(!Utils.hasStock(this, row.get().getItemOut())) {
-			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
-			if(shopOutStock) {
-				final Player ownerPlayer = Bukkit.getPlayer(owner);
-				final String itemString = row.get().getItemOut().getType().toString();
-				Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
+		} else {
+			if(!Utils.hasStock(this, row.get().getItemOut())) {
+				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
+				if(shopOutStock) {
+					final Player ownerPlayer = Bukkit.getPlayer(owner);
+					final String itemString = row.get().getItemOut().getType().toString();
+					Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
+				}
+				return;
 			}
-			return;
-		}
-		if(!Utils.hasStock(this, row.get().getItemOut2())) {
-			player.sendMessage(Messages.SHOP_NO_STOCK.toString());
-			if(shopOutStock) {
-				final Player ownerPlayer = Bukkit.getPlayer(owner);
-				final String itemString = row.get().getItemOut2().getType().toString();
-				Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
+			if(!Utils.hasStock(this, row.get().getItemOut2())) {
+				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
+				if(shopOutStock) {
+					final Player ownerPlayer = Bukkit.getPlayer(owner);
+					final String itemString = row.get().getItemOut2().getType().toString();
+					Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStockItem(ownerPlayer, itemString));
+				}
+				return;
 			}
-			return;
 		}
 		if(player.getInventory().firstEmpty() != -1) {
 			if(!row.get().getItemIn().isSimilar(airItem))
