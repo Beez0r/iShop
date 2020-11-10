@@ -338,8 +338,7 @@ public class Shop {
 		if(row.get().getItemIn().isSimilar(row.get().getItemIn2()) && !Utils.hasDoubleItemStock(player, row.get().getItemIn(), row.get().getItemIn2())) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
-		}
-		if(!Utils.hasStock(player, row.get().getItemIn()) || !Utils.hasStock(player, row.get().getItemIn2())) {
+		} else if(!Utils.hasStock(player, row.get().getItemIn()) || !Utils.hasStock(player, row.get().getItemIn2())) {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 		}
