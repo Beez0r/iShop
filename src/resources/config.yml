@@ -1,3 +1,4 @@
+# iShop - https://www.spigotmc.org/resources/ishop.84555/
 # The block you want to open the shop GUI
 # Shop GUI will be activated only by left or right click
 shopBlock: 'minecraft:barrel'
@@ -139,8 +140,8 @@ shopNotOwned: "&cYou do not own this shop!"
 stockCommandDisabled: "&cThe /shop stock command has been disabled!"
 stockTitle: "Shop Stock Inventory"
 targetMismatch: "&cTargeted block must match set shop block!"
-clickManage: "&6MANAGE"
-clickShop: "&6SHOP"
+clickManage: "&eMANAGE"
+clickShop: "&eSHOP"
 listAdminShop: "&6Listing all found admin shops:"
 noAdminShopsFound: "&cNo admin shops have been found!"
 noShopBlock: "&cshopBlock cannot be empty! Reverting to default minecraft:barrel"

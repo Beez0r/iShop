@@ -159,8 +159,6 @@ public class iShop extends JavaPlugin {
 			switch(ver) {
 				case "1.0":
 					config.set("adminShopDisabled", "&cAdmin shops have been disabled!");
-					config.set("clickManage", "&6MANAGE");
-					config.set("clickShop", "&6SHOP");
 					config.set("listAdminShop", "&6Listing all found admin shops:");
 					config.set("noAdminShopsFound", "&cNo admin shops have been found!");
 					config.set("noShopBlock", "&cshopBlock cannot be empty! Reverting to default minecraft:barrel");
@@ -191,6 +189,8 @@ public class iShop extends JavaPlugin {
 				case "2.4":
 					config.set("placeItemFrameSigns", true);
 					config.set("protectShopBlocksFromExplosions", true);
+					config.set("clickManage", "&eMANAGE");
+					config.set("clickShop", "&eSHOP");
 					config.set("normalShop", "%player%'s Shop #%id");
 					config.set("shopNumber", "%player's shop #%id");
 					config.set("adminShopNumber", "Admin shop #%id");
