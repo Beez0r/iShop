@@ -32,9 +32,7 @@ import com.google.gson.JsonParser;
 import com.minedhype.ishop.inventories.InvStock;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class Shop {
 	public static boolean shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
@@ -113,7 +111,6 @@ public class Shop {
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
 						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
-						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_MANAGE_TEXT.toString())));
 						manageMsg.addExtra(manageText);
 						player.spigot().sendMessage(manageMsg);
 					} else if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
@@ -121,14 +118,12 @@ public class Shop {
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
 						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
-						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_MANAGE_TEXT.toString())));
 						manageMsg.addExtra(manageText);
 						String shopMessage = "";
 						if(!s.isOwner(player.getUniqueId())) {
 							TextComponent shopMsg = new TextComponent(shopMessage);
 							TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_SHOP.toString() + ChatColor.DARK_GRAY + "]");
 							shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
-							shopText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_SHOP_TEXT.toString())));
 							shopMsg.addExtra(shopText);
 							player.spigot().sendMessage(manageMsg, shopMsg);
 						} else
@@ -138,7 +133,6 @@ public class Shop {
 						TextComponent shopMsg = new TextComponent(shopMessage);
 						TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_SHOP.toString() + ChatColor.DARK_GRAY + "]");
 						shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
-						shopText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_SHOP_TEXT.toString())));
 						shopMsg.addExtra(shopText);
 						player.spigot().sendMessage(shopMsg);
 					} else
@@ -157,7 +151,6 @@ public class Shop {
 						TextComponent manageMsg = new TextComponent(manageMessage);
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
 						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
-						manageText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Messages.SHOP_CLICK_MANAGE_TEXT.toString())));
 						manageMsg.addExtra(manageText);
 						player.spigot().sendMessage(manageMsg);
 						shopCount.getAndIncrement();
@@ -425,9 +418,7 @@ public class Shop {
 	}
 
 	public boolean hasExpired() {
-		if(this.admin)
-			return false;
-		if(maxDays <= 0)
+		if(this.admin || maxDays <= 0)
 			return false;
 		OfflinePlayer player = Bukkit.getOfflinePlayer(this.owner);
 		if(player.isOnline())

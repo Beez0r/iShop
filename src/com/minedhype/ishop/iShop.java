@@ -162,12 +162,10 @@ public class iShop extends JavaPlugin {
 					config.set("clickManage", "&6MANAGE");
 					config.set("clickShop", "&6SHOP");
 					config.set("listAdminShop", "&6Listing all found admin shops:");
-					config.set("manageText", "&6Manage this shop!");
 					config.set("noAdminShopsFound", "&cNo admin shops have been found!");
 					config.set("noShopBlock", "&cshopBlock cannot be empty! Reverting to default minecraft:barrel");
 					config.set("noStockBlock", "&cstockBlock cannot be empty! Reverting to default minecraft:composter");
 					config.set("notPlayer", "&cOnly players in the game can use shop commands!");
-					config.set("shopText", "&6Remotely shop here!");
 				case "1.1":
 					config.set("buyTitle","PRICE TO BUY ITEMS [SLOT 1]");
 					config.set("buyTitle2","PRICE TO BUY ITEMS [SLOT 2]");
@@ -190,9 +188,9 @@ public class iShop extends JavaPlugin {
 					config.set("shopListDisabled", "&cShops list has been disabled!");
 				case "2.3":
 					config.set("enableStockAccessFromShopGUI", true);
-				case"2.4":
-					config.set("placeItemFrameSigns", false);
-					config.set("protectShopBlocksFromExplosions", false);
+				case "2.4":
+					config.set("placeItemFrameSigns", true);
+					config.set("protectShopBlocksFromExplosions", true);
 					config.set("normalShop", "%player%'s Shop #%id");
 					config.set("shopNumber", "%player's shop #%id");
 					config.set("adminShopNumber", "Admin shop #%id");

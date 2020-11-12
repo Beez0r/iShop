@@ -89,10 +89,10 @@ adminShopPublic: true
 publicShopListShowsOwned: true
 
 # Allow shop owners and admins to place item frames and signs on shop blocks when sneaking
-placeItemFrameSigns: false
+placeItemFrameSigns: true
 
 # Setting to true will protect shop blocks from explosions
-protectShopBlocksFromExplosions: false
+protectShopBlocksFromExplosions: true
 
 # Customizable Messages
 adminShop: "Admin Shop #%id"
@@ -142,12 +142,10 @@ targetMismatch: "&cTargeted block must match set shop block!"
 clickManage: "&6MANAGE"
 clickShop: "&6SHOP"
 listAdminShop: "&6Listing all found admin shops:"
-manageText: "&6Manage this shop!"
 noAdminShopsFound: "&cNo admin shops have been found!"
 noShopBlock: "&cshopBlock cannot be empty! Reverting to default minecraft:barrel"
 noStockBlock: "&cstockBlock cannot be empty! Reverting to default minecraft:composter"
 notPlayer: "&cOnly players in the game can use shop commands!"
-shopText: "&6Remotely shop here!"
 shopListTitle: "Shops List"
 shopNumber: "%player shop #%id"
 shopListDisabled: "&cShops list has been disabled!"

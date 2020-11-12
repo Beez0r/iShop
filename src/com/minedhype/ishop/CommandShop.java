@@ -565,7 +565,6 @@ public class CommandShop implements CommandExecutor {
 				return;
 			}
 		}
-
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(sOwner);
 		if(offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
 			player.sendMessage(Messages.NO_PLAYER_FOUND.toString());

@@ -81,6 +81,7 @@ public class StockShop {
 	public Inventory getInventory() {
 		return inventory;
 	}
+
 	public void setInventory(Inventory inventory) {
 		for(int i=0; i<45; i++)
 			this.inventory.setItem(i, inventory.getItem(i));
