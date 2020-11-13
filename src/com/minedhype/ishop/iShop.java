@@ -184,6 +184,7 @@ public class iShop extends JavaPlugin {
 				case "2.3":
 					config.set("enableStockAccessFromShopGUI", true);
 				case "2.4":
+					config.set("adminShopPublic", true);
 					config.set("placeItemFrameSigns", true);
 					config.set("protectShopBlocksFromExplosions", true);
 					config.set("adminShop", "Admin Shop #%id");
