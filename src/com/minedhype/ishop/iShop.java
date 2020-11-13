@@ -179,7 +179,6 @@ public class iShop extends JavaPlugin {
 					config.set("shopListTitle", "Shops List");
 					config.set("shopNumber", "%player shop #%id");
 					config.set("normalShop", "%player%'s Shop #");
-					config.set("adminShop", "Admin Shop #");
 				case "2.1":
 				case "2.2":
 					config.set("publicShopListShowsOwned", true);
@@ -189,6 +188,7 @@ public class iShop extends JavaPlugin {
 				case "2.4":
 					config.set("placeItemFrameSigns", true);
 					config.set("protectShopBlocksFromExplosions", true);
+					config.set("adminShop", "Admin Shop #%id");
 					config.set("clickManage", "&eMANAGE");
 					config.set("clickShop", "&eSHOP");
 					config.set("normalShop", "%player%'s Shop #%id");
