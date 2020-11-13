@@ -46,19 +46,15 @@ public class InvStock extends GUI {
 		stock = stockOpt.orElseGet(() -> new StockShop(owner, pag));
 		Inventory inv = stock.getInventory();
 		for(int i=0; i<45; i++) {
-			ItemStack item = inv.getItem(i);
-			placeItem(i, item);
+			placeItem(i, inv.getItem(i));
 		}
 		for(int i=45; i<54; i++) {
 			if(i == 47 && pag > 0) {
-				ItemStack item = GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag));
-				placeItem(i, item, p -> openPage(p, pag-1));
+				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag)), p -> openPage(p, pag-1));
 			} else if(i == 51 && pag < iShop.config.getInt("stockPages")-1) {
-				ItemStack item = GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag+2));
-				placeItem(i, item, p -> openPage(p, pag+1));
+				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag+2)), p -> openPage(p, pag+1));
 			} else {
-				ItemStack item = GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, "");
-				placeItem(i, item);
+				placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 			}
 		}
 	}

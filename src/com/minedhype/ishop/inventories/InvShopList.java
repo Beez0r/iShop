@@ -57,14 +57,11 @@ public class InvShopList extends GUI {
 		int shopListPages = (int)Math.ceil(shopslist.size()-1)/44;
 		for(int i=45; i<54; i++) {
 			if(i == 47 && pag > 0) {
-				ItemStack item = GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag));
-				placeItem(i, item, p -> openPage(p, pag-1));
+				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag)), p -> openPage(p, pag-1));
 			} else if(i == 51 && pag < shopListPages) {
-				ItemStack item = GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag+2));
-				placeItem(i, item, p -> openPage(p, pag+1));
+				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag+2)), p -> openPage(p, pag+1));
 			} else {
-				ItemStack item = GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, "");
-				placeItem(i, item);
+				placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 			}
 		}
 	}
