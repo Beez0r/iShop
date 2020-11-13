@@ -177,8 +177,6 @@ public class iShop extends JavaPlugin {
 				case "2.0":
 					config.set("publicShopListCommand", true);
 					config.set("shopListTitle", "Shops List");
-					config.set("shopNumber", "%player shop #%id");
-					config.set("normalShop", "%player%'s Shop #");
 				case "2.1":
 				case "2.2":
 					config.set("publicShopListShowsOwned", true);
