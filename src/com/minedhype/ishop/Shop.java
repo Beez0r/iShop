@@ -101,8 +101,7 @@ public class Shop {
 	}
 
 	public static void getShopList(Player player, UUID sOwner, String pOwner) {
-		player.sendMessage(Messages.SHOP_FOUND.toString()
-		.replaceAll("%p", pOwner).replaceAll("%shops", String.valueOf(getNumShops(sOwner))));
+		player.sendMessage(Messages.SHOP_FOUND.toString().replaceAll("%p", pOwner).replaceAll("%shops", String.valueOf(getNumShops(sOwner))));
 		shops.parallelStream()
 				.filter(s -> !s.admin && s.isOwner(sOwner))
 				.forEach(s -> {

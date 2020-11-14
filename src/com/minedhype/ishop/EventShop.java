@@ -171,8 +171,7 @@ public class EventShop implements Listener {
 
 	@EventHandler
 	public void protectFromWitherDamage(EntityChangeBlockEvent event) {
-		if(protectShopFromExplosion && shopEnabled)
-			if(event.getEntity() instanceof Wither && checkShopLoc(event.getBlock().getLocation()))
+		if(protectShopFromExplosion && shopEnabled && event.getEntity() instanceof Wither && checkShopLoc(event.getBlock().getLocation()))
 				event.setCancelled(true);
 	}
 
