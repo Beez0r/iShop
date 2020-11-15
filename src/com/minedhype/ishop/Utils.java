@@ -27,12 +27,13 @@ public class Utils {
 			if(stockStore.get().getInventory().containsAtLeast(item, amount))
 				return true;
 			if(stockStore.get().getInventory().contains(item.getType())) {
-				for(int j = 0; j < stockStore.get().getInventory().getSize(); j++)
+				for(int j = 0; j < stockStore.get().getInventory().getSize(); j++) {
 					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
 						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
+					if(itemAmountCount >= amount)
+						return true;
+				}
 			}
-			if(itemAmountCount >= amount)
-				return true;
 		}
 		return false;
 	}
@@ -56,12 +57,13 @@ public class Utils {
 			if(stockStore.get().getInventory().containsAtLeast(item, amount))
 				return true;
 			if(stockStore.get().getInventory().contains(item.getType())) {
-				for(int j = 0; j < stockStore.get().getInventory().getSize(); j++)
+				for(int j = 0; j < stockStore.get().getInventory().getSize(); j++) {
 					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
 						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
+					if(itemAmountCount >= amount)
+						return true;
+				}
 			}
-			if(itemAmountCount >= amount)
-				return true;
 		}
 		return false;
 	}
