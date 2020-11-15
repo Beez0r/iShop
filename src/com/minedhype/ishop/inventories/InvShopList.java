@@ -87,7 +87,7 @@ public class InvShopList extends GUI {
 					skullLore.add(id.toString());
 					skullMeta.setLore(skullLore);
 					item.setItemMeta(skullMeta);
-					InvShopList.shopslist.add(item);
+					shopslist.add(item);
 				}
 			}
 		}
