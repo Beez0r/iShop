@@ -18,11 +18,20 @@ public class Utils {
 		if(shop.isAdmin() || item == null || item == airItem)
 			return true;
 		int max = iShop.config.getInt("stockPages");
+		int amount = item.getAmount();
+		int itemAmountCount = 0;
 		for(int i=0; i<max; i++) {
 			Optional<StockShop> stockStore = StockShop.getStockShopByOwner(shop.getOwner(), i);
 			if(!stockStore.isPresent())
 				continue;
-			if(stockStore.get().getInventory().containsAtLeast(item, item.getAmount()))
+			if(stockStore.get().getInventory().containsAtLeast(item, amount))
+				return true;
+			if(stockStore.get().getInventory().contains(item.getType())) {
+				for(int j = 0; j < stockStore.get().getInventory().getSize(); j++)
+					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
+						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
+			}
+			if(itemAmountCount >= amount)
 				return true;
 		}
 		return false;
@@ -39,16 +48,20 @@ public class Utils {
 		if(shop.isAdmin() || item == null || item == airItem)
 			return true;
 		int max = iShop.config.getInt("stockPages");
-		int doubleItems = 0;
-		int halfAmount = (int)Math.ceil((double)amount/2);
+		int itemAmountCount = 0;
 		for(int i=0; i<max; i++) {
 			Optional<StockShop> stockStore = StockShop.getStockShopByOwner(shop.getOwner(), i);
 			if(!stockStore.isPresent())
 				continue;
-			if(doubleItems >= 2 || stockStore.get().getInventory().containsAtLeast(item, amount))
+			if(stockStore.get().getInventory().containsAtLeast(item, amount))
 				return true;
-			if(stockStore.get().getInventory().containsAtLeast(item, halfAmount))
-				doubleItems++;
+			if(stockStore.get().getInventory().contains(item.getType())) {
+				for(int j = 0; j < stockStore.get().getInventory().getSize(); j++)
+					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
+						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
+			}
+			if(itemAmountCount >= amount)
+				return true;
 		}
 		return false;
 	}

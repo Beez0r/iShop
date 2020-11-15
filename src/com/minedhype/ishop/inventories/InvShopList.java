@@ -40,7 +40,7 @@ public class InvShopList extends GUI {
 			Player player = (Player) event.getWhoClicked();
 			List<String> itemLore = event.getCurrentItem().getItemMeta().getLore();
 			player.closeInventory();
-			Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), shopslist::clear);
+			shopslist.clear();
 			player.performCommand("shop view " + itemLore.get(0));
 		}
 	}
