@@ -75,17 +75,17 @@ public class InvShop extends GUI {
 					if(row.isPresent()) {
 						final int index = y - 1;
 						if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(shop, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount()))
-							placeItem(y * 9 + x, GUI.createItem(Material.RED_DYE, ChatColor.RED + Messages.SHOP_NO_STOCK.toString()), p -> {
+							placeItem(y * 9 + x, GUI.createItem(Material.RED_DYE, ChatColor.RED + Messages.SHOP_NO_STOCK_BUTTON.toString()), p -> {
 								p.closeInventory();
 								shop.buy(p, index);
 							});
 						else if(!Utils.hasStock(shop, row.get().getItemOut()))
-							placeItem(y * 9 + x, GUI.createItem(Material.RED_DYE, ChatColor.RED + Messages.SHOP_NO_STOCK.toString()), p -> {
+							placeItem(y * 9 + x, GUI.createItem(Material.RED_DYE, ChatColor.RED + Messages.SHOP_NO_STOCK_BUTTON.toString()), p -> {
 								p.closeInventory();
 								shop.buy(p, index);
 							});
 						else if(!Utils.hasStock(shop, row.get().getItemOut2()))
-							placeItem(y * 9 + x, GUI.createItem(Material.RED_DYE, ChatColor.RED + Messages.SHOP_NO_STOCK.toString()), p -> {
+							placeItem(y * 9 + x, GUI.createItem(Material.RED_DYE, ChatColor.RED + Messages.SHOP_NO_STOCK_BUTTON.toString()), p -> {
 								p.closeInventory();
 								shop.buy(p, index);
 							});

@@ -151,6 +151,7 @@ shopListTitle: "Shops List"
 shopNumber: "%player shop #%id"
 shopListDisabled: "&cShops list has been disabled!"
 adminShopNumber: "Admin shop #%id"
+noStockButton: "&cItem(s) out of stock!"
 stockIntegerError: "&cStock page must be an integer greater than 0!"
 
 # Do not edit this!

@@ -12,7 +12,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.minedhype.ishop.inventories.InvAdminShop;
-import com.minedhype.ishop.inventories.InvShopList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,7 +23,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -42,7 +40,6 @@ public class Shop {
 	public static boolean particleEffects = iShop.config.getBoolean("showParticles");
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
 	public static final ConcurrentHashMap<Integer, UUID> shopList = new ConcurrentHashMap<>();
-	private static final ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD,1);
 	private static final List<Shop> shops = new ArrayList<>();
 	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
 	private static final long millisecondsPerDay = 86400000;
@@ -489,30 +486,6 @@ public class Shop {
 				} catch (Exception e) { e.printStackTrace(); }
 			}
 		});
-	}
-
-	public static void getShopList(UUID uuid) {
-		for(Integer id : Shop.shopList.keySet()) {
-			if(Shop.shopList.get(id) != null) {
-				if(Shop.shopList.get(id).equals(uuid) && !showOwnedShops)
-					continue;
-				else {
-					ItemStack item = new ItemStack(playerHead);
-					SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
-					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
-					skullMeta.setOwningPlayer(offlinePlayer);
-					if(Shop.shopList.get(id).equals(UUID.fromString("00000000-0000-0000-0000-000000000000")))
-						skullMeta.setDisplayName(Messages.ADMIN_SHOP_NUMBER.toString().replaceAll("%id", id.toString()));
-					else
-						skullMeta.setDisplayName(Messages.SHOP_NUMBER.toString().replaceAll("%player", offlinePlayer.getName()).replaceAll("%id", id.toString()));
-					List<String> skullLore = new ArrayList<>();
-					skullLore.add(id.toString());
-					skullMeta.setLore(skullLore);
-					item.setItemMeta(skullMeta);
-					InvShopList.shopslist.add(item);
-				}
-			}
-		}
 	}
 
 	public void sendShopMessages(String i1, String i2, String o1, String o2, int inA1, int inA2, int outA1, int outA2, Player ownerPlayer, Player player, boolean isAdminShop, boolean rowBroadcast) {

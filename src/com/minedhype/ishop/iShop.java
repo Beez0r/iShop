@@ -193,6 +193,7 @@ public class iShop extends JavaPlugin {
 					config.set("normalShop", "%player%'s Shop #%id");
 					config.set("shopNumber", "%player's shop #%id");
 					config.set("adminShopNumber", "Admin shop #%id");
+					config.set("noStockButton", "&cItem(s) out of stock!");
 					config.set("stockIntegerError", "&cStock page must be an integer greater than 0!");
 					config.set("configVersion", 2.5);
 					config.save(configFile);

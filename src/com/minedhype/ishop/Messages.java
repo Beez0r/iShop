@@ -36,6 +36,7 @@ public enum Messages {
 	SHOP_NO_REMOTE("noRemoteShops"),
 	SHOP_NO_SELF("shopNotOwned"),
 	SHOP_NO_STOCK("noStock"),
+	SHOP_NO_STOCK_BUTTON("noStockButton"),
 	SHOP_NO_STOCK_SHELF("noStockNotify"),
 	SHOP_NUMBER("shopNumber"),
 	SHOP_PAGE("page"),
