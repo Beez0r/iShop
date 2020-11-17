@@ -27,7 +27,7 @@ public class Utils {
 			if(stockStore.get().getInventory().containsAtLeast(item, amount))
 				return true;
 			if(stockStore.get().getInventory().contains(item.getType())) {
-				for(int j = 0; j < stockStore.get().getInventory().getSize(); j++) {
+				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
 					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
 						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
 					if(itemAmountCount >= amount)
@@ -57,7 +57,7 @@ public class Utils {
 			if(stockStore.get().getInventory().containsAtLeast(item, amount))
 				return true;
 			if(stockStore.get().getInventory().contains(item.getType())) {
-				for(int j = 0; j < stockStore.get().getInventory().getSize(); j++) {
+				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
 					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
 						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
 					if(itemAmountCount >= amount)
