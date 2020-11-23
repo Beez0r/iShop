@@ -3,6 +3,7 @@ package com.minedhype.ishop;
 import com.minedhype.ishop.inventories.InvAdminShop;
 import com.minedhype.ishop.inventories.InvShop;
 import com.minedhype.ishop.inventories.InvStock;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,20 +22,32 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventShop implements Listener {
 	public static boolean adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
 	public static boolean stockEnabled = iShop.config.getBoolean("enableStockBlock");
+	public static boolean multipleShopBlocks = iShop.config.getBoolean("multipleShopBlocks");
+	public static boolean multipleStockBlocks = iShop.config.getBoolean("multipleStockBlocks");
 	public static boolean shopEnabled = iShop.config.getBoolean("enableShopBlock");
+	public static boolean soldJoinMessage = iShop.config.getBoolean("enableSoldNotificationOnJoin");
+	public static boolean soldOnlyOnFirstConnect = iShop.config.getBoolean("onlyNotifySoldOnceUntilClear");
 	public static boolean noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
 	public static boolean placeFrameSign = iShop.config.getBoolean("placeItemFrameSigns");
 	public static boolean protectShopFromExplosion = iShop.config.getBoolean("protectShopBlocksFromExplosions");
+	public static int soldMessageDelayTime = iShop.config.getInt("soldNotificationsDelayTime");
 	public static String shopBlock = iShop.config.getString("shopBlock");
 	public static String stockBlock = iShop.config.getString("stockBlock");
 	public static Material shopBlk = Material.matchMaterial(shopBlock);
 	public static Material stockBlk = Material.matchMaterial(stockBlock);
+	public static List<String> multipleShopBlock = iShop.config.getStringList("shopBlockList");
+	public static List<String> multipleStockBlock = iShop.config.getStringList("stockBlockList");
+	public static final ConcurrentHashMap<UUID, Integer> soldListSent = new ConcurrentHashMap<>();
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
@@ -53,7 +66,7 @@ public class EventShop implements Listener {
 				stockBlk = Material.matchMaterial(stockBlock.split("minecraft:")[1].toUpperCase());
 			} catch (Exception e) { stockBlk = Material.COMPOSTER; }
 		}
-		if(!block.getType().equals(stockBlk) && !block.getType().equals(shopBlk))
+		if(!block.getType().equals(stockBlk) && !block.getType().equals(shopBlk) && !multipleShopBlocks && !multipleStockBlocks)
 			return;
 		if(block.getType().equals(stockBlk) && block.getType().equals(shopBlk) && shopEnabled) {
 			boolean isShopLoc;
@@ -144,6 +157,75 @@ public class EventShop implements Listener {
 			} else {
 				InvShop inv = new InvShop(shop.get());
 				inv.open(event.getPlayer(), shop.get().getOwner());
+			}
+			return;
+		}
+		if(multipleShopBlocks && shopEnabled) {
+			for(String shopBlocks:multipleShopBlock) {
+				Material shopListBlocks = Material.matchMaterial(shopBlocks);
+				if(shopListBlocks != null && block.getType().equals(shopListBlocks)) {
+					boolean isShopLoc;
+					if(iShop.wgLoader != null)
+						isShopLoc = iShop.wgLoader.checkRegion(block);
+					else
+						isShopLoc = true;
+					Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
+					if(!shop.isPresent() || !isShopLoc)
+						return;
+					if(placeFrameSign)
+						if(event.getPlayer().isSneaking() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && (shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) && (event.getPlayer().getInventory().getItemInMainHand().getType().toString().endsWith("_SIGN") || event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.ITEM_FRAME)))
+							return;
+					if(shop.get().isAdmin() && !adminShopEnabled) {
+						event.setCancelled(true);
+						event.getPlayer().sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
+						return;
+					}
+					event.setCancelled(true);
+					if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
+						if(event.getHand().equals(EquipmentSlot.HAND))
+							event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
+						else if(event.getHand().equals(EquipmentSlot.OFF_HAND))
+							event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
+						return;
+					}
+					if((shop.get().isAdmin() && event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) || shop.get().isOwner(event.getPlayer().getUniqueId())) {
+						InvAdminShop inv = new InvAdminShop(shop.get(), event.getPlayer());
+						inv.open(event.getPlayer(), shop.get().getOwner());
+					} else {
+						InvShop inv = new InvShop(shop.get());
+						inv.open(event.getPlayer(), shop.get().getOwner());
+					}
+					return;
+				}
+			}
+		}
+		if(multipleStockBlocks && stockEnabled) {
+			for(String stockBlocks:multipleStockBlock) {
+				Material stockListBlocks = Material.matchMaterial(stockBlocks);
+				if(stockListBlocks != null && block.getType().equals(stockListBlocks)) {
+					boolean isShopLoc;
+					if(iShop.wgLoader != null)
+						isShopLoc = iShop.wgLoader.checkRegion(block);
+					else
+						isShopLoc = true;
+					if(!isShopLoc || event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking())
+						return;
+					event.setCancelled(true);
+					if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
+						if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1 && noShopNoStock) {
+							event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
+							return;
+						}
+						if(InvStock.inShopInv.containsValue(event.getPlayer().getUniqueId())) {
+							event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
+							return;
+						} else { InvStock.inShopInv.put(event.getPlayer(), event.getPlayer().getUniqueId()); }
+						InvStock inv = InvStock.getInvStock(event.getPlayer().getUniqueId());
+						inv.setPag(0);
+						inv.open(event.getPlayer());
+					}
+					return;
+				}
 			}
 		}
 	}
@@ -238,6 +320,25 @@ public class EventShop implements Listener {
 				return;
 			else
 				event.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void shopSoldMessages(PlayerJoinEvent event) {
+		if(Shop.stockMessages && soldJoinMessage && Shop.shopMessages.containsKey(event.getPlayer().getUniqueId())) {
+			final long delayTime;
+			if(soldMessageDelayTime < 1)
+				delayTime = 1;
+			else
+				delayTime = soldMessageDelayTime*20;
+			final UUID uuid = event.getPlayer().getUniqueId();
+			Bukkit.getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
+				if(soldOnlyOnFirstConnect && soldListSent.containsKey(event.getPlayer().getUniqueId())) {
+				} else if(uuid != null && Bukkit.getPlayer(uuid).isOnline()) {
+					soldListSent.put(uuid, 1);
+					Bukkit.getPlayer(uuid).sendMessage(Messages.SOLD_JOIN_NOTIFY.toString());
+				}
+			}, delayTime);
 		}
 	}
 

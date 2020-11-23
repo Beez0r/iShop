@@ -1,10 +1,13 @@
 package com.minedhype.ishop;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 import com.minedhype.ishop.inventories.InvShop;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.block.Block;
@@ -70,6 +73,10 @@ public class CommandShop implements CommandExecutor {
 			reloadShop(player);
 		else if(args[0].equalsIgnoreCase("shops"))
 			listAllShops(player);
+		else if(args[0].equalsIgnoreCase("sold") && args.length == 1)
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> shopSold(player, null));
+		else if(args[0].equalsIgnoreCase("sold") && args.length >= 2)
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> shopSold(player, args[1]));
 		else if(args[0].equalsIgnoreCase("stock") && args.length == 1)
 			stockShop(player, "1");
 		else if(args[0].equalsIgnoreCase("stock") && args.length >= 2)
@@ -93,6 +100,8 @@ public class CommandShop implements CommandExecutor {
 		if(iShop.config.getBoolean("publicShopListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " shops");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " manage <id>");
+		if(iShop.config.getBoolean("enableShopSoldMessage"));
+			player.sendMessage(ChatColor.GRAY + "/" + label + " sold <page/clear>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " stock <page>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " view <id>");
 		if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
@@ -127,9 +136,24 @@ public class CommandShop implements CommandExecutor {
 			if(match == null)
 				match = Material.BARREL;
 		}
-		if(!block.getType().equals(match)) {
-			player.sendMessage(Messages.TARGET_MISMATCH.toString());
-			return;
+		if(!EventShop.multipleShopBlocks) {
+			if(!block.getType().equals(match)) {
+				player.sendMessage(Messages.TARGET_MISMATCH.toString());
+				return;
+			}
+		} else {
+			boolean shopMatch = false;
+			for(String shopBlocks:EventShop.multipleShopBlock) {
+				Material shopListBlocks = Material.matchMaterial(shopBlocks);
+				if(shopListBlocks != null && block.getType().equals(shopListBlocks)) {
+					shopMatch = true;
+					break;
+				}
+			}
+			if(!block.getType().equals(match) && !shopMatch) {
+				player.sendMessage(Messages.TARGET_MISMATCH.toString());
+				return;
+			}
 		}
 		boolean isShopLoc;
 		if(iShop.wgLoader != null)
@@ -212,9 +236,24 @@ public class CommandShop implements CommandExecutor {
 			if(match == null)
 				match = Material.BARREL;
 		}
-		if(!block.getType().equals(match)) {
-			player.sendMessage(Messages.TARGET_MISMATCH.toString());
-			return;
+		if(!EventShop.multipleShopBlocks) {
+			if(!block.getType().equals(match)) {
+				player.sendMessage(Messages.TARGET_MISMATCH.toString());
+				return;
+			}
+		} else {
+			boolean shopMatch = false;
+			for(String shopBlocks:EventShop.multipleShopBlock) {
+				Material shopListBlocks = Material.matchMaterial(shopBlocks);
+				if(shopListBlocks != null && block.getType().equals(shopListBlocks)) {
+					shopMatch = true;
+					break;
+				}
+			}
+			if(!block.getType().equals(match) && !shopMatch) {
+				player.sendMessage(Messages.TARGET_MISMATCH.toString());
+				return;
+			}
 		}
 		UUID shopOwner;
 		if(playerShop == null) {
@@ -437,29 +476,40 @@ public class CommandShop implements CommandExecutor {
 		if(plugin != null)
 			plugin.createConfig();
 		if(player != null)
-			player.sendMessage(Messages.SHOP_RELOAD.toString());
+			player.sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
 		else
 			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
-		EventShop.adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
-		EventShop.noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
-		EventShop.placeFrameSign = iShop.config.getBoolean("placeItemFrameSigns");
-		EventShop.protectShopFromExplosion = iShop.config.getBoolean("protectShopBlocksFromExplosions");
-		EventShop.shopBlock = iShop.config.getString("shopBlock");
-		EventShop.stockBlock = iShop.config.getString("stockBlock");
-		EventShop.stockEnabled = iShop.config.getBoolean("enableStockBlock");
-		EventShop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
-		EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
-		EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
-		InvAdminShop.remoteManage = iShop.config.getBoolean("remoteManage");
-		InvAdminShop.stockCommandEnabled = iShop.config.getBoolean("enableStockCommand");
-		InvAdminShop.stockGUIShop = iShop.config.getBoolean("enableStockAccessFromShopGUI");
-		InvShop.listAllShops = iShop.config.getBoolean("publicShopListCommand");
-		Shop.showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
-		Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
-		Shop.shopNotifications = iShop.config.getBoolean("enableShopNotifications");
-		Shop.shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
-		Shop.particleEffects = iShop.config.getBoolean("showParticles");
-		Shop.maxDays = iShop.config.getInt("maxInactiveDays");
+		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> {
+			EventShop.adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
+			EventShop.noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
+			EventShop.placeFrameSign = iShop.config.getBoolean("placeItemFrameSigns");
+			EventShop.protectShopFromExplosion = iShop.config.getBoolean("protectShopBlocksFromExplosions");
+			EventShop.shopBlock = iShop.config.getString("shopBlock");
+			EventShop.stockBlock = iShop.config.getString("stockBlock");
+			EventShop.stockEnabled = iShop.config.getBoolean("enableStockBlock");
+			EventShop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
+			EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
+			EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
+			EventShop.soldJoinMessage = iShop.config.getBoolean("enableSoldNotificationOnJoin");
+			EventShop.soldOnlyOnFirstConnect = iShop.config.getBoolean("onlyNotifySoldOnceUntilClear");
+			EventShop.soldMessageDelayTime = iShop.config.getInt("soldNotificationsDelayTime");
+			EventShop.multipleShopBlock = iShop.config.getStringList("shopBlockList");
+			EventShop.multipleStockBlock = iShop.config.getStringList("stockBlockList");
+			EventShop.multipleShopBlocks = iShop.config.getBoolean("multipleShopBlocks");
+			EventShop.multipleStockBlocks = iShop.config.getBoolean("multipleStockBlocks");
+			InvAdminShop.remoteManage = iShop.config.getBoolean("remoteManage");
+			InvAdminShop.stockCommandEnabled = iShop.config.getBoolean("enableStockCommand");
+			InvAdminShop.stockGUIShop = iShop.config.getBoolean("enableStockAccessFromShopGUI");
+			InvShop.listAllShops = iShop.config.getBoolean("publicShopListCommand");
+			Shop.showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
+			Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
+			Shop.shopNotifications = iShop.config.getBoolean("enableShopNotifications");
+			Shop.shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
+			Shop.particleEffects = iShop.config.getBoolean("showParticles");
+			Shop.maxDays = iShop.config.getInt("maxInactiveDays");
+			Shop.deletePlayerShop = iShop.config.getBoolean("deleteBlock");
+			Shop.stockMessages = iShop.config.getBoolean("enableShopSoldMessage");
+		});
 	}
 
 	private static UUID getUUID(String name) throws Exception {
@@ -592,5 +642,94 @@ public class CommandShop implements CommandExecutor {
 			inv.setPag(openPage);
 			inv.open(player);
 		});
+	}
+
+	private void shopSold(Player player, String clearOrPageNumber) {
+		if(Shop.stockMessages) {
+			int pageNum;
+			if(clearOrPageNumber == null)
+				pageNum=1;
+			else if(clearOrPageNumber.equals("clear") && Shop.shopMessages.containsKey(player.getUniqueId())) {
+				Shop.shopMessages.remove(player.getUniqueId());
+				EventShop.soldListSent.remove(player.getUniqueId());
+				player.sendMessage(Messages.SOLD_CLEAR.toString());
+				return;
+			}
+			else {
+				try {
+					pageNum = Integer.parseInt(clearOrPageNumber);
+				} catch (Exception e) {
+					pageNum=1;
+				}
+				if(pageNum<1) {
+					player.sendMessage(Messages.SOLD_INTEGER_ERROR.toString());
+					return;
+				}
+			}
+			if(Shop.shopMessages.containsKey(player.getUniqueId())) {
+				List<String> messages = Shop.shopMessages.get(player.getUniqueId());
+				int msgSize = messages.size();
+				int maxSoldPages = (int)Math.ceil(msgSize/5);
+				if(pageNum>maxSoldPages)
+					pageNum=maxSoldPages+1;
+				player.sendMessage(Messages.SOLD_HEADER.toString().replaceAll("%p", String.valueOf(pageNum)));
+				pageNum--;
+				if(msgSize<=5) {
+					for(String msg:messages)
+						player.sendMessage(msg);
+				} else {
+					int index;
+					if(pageNum>0)
+						index=pageNum*5;
+					else
+						index=0;
+					for(int i=0; i<5; i++)
+						if(index<=msgSize-1) {
+							player.sendMessage(messages.get(index));
+							index++;
+						}
+					if(index<=5) {
+						int pageNext = pageNum+2;
+						int currentPage = pageNum+1;
+						String soldPages = Messages.SOLD_PAGES.toString().replaceAll("%p", String.valueOf(currentPage));
+						TextComponent soldMsg = new TextComponent(soldPages);
+						TextComponent pageNextText = new TextComponent(Messages.SOLD_PAGES_NEXT.toString());
+						pageNextText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shop sold " + pageNext));
+						soldMsg.addExtra(pageNextText);
+						player.spigot().sendMessage(soldMsg);
+					} else if(index<msgSize-1) {
+						int pageNext = pageNum+2;
+						int currentPage = pageNum+1;
+						String prevPage = "";
+						TextComponent totalMsg = new TextComponent(prevPage);
+						TextComponent pagePrevText = new TextComponent(Messages.SOLD_PAGES_PREVIOUS.toString());
+						pagePrevText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shop sold " + pageNum));
+						String soldPages = Messages.SOLD_PAGES.toString().replaceAll("%p", String.valueOf(currentPage));
+						TextComponent soldMsg = new TextComponent(soldPages);
+						TextComponent pageNextText = new TextComponent(Messages.SOLD_PAGES_NEXT.toString());
+						pageNextText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shop sold " + pageNext));
+						totalMsg.addExtra(pagePrevText);
+						totalMsg.addExtra(soldMsg);
+						totalMsg.addExtra(pageNextText);
+						player.spigot().sendMessage(totalMsg);
+					} else {
+						int currentPage = pageNum+1;
+						String prevPage = "";
+						TextComponent totalMsg = new TextComponent(prevPage);
+						TextComponent pagePrevText = new TextComponent(Messages.SOLD_PAGES_PREVIOUS.toString());
+						pagePrevText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shop sold " + pageNum));
+						String soldPages = Messages.SOLD_PAGES.toString().replaceAll("%p", String.valueOf(currentPage));
+						TextComponent soldMsg = new TextComponent(soldPages);
+						totalMsg.addExtra(pagePrevText);
+						totalMsg.addExtra(soldMsg);
+						player.spigot().sendMessage(totalMsg);
+					}
+				}
+			}
+			else
+				player.sendMessage(Messages.SOLD_NOTHING.toString());
+		}
+		else
+			player.sendMessage(Messages.SOLD_COMMAND_DISABLED.toString());
 	}
 }

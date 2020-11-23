@@ -2,14 +2,15 @@ package com.minedhype.ishop.inventories;
 
 import java.util.Optional;
 import com.minedhype.ishop.iShop;
+import com.minedhype.ishop.Messages;
+import com.minedhype.ishop.RowStore;
+import com.minedhype.ishop.Shop;
+import com.minedhype.ishop.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import com.minedhype.ishop.RowStore;
-import com.minedhype.ishop.Messages;
-import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.gui.GUI;
 
 public class InvAdminShop extends GUI {
@@ -104,22 +105,36 @@ public class InvAdminShop extends GUI {
 						});
 					} else
 						placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
-				} else if(x == 8 && y >= 1 && shop.isAdmin()) {
+				} else if(x == 8 && y >= 1) {
 					final Optional<RowStore> row = shop.getRow(y-1);
-					if(row.isPresent()) {
-						if(row.get().broadcast) {
-							placeItem(y*9+x, GUI.createItem(Material.REDSTONE_TORCH, Messages.SHOP_TITLE_BROADCAST_ON.toString(), (short) 15), p -> {
-								row.get().toggleBroadcast();
-								updateItems(player);
-							});
-						} else {
-							placeItem(y*9+x, GUI.createItem(Material.LEVER, Messages.SHOP_TITLE_BROADCAST_OFF.toString(), (short) 15), p -> {
-								row.get().toggleBroadcast();
-								updateItems(player);
-							});
-						}
-					} else
-						placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
+					if(shop.isAdmin()) {
+						if(row.isPresent()) {
+							if(row.get().broadcast) {
+								placeItem(y * 9 + x, GUI.createItem(Material.REDSTONE_TORCH, Messages.SHOP_TITLE_BROADCAST_ON.toString(), (short) 15), p -> {
+									row.get().toggleBroadcast();
+									updateItems(player);
+								});
+							} else {
+								placeItem(y * 9 + x, GUI.createItem(Material.LEVER, Messages.SHOP_TITLE_BROADCAST_OFF.toString(), (short) 15), p -> {
+									row.get().toggleBroadcast();
+									updateItems(player);
+								});
+							}
+						} else
+							placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
+					} else {
+						if(row.isPresent()) {
+							if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(shop, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount()))
+								placeItem(y*9+x, GUI.createItem(Material.RED_DYE, Messages.SHOP_NO_STOCK_BUTTON.toString()));
+							else if(!Utils.hasStock(shop, row.get().getItemOut()))
+								placeItem(y*9+x, GUI.createItem(Material.RED_DYE, Messages.SHOP_NO_STOCK_BUTTON.toString()));
+							else if(!Utils.hasStock(shop, row.get().getItemOut2()))
+								placeItem(y*9+x, GUI.createItem(Material.RED_DYE, Messages.SHOP_NO_STOCK_BUTTON.toString()));
+							else
+								placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
+						} else
+							placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
+					}
 				} else
 					placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 			}

@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.bukkit.Bukkit;
@@ -62,7 +63,7 @@ public class iShop extends JavaPlugin {
 		expiredTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 5, 20000);
 		saveTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 500, 6000);
 		tickTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 100, 50);
-		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 60);
+		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 70);
 		MetricsLite metrics = new MetricsLite(this, 9189);
 		new UpdateChecker(this, 84555).getVersion(version -> {
 			if(!this.getDescription().getVersion().equalsIgnoreCase(version))
@@ -165,10 +166,10 @@ public class iShop extends JavaPlugin {
 					config.set("noStockBlock", "&cstockBlock cannot be empty! Reverting to default minecraft:composter");
 					config.set("notPlayer", "&cOnly players in the game can use shop commands!");
 				case "1.1":
-					config.set("buyTitle","PRICE TO BUY ITEMS [SLOT 1]");
-					config.set("buyTitle2","PRICE TO BUY ITEMS [SLOT 2]");
-					config.set("sellTitle","ITEMS FOR SALE [SLOT 1]");
-					config.set("sellTitle2","ITEMS FOR SALE [SLOT 2]");
+					config.set("buyTitle", "PRICE TO BUY ITEMS [SLOT 1]");
+					config.set("buyTitle2", "PRICE TO BUY ITEMS [SLOT 2]");
+					config.set("sellTitle", "ITEMS FOR SALE [SLOT 1]");
+					config.set("sellTitle2", "ITEMS FOR SALE [SLOT 2]");
 					config.set("foundShops", "&6Found&a %shops &6shops(s) for player:&a %p");
 					config.set("location", "&6Shop&a %id &6location XYZ: ");
 					config.set("enableShopNotifications", true);
@@ -195,9 +196,30 @@ public class iShop extends JavaPlugin {
 					config.set("adminShopNumber", "Admin shop #%id");
 					config.set("noStockButton", "&cItem(s) out of stock!");
 					config.set("stockIntegerError", "&cStock page must be an integer greater than 0!");
-					config.set("configVersion", 2.5);
-					config.save(configFile);
 				case "2.5":
+					config.set("multipleShopBlocks", false);
+					List<String> defaultShopBlockList = Arrays.asList("minecraft:chest", "minecraft:crafting_table");
+					config.set("shopBlockList", defaultShopBlockList);
+					config.set("multipleStockBlocks", false);
+					List<String> defaultStockBlockList = Arrays.asList("minecraft:ender_chest", "minecraft:jukebox");
+					config.set("stockBlockList", defaultStockBlockList);
+					config.set("enableShopSoldMessage", true);
+					config.set("enableSoldNotificationOnJoin", true);
+					config.set("onlyNotifySoldOnceUntilClear", true);
+					config.set("soldNotificationsDelayTime", 5);
+					config.set("autoClearSoldListOnLast", false);
+					config.set("soldClear", "&6Sold shop items list has been&c cleared");
+					config.set("soldCommandDisabled", "&cShop sold command has been disabled");
+					config.set("soldHeader", "&6Sold items while offline or last server restart (Page %p):");
+					config.set("soldIntegerError", "&cSold page must be an integer greater than 0!");
+					config.set("soldJoinNotify", "&6Type &a/shop sold&6 to see sold items or use &a/shop sold clear");
+					config.set("soldNothing", "&cNo shop trades found while offline or since server restart");
+					config.set("soldPages", "&7Page %p");
+					config.set("soldPagesNext", " &7>> &6Next");
+					config.set("soldPagesPrevious", "&6Previous &7<< ");
+					config.set("configVersion", 2.6);
+					config.save(configFile);
+				case "2.6:":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

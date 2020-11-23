@@ -11,8 +11,20 @@ stockBlock: 'minecraft:composter'
 # WARNING: Setting to false will allow breaking of existing shop blocks without deleting shop!
 enableShopBlock: true
 
+# Enable more than 1 shop block adding unlimited blocks listed below if true
+multipleShopBlocks: false
+shopBlockList:
+  - minecraft:chest
+  - minecraft:crafting_table
+
 # Allows the use of stock blocks. Setting to false will disable players using specified stock block to open stock GUI
 enableStockBlock: true
+
+# Enable more than 1 stock block adding unlimited blocks listed below if true
+multipleStockBlocks: false
+stockBlockList:
+  - minecraft:ender_chest
+  - minecraft:jukebox
 
 # This enables admin shops that don't need stock. Created by typing /shop adminshop, requires ishop.admin permission
 enableAdminShop: true
@@ -29,6 +41,21 @@ stockPages: 5
 
 # Enable sending of messages when players have purchased or sold item(s) from shops
 enableShopNotifications: true
+
+# Enable sending of missed sold item(s) from shops by using command /shop sold
+enableShopSoldMessage: true
+
+# Enable sending of message when player connects if items have been sold while offline
+enableSoldNotificationOnJoin: true
+
+# Only send sold notification 1 time when players first connects until they use /shop sold clear or server restarts
+onlyNotifySoldOnceUntilClear: true
+
+# Delay time in seconds after connecting to notify player of '/shop sold'
+soldNotificationsDelayTime: 5
+
+# Automatically clear shop sold list when player reaches end of list
+autoClearSoldListOnLast: false
 
 # Enable sending of messages to shop owners if item(s) are out of stock when players try to purchase
 enableOutOfStockMessages: true
@@ -153,6 +180,15 @@ shopListDisabled: "&cShops list has been disabled!"
 adminShopNumber: "Admin shop #%id"
 noStockButton: "&cItem(s) out of stock!"
 stockIntegerError: "&cStock page must be an integer greater than 0!"
+soldClear: "&6Sold shop items list has been&c cleared"
+soldCommandDisabled: "&cShop sold command has been disabled"
+soldHeader: "&6Sold items while offline or last server restart (Page %p):"
+soldIntegerError: "&cSold page must be an integer greater than 0!"
+soldJoinNotify: "&6Type &a/shop sold&6 to see sold items or use &a/shop sold clear"
+soldNothing: "&cNo shop trades found while offline or since server restart"
+soldPages: "&7Page %p"
+soldPagesNext: " &7>> &6Next"
+soldPagesPrevious: "&6Previous &7<< "
 
 # Do not edit this!
-configVersion: 2.5
+configVersion: 2.6

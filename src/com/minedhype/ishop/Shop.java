@@ -33,13 +33,16 @@ import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class Shop {
+	public static boolean deletePlayerShop = iShop.config.getBoolean("deleteBlock");
+	public static boolean particleEffects = iShop.config.getBoolean("showParticles");
 	public static boolean shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
 	public static boolean shopEnabled = iShop.config.getBoolean("enableShopBlock");
 	public static boolean showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
 	public static boolean shopNotifications = iShop.config.getBoolean("enableShopNotifications");
-	public static boolean particleEffects = iShop.config.getBoolean("showParticles");
+	public static boolean stockMessages = iShop.config.getBoolean("enableShopSoldMessage");
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
 	public static final ConcurrentHashMap<Integer, UUID> shopList = new ConcurrentHashMap<>();
+	public static final ConcurrentHashMap<UUID, ArrayList<String>> shopMessages = new ConcurrentHashMap<>();
 	private static final List<Shop> shops = new ArrayList<>();
 	private static final Plugin plugin = Bukkit.getPluginManager().getPlugin("iShop");
 	private static final long millisecondsPerDay = 86400000;
@@ -115,8 +118,8 @@ public class Shop {
 						TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE.toString() + ChatColor.DARK_GRAY + "]");
 						manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
 						manageMsg.addExtra(manageText);
-						String shopMessage = "";
 						if(!s.isOwner(player.getUniqueId())) {
+							String shopMessage = "";
 							TextComponent shopMsg = new TextComponent(shopMessage);
 							TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_SHOP.toString() + ChatColor.DARK_GRAY + "]");
 							shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
@@ -400,7 +403,7 @@ public class Shop {
 			if(row.get().getItemIn2() != null || !row.get().getItemIn2().getType().isAir())
 				this.giveItem(row.get().getItemIn2().clone());
 		}
-		Player ownerPlayer = Bukkit.getPlayer(owner);
+		final Player shoppingPlayer = player;
 		final boolean rowBroadcast = row.get().broadcast;
 		final String i1 = nameIn1 + " x " + inA1;
 		final String i2 = nameIn2 + " x " + inA2;
@@ -410,7 +413,7 @@ public class Shop {
 		final int iA2 = inA2;
 		final int oA1 = outA1;
 		final int oA2 = outA2;
-		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> sendShopMessages(i1, i2, o1, o2, iA1, iA2, oA1, oA2, ownerPlayer, player, this.admin, rowBroadcast));
+		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> sendShopMessages(i1, i2, o1, o2, iA1, iA2, oA1, oA2, this.owner, shoppingPlayer, this.admin, rowBroadcast));
 	}
 
 	public boolean hasExpired() {
@@ -463,8 +466,8 @@ public class Shop {
 	public void deleteShop(boolean removalOfArray) {
 		if(removalOfArray) {
 			shops.remove(this);
-			if(iShop.config.getBoolean("deleteBlock"))
-				this.location.getBlock().setType(Material.AIR);
+			if(deletePlayerShop)
+				Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> this.location.getBlock().setType(Material.AIR));
 		}
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			PreparedStatement stmt1 = null;
@@ -488,27 +491,145 @@ public class Shop {
 		});
 	}
 
-	public void sendShopMessages(String i1, String i2, String o1, String o2, int inA1, int inA2, int outA1, int outA2, Player ownerPlayer, Player player, boolean isAdminShop, boolean rowBroadcast) {
+	public void sendShopMessages(String i1, String i2, String o1, String o2, int inA1, int inA2, int outA1, int outA2, UUID shopOwner, Player player, boolean isAdminShop, boolean rowBroadcast) {
+		OfflinePlayer ownerPlayer = Bukkit.getOfflinePlayer(shopOwner);
 		if(!isAdminShop) {
-			if(ownerPlayer != null && ownerPlayer.isOnline() && shopNotifications) {
-				if(inA1 == 0 && outA1 == 0)
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
-				else if(inA1 == 0 && outA2 == 0)
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i2).replaceAll("%p", player.getName()));
-				else if(inA2 == 0 && outA1 == 0)
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
-				else if(inA2 == 0 && outA2 == 0)
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i1).replaceAll("%p", player.getName()));
-				else if(inA1 == 0)
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
-				else if(inA2 == 0)
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
-				else if(outA1 == 0)
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
-				else if(outA2 == 0)
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
-				else
-					ownerPlayer.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+			if(ownerPlayer != null && shopNotifications) {
+				if(inA1 == 0 && outA1 == 0) {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
+				else if(inA1 == 0 && outA2 == 0) {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
+				else if(inA2 == 0 && outA1 == 0) {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
+				else if(inA2 == 0 && outA2 == 0) {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
+				else if(inA1 == 0) {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i2).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
+				else if(inA2 == 0) {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
+				else if(outA1 == 0) {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
+				else if(outA2 == 0) {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o1).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
+				else {
+					if(ownerPlayer.isOnline()) {
+						Player ownerPlayerOnline = Bukkit.getPlayer(shopOwner);
+						ownerPlayerOnline.sendMessage(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+					}
+					else if(stockMessages) {
+						ArrayList<String> addMsg;
+						if(shopMessages.containsKey(shopOwner))
+							addMsg = shopMessages.get(shopOwner);
+						else
+							addMsg = new ArrayList<>();
+						addMsg.add(Messages.SHOP_SELL.toString().replaceAll("%in", o1 + " & " + o2).replaceAll("%out", i1 + " & " + i2).replaceAll("%p", player.getName()));
+						shopMessages.put(ownerPlayer.getUniqueId(), addMsg);
+					}
+				}
 			}
 		} else if(rowBroadcast) {
 			if(inA1 == 0 && outA1 == 0)
@@ -567,7 +688,7 @@ public class Shop {
 					ownerPlayer.sendMessage(Messages.SHOP_NO_STOCK_SHELF.toString().replaceAll("%s", itemString));
 					cdTime.put(ownerPlayer, System.currentTimeMillis());
 				}
-			}
+		}
 	}
 
 	public Optional<RowStore> getRow(int index) {
