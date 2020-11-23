@@ -12,6 +12,7 @@ stockBlock: 'minecraft:composter'
 enableShopBlock: true
 
 # Enable more than 1 shop block adding unlimited blocks listed below if true
+# WARNING: Removing previously set blocks from this list will allow breaking of existing shop blocks without deleting shop!
 multipleShopBlocks: false
 shopBlockList:
   - minecraft:chest
