@@ -57,6 +57,7 @@ public enum Messages {
 	SHOP_TITLE_SELL("sellTitle"),
 	SHOP_TITLE_SELL2("sellTitle2"),
 	SHOP_TITLE_STOCK("stockTitle"),
+	SHOP_WORLD_DISABLED("disabledWorld"),
 	SOLD_CLEAR("soldClear"),
 	SOLD_COMMAND_DISABLED("soldCommandDisabled"),
 	SOLD_HEADER("soldHeader"),

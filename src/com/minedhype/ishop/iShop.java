@@ -217,9 +217,14 @@ public class iShop extends JavaPlugin {
 					config.set("soldPages", "&7Page %p");
 					config.set("soldPagesNext", " &7>> &6Next");
 					config.set("soldPagesPrevious", "&6Previous &7<< ");
-					config.set("configVersion", 2.6);
+				case "2.6":
+					config.set("disableShopInWorld", false);
+					List<String> disabledWorlds = Arrays.asList("world_nether", "world_the_end");
+					config.set("disabledWorldList", disabledWorlds);
+					config.set("disabledWorld", "&cCreating shops in the world you are in has been disabled!");
+					config.set("configVersion", 2.7);
 					config.save(configFile);
-				case "2.6:":
+				case "2.7":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

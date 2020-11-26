@@ -27,6 +27,12 @@ stockBlockList:
   - minecraft:ender_chest
   - minecraft:jukebox
 
+# Disable creating shops in worlds listed below if true
+disableShopInWorld: false
+disabledWorldList:
+  - world_nether
+  - world_the_end
+
 # This enables admin shops that don't need stock. Created by typing /shop adminshop, requires ishop.admin permission
 enableAdminShop: true
 
@@ -190,6 +196,7 @@ soldNothing: "&cNo shop trades found while offline or since server restart"
 soldPages: "&7Page %p"
 soldPagesNext: " &7>> &6Next"
 soldPagesPrevious: "&6Previous &7<< "
+disabledWorld: "&cCreating shops in the world you are in has been disabled!"
 
 # Do not edit this!
-configVersion: 2.6
+configVersion: 2.7

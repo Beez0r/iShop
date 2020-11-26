@@ -127,6 +127,15 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.TARGET_MISMATCH.toString());
 			return;
 		}
+		if(iShop.config.getBoolean("disableShopInWorld")) {
+			List<String> disabledWorldsList = iShop.config.getStringList("disabledWorldList");
+			for(String disabledWorlds:disabledWorldsList) {
+				if(disabledWorlds != null && block.getWorld().getName().equals(disabledWorlds)) {
+					player.sendMessage(Messages.SHOP_WORLD_DISABLED.toString());
+					return;
+				}
+			}
+		}
 		String shopBlock = iShop.config.getString("shopBlock");
 		Material match = Material.matchMaterial(shopBlock);
 		if(match == null) {
@@ -226,6 +235,15 @@ public class CommandShop implements CommandExecutor {
 		if(block == null) {
 			player.sendMessage(Messages.TARGET_MISMATCH.toString());
 			return;
+		}
+		if(iShop.config.getBoolean("disableShopInWorld")) {
+			List<String> disabledWorldsList = iShop.config.getStringList("disabledWorldList");
+			for(String disabledWorlds:disabledWorldsList) {
+				if(disabledWorlds != null && block.getWorld().getName().equals(disabledWorlds)) {
+					player.sendMessage(Messages.SHOP_WORLD_DISABLED.toString());
+					return;
+				}
+			}
 		}
 		String shopBlock = iShop.config.getString("shopBlock");
 		Material match = Material.matchMaterial(shopBlock);
@@ -674,9 +692,13 @@ public class CommandShop implements CommandExecutor {
 					pageNum=maxSoldPages+1;
 				player.sendMessage(Messages.SOLD_HEADER.toString().replaceAll("%p", String.valueOf(pageNum)));
 				pageNum--;
-				if(msgSize<=5) {
+				if(msgSize<6) {
 					for(String msg:messages)
 						player.sendMessage(msg);
+					if(iShop.config.getBoolean("autoClearSoldListOnLast")) {
+						Shop.shopMessages.remove(player.getUniqueId());
+						EventShop.soldListSent.remove(player.getUniqueId());
+					}
 				} else {
 					int index;
 					if(pageNum>0)
@@ -688,7 +710,7 @@ public class CommandShop implements CommandExecutor {
 							player.sendMessage(messages.get(index));
 							index++;
 						}
-					if(index<=5) {
+					if(index<6) {
 						int pageNext = pageNum+2;
 						int currentPage = pageNum+1;
 						String soldPages = Messages.SOLD_PAGES.toString().replaceAll("%p", String.valueOf(currentPage));
@@ -713,16 +735,21 @@ public class CommandShop implements CommandExecutor {
 						totalMsg.addExtra(pageNextText);
 						player.spigot().sendMessage(totalMsg);
 					} else {
-						int currentPage = pageNum+1;
-						String prevPage = "";
-						TextComponent totalMsg = new TextComponent(prevPage);
-						TextComponent pagePrevText = new TextComponent(Messages.SOLD_PAGES_PREVIOUS.toString());
-						pagePrevText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shop sold " + pageNum));
-						String soldPages = Messages.SOLD_PAGES.toString().replaceAll("%p", String.valueOf(currentPage));
-						TextComponent soldMsg = new TextComponent(soldPages);
-						totalMsg.addExtra(pagePrevText);
-						totalMsg.addExtra(soldMsg);
-						player.spigot().sendMessage(totalMsg);
+						if(iShop.config.getBoolean("autoClearSoldListOnLast")) {
+							Shop.shopMessages.remove(player.getUniqueId());
+							EventShop.soldListSent.remove(player.getUniqueId());
+						} else {
+							int currentPage = pageNum+1;
+							String prevPage = "";
+							TextComponent totalMsg = new TextComponent(prevPage);
+							TextComponent pagePrevText = new TextComponent(Messages.SOLD_PAGES_PREVIOUS.toString());
+							pagePrevText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shop sold " + pageNum));
+							String soldPages = Messages.SOLD_PAGES.toString().replaceAll("%p", String.valueOf(currentPage));
+							TextComponent soldMsg = new TextComponent(soldPages);
+							totalMsg.addExtra(pagePrevText);
+							totalMsg.addExtra(soldMsg);
+							player.spigot().sendMessage(totalMsg);
+						}
 					}
 				}
 			}
