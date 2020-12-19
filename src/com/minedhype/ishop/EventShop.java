@@ -102,30 +102,6 @@ public class EventShop implements Listener {
 			}
 			return;
 		}
-		if(block.getType().equals(stockBlk) && stockEnabled) {
-			boolean isShopLoc;
-			if(iShop.wgLoader != null)
-				isShopLoc = iShop.wgLoader.checkRegion(block);
-			else
-				isShopLoc = true;
-			if(!isShopLoc || event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking())
-				return;
-			event.setCancelled(true);
-			if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
-				if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1 && noShopNoStock) {
-					event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
-					return;
-				}
-				if(InvStock.inShopInv.containsValue(event.getPlayer().getUniqueId())) {
-					event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
-					return;
-				} else { InvStock.inShopInv.put(event.getPlayer(), event.getPlayer().getUniqueId()); }
-				InvStock inv = InvStock.getInvStock(event.getPlayer().getUniqueId());
-				inv.setPag(0);
-				inv.open(event.getPlayer());
-			}
-			return;
-		}
 		if(block.getType().equals(shopBlk) && shopEnabled) {
 			boolean isShopLoc;
 			if(iShop.wgLoader != null)
@@ -198,6 +174,30 @@ public class EventShop implements Listener {
 					return;
 				}
 			}
+		}
+		if(block.getType().equals(stockBlk) && stockEnabled) {
+			boolean isShopLoc;
+			if(iShop.wgLoader != null)
+				isShopLoc = iShop.wgLoader.checkRegion(block);
+			else
+				isShopLoc = true;
+			if(!isShopLoc || event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking())
+				return;
+			event.setCancelled(true);
+			if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
+				if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1 && noShopNoStock) {
+					event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
+					return;
+				}
+				if(InvStock.inShopInv.containsValue(event.getPlayer().getUniqueId())) {
+					event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
+					return;
+				} else { InvStock.inShopInv.put(event.getPlayer(), event.getPlayer().getUniqueId()); }
+				InvStock inv = InvStock.getInvStock(event.getPlayer().getUniqueId());
+				inv.setPag(0);
+				inv.open(event.getPlayer());
+			}
+			return;
 		}
 		if(multipleStockBlocks && stockEnabled) {
 			for(String stockBlocks:multipleStockBlock) {
@@ -278,6 +278,13 @@ public class EventShop implements Listener {
 					shopBlk = Material.matchMaterial(shopBlock.split("minecraft:")[1].toUpperCase());
 				} catch (Exception e) {
 					shopBlk = Material.BARREL;
+				}
+			}
+			if(multipleShopBlocks) {
+				for(String shopBlocks:multipleShopBlock) {
+					Material shopListBlocks = Material.matchMaterial(shopBlocks);
+					if(shopListBlocks != null)
+						event.blockList().removeIf(block -> block.getType().equals(shopListBlocks) && checkShopLoc(block.getLocation()));
 				}
 			}
 			event.blockList().removeIf(block -> block.getType().equals(shopBlk) && checkShopLoc(block.getLocation()));

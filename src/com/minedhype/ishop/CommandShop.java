@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
+import com.minedhype.ishop.inventories.InvCreateRow;
 import com.minedhype.ishop.inventories.InvShop;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -518,6 +519,7 @@ public class CommandShop implements CommandExecutor {
 			InvAdminShop.remoteManage = iShop.config.getBoolean("remoteManage");
 			InvAdminShop.stockCommandEnabled = iShop.config.getBoolean("enableStockCommand");
 			InvAdminShop.stockGUIShop = iShop.config.getBoolean("enableStockAccessFromShopGUI");
+			InvCreateRow.disabledItemsList = iShop.config.getStringList("disabledItemsList");
 			InvShop.listAllShops = iShop.config.getBoolean("publicShopListCommand");
 			Shop.showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
 			Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");

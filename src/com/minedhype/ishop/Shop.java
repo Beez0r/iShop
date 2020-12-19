@@ -191,8 +191,10 @@ public class Shop {
 			if(shop.hasExpired() || shop.location.getWorld() == null)
 				shopDelete.add(shop);
 
-		for(Shop shop : shopDelete)
+		for(Shop shop : shopDelete) {
+			shopList.remove(shop.shopId());
 			shop.deleteShop();
+		}
 	}
 
 	public static void loadData() {

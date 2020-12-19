@@ -27,6 +27,13 @@ stockBlockList:
   - minecraft:ender_chest
   - minecraft:jukebox
 
+# Disable trading of listed items below if true
+disabledItems: false
+disabledItemsList:
+  - TNT
+  - GUNPOWDER
+  - WITHER_SKELETON_SKULL
+
 # Disable creating shops in worlds listed below if true
 disableShopInWorld: false
 disabledWorldList:
@@ -199,4 +206,4 @@ soldPagesPrevious: "&6Previous &7<< "
 disabledWorld: "&cCreating shops in the world you are in has been disabled!"
 
 # Do not edit this!
-configVersion: 2.7
+configVersion: 2.8

@@ -2,6 +2,7 @@ package com.minedhype.ishop.inventories;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -11,7 +12,10 @@ import org.bukkit.inventory.ItemStack;
 import com.minedhype.ishop.RowStore;
 import com.minedhype.ishop.Messages;
 import com.minedhype.ishop.Shop;
+import com.minedhype.ishop.iShop;
 import com.minedhype.ishop.gui.GUI;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import java.util.List;
 
 public class InvCreateRow extends GUI {
 	private ItemStack itemIn;
@@ -19,6 +23,7 @@ public class InvCreateRow extends GUI {
 	private ItemStack itemOut;
 	private ItemStack itemOut2;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
+	public static List<String> disabledItemsList = iShop.config.getStringList("disabledItemsList");
 	
 	public InvCreateRow(Shop shop, int index) {
 		super(9*3, Messages.SHOP_TITLE_CREATESHOP.toString());
@@ -46,6 +51,37 @@ public class InvCreateRow extends GUI {
 						return;
 					if((itemOut == airItem && itemOut2 == airItem) || (itemIn == airItem && itemIn2 == airItem))
 						return;
+					for(String itemsList:disabledItemsList) {
+						Material disabledItemsList = Material.matchMaterial(itemsList);
+						if(disabledItemsList != null) {
+							if(itemIn.getType().equals(disabledItemsList) || itemIn2.getType().equals(disabledItemsList) || itemOut.getType().equals(disabledItemsList) || itemOut2.getType().equals(disabledItemsList))
+								return;
+							if(itemIn.getType().equals(Material.SHULKER_BOX) && itemIn.getItemMeta() instanceof BlockStateMeta) {
+								BlockStateMeta itemMeta1 = (BlockStateMeta) itemIn.getItemMeta();
+								ShulkerBox shulkerBox1 = (ShulkerBox) itemMeta1.getBlockState();
+								if(shulkerBox1.getInventory().contains(disabledItemsList))
+									return;
+							}
+							if(itemIn2.getType().equals(Material.SHULKER_BOX) && itemIn2.getItemMeta() instanceof BlockStateMeta) {
+								BlockStateMeta itemMeta2 = (BlockStateMeta) itemIn2.getItemMeta();
+								ShulkerBox shulkerBox2 = (ShulkerBox) itemMeta2.getBlockState();
+								if(shulkerBox2.getInventory().contains(disabledItemsList))
+									return;
+							}
+							if(itemOut.getType().equals(Material.SHULKER_BOX) && itemOut.getItemMeta() instanceof BlockStateMeta) {
+								BlockStateMeta itemMeta3 = (BlockStateMeta) itemOut.getItemMeta();
+								ShulkerBox shulkerBox3 = (ShulkerBox) itemMeta3.getBlockState();
+								if(shulkerBox3.getInventory().contains(disabledItemsList))
+									return;
+							}
+							if(itemOut2.getType().equals(Material.SHULKER_BOX) && itemOut2.getItemMeta() instanceof BlockStateMeta) {
+								BlockStateMeta itemMeta4 = (BlockStateMeta) itemOut2.getItemMeta();
+								ShulkerBox shulkerBox4 = (ShulkerBox) itemMeta4.getBlockState();
+								if(shulkerBox4.getInventory().contains(disabledItemsList))
+									return;
+							}
+						}
+					}
 					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
 					InvAdminShop inv = new InvAdminShop(shop, p.getPlayer());
 					inv.open(p);

@@ -222,9 +222,13 @@ public class iShop extends JavaPlugin {
 					List<String> disabledWorlds = Arrays.asList("world_nether", "world_the_end");
 					config.set("disabledWorldList", disabledWorlds);
 					config.set("disabledWorld", "&cCreating shops in the world you are in has been disabled!");
-					config.set("configVersion", 2.7);
-					config.save(configFile);
 				case "2.7":
+					config.set("disabledItems", false);
+					List<String> disabledItemList = Arrays.asList("TNT", "GUNPOWDER", "WITHER_SKELETON_SKULL");
+					config.set("disabledItemsList", disabledItemList);
+					config.set("configVersion", 2.8);
+					config.save(configFile);
+				case "2.8":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }
