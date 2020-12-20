@@ -19,7 +19,6 @@ public class Utils {
 			return true;
 		int max = iShop.config.getInt("stockPages");
 		int amount = item.getAmount();
-		int itemAmountCount = 0;
 		int itemAmountCountMeta = 0;
 		for(int i=0; i<max; i++) {
 			Optional<StockShop> stockStore = StockShop.getStockShopByOwner(shop.getOwner(), i);
@@ -27,15 +26,7 @@ public class Utils {
 				continue;
 			if(stockStore.get().getInventory().containsAtLeast(item, amount))
 				return true;
-			if(!item.hasItemMeta() && stockStore.get().getInventory().contains(item.getType())) {
-				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
-					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
-						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
-					if(itemAmountCount >= amount)
-						return true;
-				}
-			}
-			if(stockStore.get().getInventory().contains(item)) {
+			if(stockStore.get().getInventory().contains(item.getType())) {
 				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
 					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).equals(item))
 						itemAmountCountMeta += stockStore.get().getInventory().getItem(j).getAmount();
@@ -58,7 +49,6 @@ public class Utils {
 		if(shop.isAdmin() || item == null || item == airItem)
 			return true;
 		int max = iShop.config.getInt("stockPages");
-		int itemAmountCount = 0;
 		int itemAmountCountMeta = 0;
 		for(int i=0; i<max; i++) {
 			Optional<StockShop> stockStore = StockShop.getStockShopByOwner(shop.getOwner(), i);
@@ -66,15 +56,7 @@ public class Utils {
 				continue;
 			if(stockStore.get().getInventory().containsAtLeast(item, amount))
 				return true;
-			if(!item.hasItemMeta() && stockStore.get().getInventory().contains(item.getType())) {
-				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
-					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
-						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
-					if(itemAmountCount >= amount)
-						return true;
-				}
-			}
-			if(stockStore.get().getInventory().contains(item)) {
+			if(stockStore.get().getInventory().contains(item.getType())) {
 				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
 					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).equals(item))
 						itemAmountCountMeta += stockStore.get().getInventory().getItem(j).getAmount();

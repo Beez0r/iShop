@@ -23,6 +23,7 @@ public class InvCreateRow extends GUI {
 	private ItemStack itemOut;
 	private ItemStack itemOut2;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
+	public static Boolean itemsDisabled = iShop.config.getBoolean("disabledItems");
 	public static List<String> disabledItemsList = iShop.config.getStringList("disabledItemsList");
 	
 	public InvCreateRow(Shop shop, int index) {
@@ -51,34 +52,36 @@ public class InvCreateRow extends GUI {
 						return;
 					if((itemOut == airItem && itemOut2 == airItem) || (itemIn == airItem && itemIn2 == airItem))
 						return;
-					for(String itemsList:disabledItemsList) {
-						Material disabledItemsList = Material.matchMaterial(itemsList);
-						if(disabledItemsList != null) {
-							if(itemIn.getType().equals(disabledItemsList) || itemIn2.getType().equals(disabledItemsList) || itemOut.getType().equals(disabledItemsList) || itemOut2.getType().equals(disabledItemsList))
-								return;
-							if(itemIn.getType().equals(Material.SHULKER_BOX) && itemIn.getItemMeta() instanceof BlockStateMeta) {
-								BlockStateMeta itemMeta1 = (BlockStateMeta) itemIn.getItemMeta();
-								ShulkerBox shulkerBox1 = (ShulkerBox) itemMeta1.getBlockState();
-								if(shulkerBox1.getInventory().contains(disabledItemsList))
+					if(itemsDisabled) {
+						for(String itemsList:disabledItemsList) {
+							Material disabledItemsList = Material.matchMaterial(itemsList);
+							if(disabledItemsList != null) {
+								if(itemIn.getType().equals(disabledItemsList) || itemIn2.getType().equals(disabledItemsList) || itemOut.getType().equals(disabledItemsList) || itemOut2.getType().equals(disabledItemsList))
 									return;
-							}
-							if(itemIn2.getType().equals(Material.SHULKER_BOX) && itemIn2.getItemMeta() instanceof BlockStateMeta) {
-								BlockStateMeta itemMeta2 = (BlockStateMeta) itemIn2.getItemMeta();
-								ShulkerBox shulkerBox2 = (ShulkerBox) itemMeta2.getBlockState();
-								if(shulkerBox2.getInventory().contains(disabledItemsList))
-									return;
-							}
-							if(itemOut.getType().equals(Material.SHULKER_BOX) && itemOut.getItemMeta() instanceof BlockStateMeta) {
-								BlockStateMeta itemMeta3 = (BlockStateMeta) itemOut.getItemMeta();
-								ShulkerBox shulkerBox3 = (ShulkerBox) itemMeta3.getBlockState();
-								if(shulkerBox3.getInventory().contains(disabledItemsList))
-									return;
-							}
-							if(itemOut2.getType().equals(Material.SHULKER_BOX) && itemOut2.getItemMeta() instanceof BlockStateMeta) {
-								BlockStateMeta itemMeta4 = (BlockStateMeta) itemOut2.getItemMeta();
-								ShulkerBox shulkerBox4 = (ShulkerBox) itemMeta4.getBlockState();
-								if(shulkerBox4.getInventory().contains(disabledItemsList))
-									return;
+								if(itemIn.getType().equals(Material.SHULKER_BOX) && itemIn.getItemMeta() instanceof BlockStateMeta) {
+									BlockStateMeta itemMeta1 = (BlockStateMeta) itemIn.getItemMeta();
+									ShulkerBox shulkerBox1 = (ShulkerBox) itemMeta1.getBlockState();
+									if(shulkerBox1.getInventory().contains(disabledItemsList))
+										return;
+								}
+								if(itemIn2.getType().equals(Material.SHULKER_BOX) && itemIn2.getItemMeta() instanceof BlockStateMeta) {
+									BlockStateMeta itemMeta2 = (BlockStateMeta) itemIn2.getItemMeta();
+									ShulkerBox shulkerBox2 = (ShulkerBox) itemMeta2.getBlockState();
+									if(shulkerBox2.getInventory().contains(disabledItemsList))
+										return;
+								}
+								if(itemOut.getType().equals(Material.SHULKER_BOX) && itemOut.getItemMeta() instanceof BlockStateMeta) {
+									BlockStateMeta itemMeta3 = (BlockStateMeta) itemOut.getItemMeta();
+									ShulkerBox shulkerBox3 = (ShulkerBox) itemMeta3.getBlockState();
+									if(shulkerBox3.getInventory().contains(disabledItemsList))
+										return;
+								}
+								if(itemOut2.getType().equals(Material.SHULKER_BOX) && itemOut2.getItemMeta() instanceof BlockStateMeta) {
+									BlockStateMeta itemMeta4 = (BlockStateMeta) itemOut2.getItemMeta();
+									ShulkerBox shulkerBox4 = (ShulkerBox) itemMeta4.getBlockState();
+									if(shulkerBox4.getInventory().contains(disabledItemsList))
+										return;
+								}
 							}
 						}
 					}
