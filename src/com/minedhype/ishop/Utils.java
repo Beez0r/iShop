@@ -55,8 +55,6 @@ public class Utils {
 			Optional<StockShop> stockStore = StockShop.getStockShopByOwner(shop.getOwner(), i);
 			if(!stockStore.isPresent())
 				continue;
-			if(stockStore.get().getInventory().containsAtLeast(item, item1Total) || stockStore.get().getInventory().containsAtLeast(item2, item2Total))
-				return true;
 			if(stockStore.get().getInventory().contains(item.getType()) || stockStore.get().getInventory().contains(item2.getType())) {
 				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
 					if(stockStore.get().getInventory().getItem(j) != null) {
