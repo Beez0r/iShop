@@ -336,7 +336,7 @@ public class Shop {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 		}
-		if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(this, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount())) {
+		if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(this, row.get().getItemOut(), row.get().getItemOut())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 				if(shopOutStock) {
 					final Player ownerPlayer = Bukkit.getPlayer(owner);

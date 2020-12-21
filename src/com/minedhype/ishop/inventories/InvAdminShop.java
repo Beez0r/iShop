@@ -124,7 +124,7 @@ public class InvAdminShop extends GUI {
 							placeItem(y*9+x, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 					} else {
 						if(row.isPresent()) {
-							if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(shop, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount()))
+							if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(shop, row.get().getItemOut(), row.get().getItemOut2()))
 								placeItem(y*9+x, GUI.createItem(Material.RED_DYE, Messages.SHOP_NO_STOCK_BUTTON.toString()));
 							else if(!Utils.hasStock(shop, row.get().getItemOut()))
 								placeItem(y*9+x, GUI.createItem(Material.RED_DYE, Messages.SHOP_NO_STOCK_BUTTON.toString()));

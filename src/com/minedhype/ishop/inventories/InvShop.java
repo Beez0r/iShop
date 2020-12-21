@@ -74,7 +74,7 @@ public class InvShop extends GUI {
 					Optional<RowStore> row = shop.getRow(y-1);
 					if(row.isPresent()) {
 						final int index = y - 1;
-						if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(shop, row.get().getItemOut(), row.get().getItemOut().getAmount() + row.get().getItemOut2().getAmount()))
+						if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(shop, row.get().getItemOut(), row.get().getItemOut2()))
 							placeItem(y * 9 + x, GUI.createItem(Material.RED_DYE, Messages.SHOP_NO_STOCK_BUTTON.toString()), p -> {
 								p.closeInventory();
 								shop.buy(p, index);

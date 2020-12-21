@@ -24,7 +24,7 @@ public class InvCreateRow extends GUI {
 	private ItemStack itemOut2;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	public static Boolean itemsDisabled = iShop.config.getBoolean("disabledItems");
-	public static List<String> disabledItemsList = iShop.config.getStringList("disabledItemsList");
+	public static List<String> disabledItemList = iShop.config.getStringList("disabledItemsList");
 	
 	public InvCreateRow(Shop shop, int index) {
 		super(9*3, Messages.SHOP_TITLE_CREATESHOP.toString());
@@ -53,31 +53,35 @@ public class InvCreateRow extends GUI {
 					if((itemOut == airItem && itemOut2 == airItem) || (itemIn == airItem && itemIn2 == airItem))
 						return;
 					if(itemsDisabled) {
-						for(String itemsList:disabledItemsList) {
+						for(String itemsList:disabledItemList) {
 							Material disabledItemsList = Material.matchMaterial(itemsList);
 							if(disabledItemsList != null) {
-								if(itemIn.getType().equals(disabledItemsList) || itemIn2.getType().equals(disabledItemsList) || itemOut.getType().equals(disabledItemsList) || itemOut2.getType().equals(disabledItemsList))
+								ItemStack in1 = itemIn.clone();
+								ItemStack in2 = itemIn2.clone();
+								ItemStack out1 = itemOut.clone();
+								ItemStack out2 = itemOut2.clone();
+								if(in1.getType().equals(disabledItemsList) || in2.getType().equals(disabledItemsList) || out1.getType().equals(disabledItemsList) || out2.getType().equals(disabledItemsList))
 									return;
-								if(itemIn.getType().equals(Material.SHULKER_BOX) && itemIn.getItemMeta() instanceof BlockStateMeta) {
-									BlockStateMeta itemMeta1 = (BlockStateMeta) itemIn.getItemMeta();
+								if(in1.getType().equals(Material.SHULKER_BOX) && in1.getItemMeta() instanceof BlockStateMeta) {
+									BlockStateMeta itemMeta1 = (BlockStateMeta) in1.getItemMeta();
 									ShulkerBox shulkerBox1 = (ShulkerBox) itemMeta1.getBlockState();
 									if(shulkerBox1.getInventory().contains(disabledItemsList))
 										return;
 								}
-								if(itemIn2.getType().equals(Material.SHULKER_BOX) && itemIn2.getItemMeta() instanceof BlockStateMeta) {
-									BlockStateMeta itemMeta2 = (BlockStateMeta) itemIn2.getItemMeta();
+								if(in2.getType().equals(Material.SHULKER_BOX) && in2.getItemMeta() instanceof BlockStateMeta) {
+									BlockStateMeta itemMeta2 = (BlockStateMeta) in2.getItemMeta();
 									ShulkerBox shulkerBox2 = (ShulkerBox) itemMeta2.getBlockState();
 									if(shulkerBox2.getInventory().contains(disabledItemsList))
 										return;
 								}
-								if(itemOut.getType().equals(Material.SHULKER_BOX) && itemOut.getItemMeta() instanceof BlockStateMeta) {
-									BlockStateMeta itemMeta3 = (BlockStateMeta) itemOut.getItemMeta();
+								if(out1.getType().equals(Material.SHULKER_BOX) && out1.getItemMeta() instanceof BlockStateMeta) {
+									BlockStateMeta itemMeta3 = (BlockStateMeta) out1.getItemMeta();
 									ShulkerBox shulkerBox3 = (ShulkerBox) itemMeta3.getBlockState();
 									if(shulkerBox3.getInventory().contains(disabledItemsList))
 										return;
 								}
-								if(itemOut2.getType().equals(Material.SHULKER_BOX) && itemOut2.getItemMeta() instanceof BlockStateMeta) {
-									BlockStateMeta itemMeta4 = (BlockStateMeta) itemOut2.getItemMeta();
+								if(out2.getType().equals(Material.SHULKER_BOX) && out2.getItemMeta() instanceof BlockStateMeta) {
+									BlockStateMeta itemMeta4 = (BlockStateMeta) out2.getItemMeta();
 									ShulkerBox shulkerBox4 = (ShulkerBox) itemMeta4.getBlockState();
 									if(shulkerBox4.getInventory().contains(disabledItemsList))
 										return;
