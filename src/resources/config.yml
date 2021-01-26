@@ -59,6 +59,9 @@ enableShopNotifications: true
 # Enable sending of missed sold item(s) from shops by using command /shop sold
 enableShopSoldMessage: true
 
+# Enable saving ALL shop sold messages instead of only messages while player is offline
+enableSavingAllShopSoldMessages: true
+
 # Enable sending of message when player connects if items have been sold while offline
 enableSoldNotificationOnJoin: true
 
@@ -136,6 +139,10 @@ placeItemFrameSigns: true
 # Setting to true will protect shop blocks from explosions
 protectShopBlocksFromExplosions: true
 
+# Delay loading of shops database in seconds. This is useful if you have shops in custom worlds that take time to load during server startup
+# WARNING: During load delay time, shop & stock blocks will NOT be protected! Default is 0 for no delay
+shopsDatabaseLoadDelay: 0
+
 # Customizable Messages
 adminShop: "Admin Shop #%id"
 adminShopDisabled: "&cAdmin shops have been disabled!"
@@ -204,6 +211,9 @@ soldPages: "&7Page %p"
 soldPagesNext: " &7>> &6Next"
 soldPagesPrevious: "&6Previous &7<< "
 disabledWorld: "&cCreating shops in the world you are in has been disabled!"
+listOutOfStock: "&6Listing shops out of stock:"
+notOutOfStock: "&aNo shops found that are out of stock!"
+outOfStock: "&6Shop&a #%shop Row %row &6is out of stock"
 
 # Do not edit this!
-configVersion: 2.8
+configVersion: 2.9

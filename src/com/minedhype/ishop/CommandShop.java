@@ -70,6 +70,10 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> manageStock(player, args[1], "1"));
 		else if(args[0].equalsIgnoreCase("managestock") && args.length >= 3)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> manageStock(player, args[1], args[2]));
+		else if(args[0].equalsIgnoreCase("out") && args.length == 1)
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStock(player, null));
+		else if(args[0].equalsIgnoreCase("out") && args.length >= 2)
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStock(player, args[1]));
 		else if(args[0].equalsIgnoreCase("reload"))
 			reloadShop(player);
 		else if(args[0].equalsIgnoreCase("shops"))
@@ -101,6 +105,9 @@ public class CommandShop implements CommandExecutor {
 		if(iShop.config.getBoolean("publicShopListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " shops");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " manage <id>");
+		player.sendMessage(ChatColor.GRAY + "/" + label + " out");
+		if(player.hasPermission(Permission.SHOP_ADMIN.toString()))
+			player.sendMessage(ChatColor.GRAY + "/" + label + " out <player>");
 		if(iShop.config.getBoolean("enableShopSoldMessage"));
 			player.sendMessage(ChatColor.GRAY + "/" + label + " sold <page/clear>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " stock <page>");
@@ -761,5 +768,27 @@ public class CommandShop implements CommandExecutor {
 		}
 		else
 			player.sendMessage(Messages.SOLD_COMMAND_DISABLED.toString());
+	}
+
+	private void outOfStock(Player player, String playerName) {
+		if(playerName != null && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.NO_PERMISSION.toString());
+			return;
+		}
+		UUID sOwner;
+		if(playerName == null) {
+			sOwner = player.getUniqueId();
+			playerName = player.getDisplayName();
+		} else {
+			try {
+				sOwner = getUUID(playerName);
+			} catch (Exception e) {
+				player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
+				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " +  Messages.NO_PLAYER_FOUND.toString());
+				return;
+			}
+		}
+		player.sendMessage(Messages.SHOP_LIST_OUT.toString());
+		Shop.getOutOfStock(player, sOwner, playerName);
 	}
 }

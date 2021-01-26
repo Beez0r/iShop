@@ -58,8 +58,13 @@ public class Utils {
 			if(stockStore.get().getInventory().contains(item.getType()) || stockStore.get().getInventory().contains(item2.getType())) {
 				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
 					if(stockStore.get().getInventory().getItem(j) != null) {
-						if(item1Amount < item1Total && stockStore.get().getInventory().getItem(j).isSimilar(item))
+						if(item1Amount < item1Total && stockStore.get().getInventory().getItem(j).isSimilar(item)) {
 							item1Amount += stockStore.get().getInventory().getItem(j).getAmount();
+							if(item1Amount > item1Total && item.isSimilar(item2)) {
+								int difference = item1Amount - item1Total;
+								item2Amount += difference;
+							}
+						}
 						else if(item2Amount < item2Total && stockStore.get().getInventory().getItem(j).isSimilar(item2))
 							item2Amount += stockStore.get().getInventory().getItem(j).getAmount();
 					}

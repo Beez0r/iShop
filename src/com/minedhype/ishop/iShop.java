@@ -27,7 +27,7 @@ public class iShop extends JavaPlugin {
 	File configFile;
 	public static FileConfiguration config;
 	public static WorldGuardLoader wgLoader = null;
-	private static BukkitTask expiredTaskId, saveTaskId, tickTaskId;
+	private static BukkitTask expiredTask, saveTask, tickTask;
 	private static Connection connection = null;
 	private static Economy economy = null;
 	private static String chainConnect;
@@ -55,15 +55,25 @@ public class iShop extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new EventShop(), this);
 		getServer().getPluginManager().registerEvents(new GUIEvent(), this);
 		getCommand("ishop").setExecutor(new CommandShop());
+		int delayTime;
+		try {
+			delayTime = config.getInt("shopsDatabaseLoadDelay");
+		} catch(Exception e) { delayTime = 0; }
+		if(delayTime < 1)
+			delayTime = 1;
+		else
+			delayTime*=20;
+		Bukkit.getScheduler().runTaskLater(this, () -> {
 		try {
 			connection = DriverManager.getConnection(chainConnect);
 			this.createTables();
 			Shop.loadData();
 		} catch(Exception e) { e.printStackTrace(); }
-		expiredTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, 5, 20000);
-		saveTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, 500, 6000);
-		tickTaskId = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, 100, 50);
-		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, 70);
+		}, delayTime);
+		expiredTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, delayTime+20, 20000);
+		saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, delayTime+1200, 6000);
+		tickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, delayTime+150, 50);
+		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, delayTime+100);
 		MetricsLite metrics = new MetricsLite(this, 9189);
 		new UpdateChecker(this, 84555).getVersion(version -> {
 			if(!this.getDescription().getVersion().equalsIgnoreCase(version))
@@ -73,13 +83,13 @@ public class iShop extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		tickTaskId.cancel();
-		expiredTaskId.cancel();
-		if(Bukkit.getScheduler().isCurrentlyRunning(saveTaskId.getTaskId()))
-			while(Bukkit.getScheduler().isCurrentlyRunning(saveTaskId.getTaskId()))
+		tickTask.cancel();
+		expiredTask.cancel();
+		if(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId()))
+			while(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId()))
 				;
 		else {
-			saveTaskId.cancel();
+			saveTask.cancel();
 			Shop.saveData();
 		}
 		if(connection != null) {
@@ -226,9 +236,15 @@ public class iShop extends JavaPlugin {
 					config.set("disabledItems", false);
 					List<String> disabledItemList = Arrays.asList("TNT", "GUNPOWDER", "WITHER_SKELETON_SKULL");
 					config.set("disabledItemsList", disabledItemList);
-					config.set("configVersion", 2.8);
-					config.save(configFile);
 				case "2.8":
+					config.set("enableSavingAllShopSoldMessages", true);
+					config.set("shopsDatabaseLoadDelay", 0);
+					config.set("listOutOfStock", "&6Listing shops out of stock:");
+					config.set("notOutOfStock", "&aNo shops found that are out of stock!");
+					config.set("outOfStock", "&6Shop&a #%shop Row %row &6is out of stock");
+					config.set("configVersion", 2.9);
+					config.save(configFile);
+				case "2.9":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }
