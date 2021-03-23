@@ -89,6 +89,7 @@ public class Shop {
 
 	public static Optional<Shop> getShopByLocation(Location location) { return shops.parallelStream().filter(shop -> shop.location.equals(location)).findFirst(); }
 	public static Optional<Shop> getShopById(int id) { return shops.parallelStream().filter(shop -> shop.idTienda == id).findFirst(); }
+	public static boolean checkShopDistanceFromStockBlock(Location stockLocation, UUID shopOwner) { return shops.parallelStream().filter(s -> !s.admin && s.isOwner(shopOwner)).anyMatch(s -> s.getLocation().getWorld().equals(stockLocation.getWorld()) && s.location.distanceSquared(stockLocation) <= EventShop.stockRangeLimit*EventShop.stockRangeLimit); }
 	public static int getNumShops(UUID owner) { return (int) shops.parallelStream().filter(t -> !t.admin && t.owner.equals(owner)).count(); }
 
 	public static void getPlayersShopList() {

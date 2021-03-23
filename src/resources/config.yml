@@ -143,6 +143,13 @@ protectShopBlocksFromExplosions: true
 # WARNING: During load delay time, shop & stock blocks will NOT be protected! Default is 0 for no delay
 shopsDatabaseLoadDelay: 0
 
+# Set a range limit stock block(s) must be within player owned shop block(s) distance to access stock inventory
+# Default is 0 for disabled
+stockRangeLimitFromShop: 0
+
+# Set to true if you would like '/shop stock' command range limit to be enforced using stockRangeLimitFromShop distance
+stockRangeLimitUsingCommand: false
+
 # Customizable Messages
 adminShop: "Admin Shop #%id"
 adminShopDisabled: "&cAdmin shops have been disabled!"
@@ -214,6 +221,7 @@ disabledWorld: "&cCreating shops in the world you are in has been disabled!"
 listOutOfStock: "&6Listing shops out of stock:"
 notOutOfStock: "&aNo shops found that are out of stock!"
 outOfStock: "&6Shop&a #%shop Row %row &6is out of stock"
+outOfStockRange: "&cYou are too far away from your shop(s) to access stock inventory!"
 
 # Do not edit this!
-configVersion: 2.9
+configVersion: 2.101

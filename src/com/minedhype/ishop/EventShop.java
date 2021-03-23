@@ -41,6 +41,7 @@ public class EventShop implements Listener {
 	public static boolean placeFrameSign = iShop.config.getBoolean("placeItemFrameSigns");
 	public static boolean protectShopFromExplosion = iShop.config.getBoolean("protectShopBlocksFromExplosions");
 	public static int soldMessageDelayTime = iShop.config.getInt("soldNotificationsDelayTime");
+	public static int stockRangeLimit = iShop.config.getInt("stockRangeLimitFromShop");
 	public static String shopBlock = iShop.config.getString("shopBlock");
 	public static String stockBlock = iShop.config.getString("stockBlock");
 	public static Material shopBlk = Material.matchMaterial(shopBlock);
@@ -189,6 +190,11 @@ public class EventShop implements Listener {
 					event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
 					return;
 				}
+				if(stockRangeLimit > 0)
+					if(!Shop.checkShopDistanceFromStockBlock(event.getClickedBlock().getLocation(), event.getPlayer().getUniqueId())) {
+						event.getPlayer().sendMessage(Messages.SHOP_FAR.toString());
+						return;
+					}
 				if(InvStock.inShopInv.containsValue(event.getPlayer().getUniqueId())) {
 					event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
 					return;
@@ -216,6 +222,11 @@ public class EventShop implements Listener {
 							event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
 							return;
 						}
+						if(stockRangeLimit > 0)
+							if(!Shop.checkShopDistanceFromStockBlock(event.getClickedBlock().getLocation(), event.getPlayer().getUniqueId())) {
+								event.getPlayer().sendMessage(Messages.SHOP_FAR.toString());
+								return;
+							}
 						if(InvStock.inShopInv.containsValue(event.getPlayer().getUniqueId())) {
 							event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
 							return;

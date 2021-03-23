@@ -286,12 +286,17 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
 			return;
 		} else {
-			try {
-				shopOwner = getUUID(playerShop);
-			} catch (Exception e) {
-				player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
-				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " +  Messages.NO_PLAYER_FOUND.toString());
-				return;
+			Player playerInGame = Bukkit.getPlayer(playerShop);
+			if(playerInGame != null && playerInGame.isOnline())
+				shopOwner = playerInGame.getUniqueId();
+			else {
+				try {
+					shopOwner = getUUID(playerShop);
+				} catch (Exception e) {
+					player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_PLAYER_FOUND.toString());
+					return;
+				}
 			}
 		}
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(shopOwner);
@@ -473,6 +478,11 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.NO_SHOP_STOCK.toString());
 			return;
 		}
+		if(EventShop.stockRangeLimit > 0 && iShop.config.getBoolean("stockRangeLimitUsingCommand") && !player.hasPermission(Permission.SHOP_ADMIN.toString()) && !player.hasPermission(Permission.SHOP_STOCK.toString()))
+			if(!Shop.checkShopDistanceFromStockBlock(player.getLocation(), player.getUniqueId())) {
+				player.sendMessage(Messages.SHOP_FAR.toString());
+				return;
+			}
 		int openPage;
 		try { openPage = Integer.parseInt(page); }
 		catch(Exception e) { openPage = 1; }
@@ -516,6 +526,7 @@ public class CommandShop implements CommandExecutor {
 			EventShop.shopEnabled = iShop.config.getBoolean("enableShopBlock");
 			EventShop.shopBlk = Material.matchMaterial(EventShop.shopBlock);
 			EventShop.stockBlk = Material.matchMaterial(EventShop.stockBlock);
+			EventShop.stockRangeLimit = iShop.config.getInt("stockRangeLimitFromShop");
 			EventShop.soldJoinMessage = iShop.config.getBoolean("enableSoldNotificationOnJoin");
 			EventShop.soldOnlyOnFirstConnect = iShop.config.getBoolean("onlyNotifySoldOnceUntilClear");
 			EventShop.soldMessageDelayTime = iShop.config.getInt("soldNotificationsDelayTime");

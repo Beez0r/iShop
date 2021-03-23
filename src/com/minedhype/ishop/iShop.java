@@ -85,9 +85,11 @@ public class iShop extends JavaPlugin {
 	public void onDisable() {
 		tickTask.cancel();
 		expiredTask.cancel();
-		if(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId()))
+		if(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId())) {
 			while(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId()))
 				;
+			saveTask.cancel();
+		}
 		else {
 			saveTask.cancel();
 			Shop.saveData();
@@ -242,9 +244,13 @@ public class iShop extends JavaPlugin {
 					config.set("listOutOfStock", "&6Listing shops out of stock:");
 					config.set("notOutOfStock", "&aNo shops found that are out of stock!");
 					config.set("outOfStock", "&6Shop&a #%shop Row %row &6is out of stock");
-					config.set("configVersion", 2.9);
-					config.save(configFile);
 				case "2.9":
+					config.set("stockRangeLimitFromShop", 0);
+					config.set("stockRangeLimitUsingCommand", false);
+					config.set("outOfStockRange", "&cYou are too far away from your shop(s) to access stock inventory!");
+					config.set("configVersion", "2.101");
+					config.save(configFile);
+				case "2.101":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

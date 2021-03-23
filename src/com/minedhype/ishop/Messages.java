@@ -22,6 +22,7 @@ public enum Messages {
 	SHOP_CREATED("shopCreated"),
 	SHOP_CREATE_NO_MONEY("noMoney"),
 	SHOP_DELETED("shopDeleted"),
+	SHOP_FAR("outOfStockRange"),
 	SHOP_FOUND("foundShops"),
 	SHOP_IDDELETED("shopIDDeleted"),
 	SHOP_ID_INTEGER("shopIntegerError"),

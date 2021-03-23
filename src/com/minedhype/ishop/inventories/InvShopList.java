@@ -1,12 +1,12 @@
 package com.minedhype.ishop.inventories;
 
 import com.minedhype.ishop.Shop;
+import com.minedhype.ishop.iShop;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
@@ -44,7 +44,6 @@ public class InvShopList extends GUI {
 			Player player = (Player) event.getWhoClicked();
 			List<String> itemLore = event.getCurrentItem().getItemMeta().getLore();
 			player.closeInventory();
-			shopslist.clear();
 			player.performCommand("shop view " + itemLore.get(0));
 		}
 	}
@@ -97,7 +96,6 @@ public class InvShopList extends GUI {
 		for(int i=45; i<54; i++)
 			placeItem(i, new ItemStack(airItem));
 		player.closeInventory();
-		shopslist.clear();
 		this.pag = pag;
 		this.open(player);
 	}
@@ -105,13 +103,16 @@ public class InvShopList extends GUI {
 	@Override
 	public void open(Player player) {
 		shopslist.clear();
-		getShopList(player.getUniqueId());
-		PlayerShopList();
-		super.open(player);
+		final UUID playerUUID = player.getUniqueId();
+		final Player openPlayer = player;
+		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () ->  {
+			getShopList(playerUUID);
+			Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> {
+				PlayerShopList();
+				super.open(openPlayer);
+			});
+		});
 	}
-
-	@Override
-	public void onClose(InventoryCloseEvent event) { shopslist.clear(); }
 
 	@Override
 	public void onDrag(InventoryDragEvent event) {
