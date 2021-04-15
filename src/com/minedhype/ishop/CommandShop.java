@@ -21,6 +21,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -50,6 +51,8 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> listSubCmd(player, label));
 		else if(args[0].equalsIgnoreCase("adminshop"))
 			adminShop(player);
+		else if(args[0].equalsIgnoreCase("count") && args.length >= 2)
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> count(player, args[1]));
 		else if(args[0].equalsIgnoreCase("create"))
 			createStore(player);
 		else if(args[0].equalsIgnoreCase("createshop") && args.length >= 2)
@@ -96,6 +99,7 @@ public class CommandShop implements CommandExecutor {
 
 	private void listSubCmd(Player player, String label) {
 		player.sendMessage(ChatColor.GOLD + "iShop Commands:");
+		player.sendMessage(ChatColor.GRAY + "/" + label + " count <item>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " create");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " delete");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " deleteid <id>");
@@ -119,6 +123,39 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(ChatColor.GRAY + "/" + label + " managestock <player> <page>");
 			player.sendMessage(ChatColor.GRAY + "/" + label + " reload");
 		}
+	}
+
+	private void count(Player player, String itemName) {
+		if(Shop.getNumShops(player.getUniqueId()) < 1 && EventShop.noShopNoStock) {
+			player.sendMessage(Messages.NO_SHOP_STOCK.toString());
+			return;
+		}
+		Material material = Material.matchMaterial(itemName);
+		if(material == null) {
+			try {
+				material = Material.matchMaterial(itemName.split("minecraft:")[1].toUpperCase());
+			} catch(Exception ignored) { }
+			if(material == null) {
+				player.sendMessage(Messages.STOCK_COUNT_ERROR.toString());
+				return;
+			}
+		}
+		ItemStack item = new ItemStack(material);
+		int max = iShop.config.getInt("stockPages");
+		int itemAmountCount = 0;
+		for(int i=0; i<max; i++) {
+			Optional<StockShop> stockStore = StockShop.getStockShopByOwner(player.getUniqueId(),i);
+			if(!stockStore.isPresent())
+				continue;
+			if(stockStore.get().getInventory().contains(item.getType()))
+				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++)
+					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(item.getType()))
+						itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
+		}
+		if(itemAmountCount>0)
+			player.sendMessage(Messages.STOCK_COUNT_AMOUNT.toString().replaceAll("%amount", String.valueOf(itemAmountCount)).replaceAll("%item", itemName));
+		else
+			player.sendMessage(Messages.STOCK_COUNT_EMPTY.toString().replaceAll("%item", itemName));
 	}
 
 	private void createStore(Player player) {

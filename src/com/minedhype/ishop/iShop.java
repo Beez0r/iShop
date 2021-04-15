@@ -168,7 +168,7 @@ public class iShop extends JavaPlugin {
 		config = new YamlConfiguration();
 		try {
 			config.load(this.configFile);
-			String ver = config.getDouble("configVersion")+"";
+			String ver = config.getString("configVersion");
 			switch(ver) {
 				case "1.0":
 					config.set("adminShopDisabled", "&cAdmin shops have been disabled!");
@@ -248,9 +248,13 @@ public class iShop extends JavaPlugin {
 					config.set("stockRangeLimitFromShop", 0);
 					config.set("stockRangeLimitUsingCommand", false);
 					config.set("outOfStockRange", "&cYou are too far away from your shop(s) to access stock inventory!");
-					config.set("configVersion", "2.101");
-					config.save(configFile);
 				case "2.101":
+					config.set("countAmount", "&aTotal amount of %item found: %amount");
+					config.set("countEmpty", "&cCannot find any %item in stock inventory!");
+					config.set("countError", "&cGiven item to search stock for does not exist!");
+					config.set("configVersion", "3.0");
+					config.save(configFile);
+				case "3.0":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

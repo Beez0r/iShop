@@ -21,8 +21,10 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.Plugin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -166,57 +168,217 @@ public class Shop {
 				.forEach(s -> {
 					Optional<RowStore> row0 = s.getRow(0);
 					if(row0.isPresent())
-						if((row0.get().getItemOut().isSimilar(row0.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row0.get().getItemOut(), row0.get().getItemOut2())) || (!Utils.hasStock(s, row0.get().getItemOut())) || (!Utils.hasStock(s, row0.get().getItemOut2()))) {
+						if(row0.get().getItemOut().isSimilar(row0.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row0.get().getItemOut(), row0.get().getItemOut2()) || !Utils.hasStock(s, row0.get().getItemOut()) || !Utils.hasStock(s, row0.get().getItemOut2())) {
+							String row0out = "";
+							String row0out2 = "";
+							boolean out0Changed = false;
+							boolean out0Changed2 = false;
+							if(row0.get().getItemOut().getType().equals(Material.ENCHANTED_BOOK) && row0.get().getItemOut().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row0.get().getItemOut().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row0out = sb.toString().toUpperCase();
+								out0Changed = true;
+							}
+							if(row0.get().getItemOut2().getType().equals(Material.ENCHANTED_BOOK) && row0.get().getItemOut2().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row0.get().getItemOut2().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row0out2 = sb.toString().toUpperCase();
+								out0Changed2 = true;
+							}
+							if(!out0Changed)
+								row0out = row0.get().getItemOut().getType().toString();
+							if(!out0Changed2)
+								row0out2 = row0.get().getItemOut2().getType().toString();
 							if(row0.get().getItemOut2() == null || row0.get().getItemOut2().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0.get().getItemOut().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out + ")");
 							else if(row0.get().getItemOut() == null || row0.get().getItemOut().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out2 + ")");
 							else
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0.get().getItemOut().getType().toString() + " & " + row0.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(1)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row0out + " & " + row0out2 + ")");
 							outCount.getAndIncrement();
 						}
 					Optional<RowStore> row1 = s.getRow(1);
 					if(row1.isPresent())
-						if((row1.get().getItemOut().isSimilar(row1.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row1.get().getItemOut(), row1.get().getItemOut2())) || (!Utils.hasStock(s, row1.get().getItemOut())) || (!Utils.hasStock(s, row1.get().getItemOut2()))) {
+						if(row1.get().getItemOut().isSimilar(row1.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row1.get().getItemOut(), row1.get().getItemOut2()) || !Utils.hasStock(s, row1.get().getItemOut()) || !Utils.hasStock(s, row1.get().getItemOut2())) {
+							String row1out = "";
+							String row1out2 = "";
+							boolean out1Changed = false;
+							boolean out1Changed2 = false;
+							if(row1.get().getItemOut().getType().equals(Material.ENCHANTED_BOOK) && row1.get().getItemOut().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row1.get().getItemOut().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row1out = sb.toString().toUpperCase();
+								out1Changed = true;
+							}
+							if(row1.get().getItemOut2().getType().equals(Material.ENCHANTED_BOOK) && row1.get().getItemOut2().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row1.get().getItemOut2().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row1out2 = sb.toString().toUpperCase();
+								out1Changed2 = true;
+							}
+							if(!out1Changed)
+								row1out = row1.get().getItemOut().getType().toString();
+							if(!out1Changed2)
+								row1out2 = row1.get().getItemOut2().getType().toString();
 							if(row1.get().getItemOut2() == null || row1.get().getItemOut2().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1.get().getItemOut().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out + ")");
 							else if(row1.get().getItemOut() == null || row1.get().getItemOut().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out2 + ")");
 							else
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1.get().getItemOut().getType().toString() + " & " + row1.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(2)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row1out + " & " + row1out2 + ")");
 							outCount.getAndIncrement();
 						}
 					Optional<RowStore> row2 = s.getRow(2);
 					if(row2.isPresent())
-						if((row2.get().getItemOut().isSimilar(row2.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row2.get().getItemOut(), row2.get().getItemOut2())) || (!Utils.hasStock(s, row2.get().getItemOut())) || (!Utils.hasStock(s, row2.get().getItemOut2()))) {
+						if(row2.get().getItemOut().isSimilar(row2.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row2.get().getItemOut(), row2.get().getItemOut2()) || !Utils.hasStock(s, row2.get().getItemOut()) || !Utils.hasStock(s, row2.get().getItemOut2())) {
+							String row2out = "";
+							String row2out2 = "";
+							boolean out2Changed = false;
+							boolean out2Changed2 = false;
+							if(row2.get().getItemOut().getType().equals(Material.ENCHANTED_BOOK) && row2.get().getItemOut().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row2.get().getItemOut().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row2out = sb.toString().toUpperCase();
+								out2Changed = true;
+							}
+							if(row2.get().getItemOut2().getType().equals(Material.ENCHANTED_BOOK) && row2.get().getItemOut2().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row2.get().getItemOut2().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row2out2 = sb.toString().toUpperCase();
+								out2Changed2 = true;
+							}
+							if(!out2Changed)
+								row2out = row2.get().getItemOut().getType().toString();
+							if(!out2Changed2)
+								row2out2 = row2.get().getItemOut2().getType().toString();
 							if(row2.get().getItemOut2() == null || row2.get().getItemOut2().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2.get().getItemOut().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out + ")");
 							else if(row2.get().getItemOut() == null || row2.get().getItemOut().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out2 + ")");
 							else
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2.get().getItemOut().getType().toString() + " & " + row2.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(3)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row2out + " & " + row2out2 + ")");
 							outCount.getAndIncrement();
 						}
 					Optional<RowStore> row3 = s.getRow(3);
 					if(row3.isPresent())
-						if((row3.get().getItemOut().isSimilar(row3.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row3.get().getItemOut(), row3.get().getItemOut2())) || (!Utils.hasStock(s, row3.get().getItemOut())) || (!Utils.hasStock(s, row3.get().getItemOut2()))) {
+						if(row3.get().getItemOut().isSimilar(row3.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row3.get().getItemOut(), row3.get().getItemOut2()) || !Utils.hasStock(s, row3.get().getItemOut()) || !Utils.hasStock(s, row3.get().getItemOut2())) {
+							String row3out = "";
+							String row3out2 = "";
+							boolean out3Changed = false;
+							boolean out3Changed2 = false;
+							if(row3.get().getItemOut().getType().equals(Material.ENCHANTED_BOOK) && row3.get().getItemOut().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row3.get().getItemOut().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row3out = sb.toString().toUpperCase();
+								out3Changed = true;
+							}
+							if(row3.get().getItemOut2().getType().equals(Material.ENCHANTED_BOOK) && row3.get().getItemOut2().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row3.get().getItemOut2().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row3out2 = sb.toString().toUpperCase();
+								out3Changed2 = true;
+							}
+							if(!out3Changed)
+								row3out = row3.get().getItemOut().getType().toString();
+							if(!out3Changed2)
+								row3out2 = row3.get().getItemOut2().getType().toString();
 							if(row3.get().getItemOut2() == null || row3.get().getItemOut2().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3.get().getItemOut().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out + ")");
 							else if(row3.get().getItemOut() == null || row3.get().getItemOut().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out2 + ")");
 							else
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3.get().getItemOut().getType().toString() + " & " + row3.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(4)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row3out + " & " + row3out2 + ")");
 							outCount.getAndIncrement();
 						}
 					Optional<RowStore> row4 = s.getRow(4);
 					if(row4.isPresent())
-						if((row4.get().getItemOut().isSimilar(row4.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row4.get().getItemOut(), row4.get().getItemOut2())) || (!Utils.hasStock(s, row4.get().getItemOut())) || (!Utils.hasStock(s, row4.get().getItemOut2()))) {
+						if(row4.get().getItemOut().isSimilar(row4.get().getItemOut2()) && !Utils.hasDoubleItemStock(s, row4.get().getItemOut(), row4.get().getItemOut2()) || !Utils.hasStock(s, row4.get().getItemOut()) || !Utils.hasStock(s, row4.get().getItemOut2())) {
+							String row4out = "";
+							String row4out2 = "";
+							boolean out4Changed = false;
+							boolean out4Changed2 = false;
+							if(row4.get().getItemOut().getType().equals(Material.ENCHANTED_BOOK) && row4.get().getItemOut().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row4.get().getItemOut().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row4out = sb.toString().toUpperCase();
+								out4Changed = true;
+							}
+							if(row4.get().getItemOut2().getType().equals(Material.ENCHANTED_BOOK) && row4.get().getItemOut2().getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row4.get().getItemOut2().getItemMeta();
+								StringBuilder sb = new StringBuilder();
+								sb.append("enchanted book: ");
+								for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+									String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").replaceAll("minecraft:", "");
+									sb.append(enchants).append(" ").append(entry.getValue()).append(", ");
+								}
+								sb.deleteCharAt(sb.length()-1).deleteCharAt(sb.length()-1);
+								row4out2 = sb.toString().toUpperCase();
+								out4Changed2 = true;
+							}
+							if(!out4Changed)
+								row4out = row4.get().getItemOut().getType().toString();
+							if(!out4Changed2)
+								row4out2 = row4.get().getItemOut2().getType().toString();
 							if(row4.get().getItemOut2() == null || row4.get().getItemOut2().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4.get().getItemOut().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out + ")");
 							else if(row4.get().getItemOut() == null || row4.get().getItemOut().getType().equals(Material.AIR))
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out2 + ")");
 							else
-								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4.get().getItemOut().getType().toString() + " & " + row4.get().getItemOut2().getType().toString() + ")");
+								player.sendMessage(Messages.SHOP_OUT.toString().replaceAll("%row", String.valueOf(5)).replaceAll("%shop", String.valueOf(s.idTienda)) + ChatColor.RED + " (" + row4out + " & " + row4out2 + ")");
 							outCount.getAndIncrement();
 						}
 				});
@@ -401,7 +563,7 @@ public class Shop {
 				player.sendMessage(Messages.SHOP_NO_ITEMS.toString());
 				return;
 		}
-		if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(this, row.get().getItemOut(), row.get().getItemOut())) {
+		if(row.get().getItemOut().isSimilar(row.get().getItemOut2()) && !Utils.hasDoubleItemStock(this, row.get().getItemOut(), row.get().getItemOut2())) {
 				player.sendMessage(Messages.SHOP_NO_STOCK.toString());
 				if(shopOutStock) {
 					final Player ownerPlayer = Bukkit.getPlayer(owner);
@@ -429,35 +591,104 @@ public class Shop {
 				return;
 			}
 		}
-		if(player.getInventory().firstEmpty() != -1) {
-			if(!row.get().getItemIn().isSimilar(airItem))
-				player.getInventory().removeItem(row.get().getItemIn().clone());
-			if(!row.get().getItemIn2().isSimilar(airItem))
-				player.getInventory().removeItem(row.get().getItemIn2().clone());
-			if(!row.get().getItemOut().isSimilar(airItem))
-				player.getInventory().addItem(row.get().getItemOut().clone());
-			if(!row.get().getItemOut2().isSimilar(airItem))
-				player.getInventory().addItem(row.get().getItemOut2().clone());
-		} else {
-			player.sendMessage(Messages.PLAYER_INV_FULL.toString());
-			return;
+		if(!row.get().getItemOut().getType().isAir() && !row.get().getItemOut2().getType().isAir()) {
+			int emptySlots = 0;
+			for(ItemStack item : player.getInventory().getStorageContents())
+				if(item == null || item.getType().isAir())
+					emptySlots++;
+			if(emptySlots > 1) {
+				if(!row.get().getItemIn().isSimilar(airItem))
+					player.getInventory().removeItem(row.get().getItemIn().clone());
+				if(!row.get().getItemIn2().isSimilar(airItem))
+					player.getInventory().removeItem(row.get().getItemIn2().clone());
+				if(!row.get().getItemOut().isSimilar(airItem))
+					player.getInventory().addItem(row.get().getItemOut().clone());
+				if(!row.get().getItemOut2().isSimilar(airItem))
+					player.getInventory().addItem(row.get().getItemOut2().clone());
+			} else {
+				player.sendMessage(Messages.PLAYER_INV_FULL.toString());
+				return;
+			}
+		}
+		else {
+			if(player.getInventory().firstEmpty() != -1) {
+				if(!row.get().getItemIn().isSimilar(airItem))
+					player.getInventory().removeItem(row.get().getItemIn().clone());
+				if(!row.get().getItemIn2().isSimilar(airItem))
+					player.getInventory().removeItem(row.get().getItemIn2().clone());
+				if(!row.get().getItemOut().isSimilar(airItem))
+					player.getInventory().addItem(row.get().getItemOut().clone());
+				if(!row.get().getItemOut2().isSimilar(airItem))
+					player.getInventory().addItem(row.get().getItemOut2().clone());
+			} else {
+				player.sendMessage(Messages.PLAYER_INV_FULL.toString());
+				return;
+			}
 		}
 		String nameIn1, nameIn2, nameOut1, nameOut2;
 		int inA1, inA2, outA1, outA2;
 		try {
-			nameIn1 = row.get().getItemIn().getItemMeta().hasDisplayName() ? row.get().getItemIn().getItemMeta().getDisplayName() : row.get().getItemIn().getType().name().replaceAll("_", " ").toLowerCase();
+			if(row.get().getItemIn().getType().equals(Material.ENCHANTED_BOOK) && row.get().getItemIn().getItemMeta() instanceof EnchantmentStorageMeta) {
+				EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row.get().getItemIn().getItemMeta();
+				StringBuilder sbIn1 = new StringBuilder();
+				sbIn1.append("enchanted book: ");
+				for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+					String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").toLowerCase().replaceAll("minecraft:", "");
+					sbIn1.append(enchants).append(" ").append(entry.getValue()).append(", ");
+				}
+				sbIn1.deleteCharAt(sbIn1.length()-1).deleteCharAt(sbIn1.length()-1);
+				nameIn1 = sbIn1.toString().toLowerCase();
+			}
+			else
+				nameIn1 = row.get().getItemIn().getItemMeta().hasDisplayName() ? row.get().getItemIn().getItemMeta().getDisplayName() : row.get().getItemIn().getType().name().replaceAll("_", " ").toLowerCase();
 			inA1 = row.get().getItemIn().getAmount();
 		} catch(Exception e) { nameIn1 = "empty"; inA1 = 0; }
 		try {
-			nameIn2 = row.get().getItemIn2().getItemMeta().hasDisplayName() ? row.get().getItemIn2().getItemMeta().getDisplayName() : row.get().getItemIn2().getType().name().replaceAll("_", " ").toLowerCase();
+			if(row.get().getItemIn2().getType().equals(Material.ENCHANTED_BOOK) && row.get().getItemIn2().getItemMeta() instanceof EnchantmentStorageMeta) {
+				EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row.get().getItemIn2().getItemMeta();
+				StringBuilder sbIn2 = new StringBuilder();
+				sbIn2.append("enchanted book: ");
+				for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+					String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").toLowerCase().replaceAll("minecraft:", "");
+					sbIn2.append(enchants).append(" ").append(entry.getValue()).append(", ");
+				}
+				sbIn2.deleteCharAt(sbIn2.length()-1).deleteCharAt(sbIn2.length()-1);
+				nameIn2 = sbIn2.toString().toLowerCase();
+			}
+			else
+				nameIn2 = row.get().getItemIn2().getItemMeta().hasDisplayName() ? row.get().getItemIn2().getItemMeta().getDisplayName() : row.get().getItemIn2().getType().name().replaceAll("_", " ").toLowerCase();
 			inA2 = row.get().getItemIn2().getAmount();
 		} catch(Exception e) { nameIn2 = "empty"; inA2 = 0; }
 		try {
-			nameOut1 = row.get().getItemOut().getItemMeta().hasDisplayName() ? row.get().getItemOut().getItemMeta().getDisplayName() : row.get().getItemOut().getType().name().replaceAll("_", " ").toLowerCase();
+			if(row.get().getItemOut().getType().equals(Material.ENCHANTED_BOOK) && row.get().getItemOut().getItemMeta() instanceof EnchantmentStorageMeta) {
+				EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row.get().getItemOut().getItemMeta();
+				StringBuilder sbOut1 = new StringBuilder();
+				sbOut1.append("enchanted book: ");
+				for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+					String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").toLowerCase().replaceAll("minecraft:", "");
+					sbOut1.append(enchants).append(" ").append(entry.getValue()).append(", ");
+				}
+				sbOut1.deleteCharAt(sbOut1.length()-1).deleteCharAt(sbOut1.length()-1);
+				nameOut1 = sbOut1.toString().toLowerCase();
+			}
+			else
+				nameOut1 = row.get().getItemOut().getItemMeta().hasDisplayName() ? row.get().getItemOut().getItemMeta().getDisplayName() : row.get().getItemOut().getType().name().replaceAll("_", " ").toLowerCase();
 			outA1 = row.get().getItemOut().getAmount();
 		} catch(Exception e) { nameOut1 = "empty"; outA1 = 0; }
 		try {
-			nameOut2 = row.get().getItemOut2().getItemMeta().hasDisplayName() ? row.get().getItemOut2().getItemMeta().getDisplayName() : row.get().getItemOut2().getType().name().replaceAll("_", " ").toLowerCase();
+			if(row.get().getItemOut2().getType().equals(Material.ENCHANTED_BOOK) && row.get().getItemOut2().getItemMeta() instanceof EnchantmentStorageMeta) {
+				EnchantmentStorageMeta metaOut = (EnchantmentStorageMeta) row.get().getItemOut2().getItemMeta();
+				StringBuilder sbOut2 = new StringBuilder();
+				sbOut2.append("enchanted book: ");
+				for(Map.Entry<Enchantment, Integer> entry : metaOut.getStoredEnchants().entrySet()) {
+					String enchants = entry.getKey().getKey().toString().replaceAll("_", " ").toLowerCase().replaceAll("minecraft:", "");
+					sbOut2.append(enchants).append(" ").append(entry.getValue()).append(", ");
+				}
+				sbOut2.deleteCharAt(sbOut2.length()-1).deleteCharAt(sbOut2.length()-1);
+				nameOut2 = sbOut2.toString().toLowerCase();
+			}
+			else
+				nameOut2 = row.get().getItemOut2().getItemMeta().hasDisplayName() ? row.get().getItemOut2().getItemMeta().getDisplayName() : row.get().getItemOut2().getType().name().replaceAll("_", " ").toLowerCase();
 			outA2 = row.get().getItemOut2().getAmount();
 		} catch(Exception e) { nameOut2 = "empty"; outA2 = 0; }
 		if(!this.admin) {

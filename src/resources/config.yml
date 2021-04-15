@@ -222,6 +222,9 @@ listOutOfStock: "&6Listing shops out of stock:"
 notOutOfStock: "&aNo shops found that are out of stock!"
 outOfStock: "&6Shop&a #%shop Row %row &6is out of stock"
 outOfStockRange: "&cYou are too far away from your shop(s) to access stock inventory!"
+countAmount: "&aTotal amount of %item found: %amount"
+countEmpty: "&cCannot find any %item in stock inventory!"
+countError: "&cGiven item to search stock for does not exist!"
 
 # Do not edit this!
-configVersion: 2.101
+configVersion: 3.0

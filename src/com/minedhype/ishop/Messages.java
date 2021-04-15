@@ -72,6 +72,9 @@ public enum Messages {
 	SOLD_PAGES_NEXT("soldPagesNext"),
 	SOLD_PAGES_PREVIOUS("soldPagesPrevious"),
 	STOCK_COMMAND_DISABLED("stockCommandDisabled"),
+	STOCK_COUNT_AMOUNT("countAmount"),
+	STOCK_COUNT_EMPTY("countEmpty"),
+	STOCK_COUNT_ERROR("countError"),
 	STOCK_INTEGER("stockIntegerError"),
 	TARGET_MISMATCH("targetMismatch");
 
