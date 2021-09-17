@@ -15,6 +15,7 @@ import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.iShop;
 import com.minedhype.ishop.gui.GUI;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.BundleMeta;
 import java.util.List;
 
 public class InvCreateRow extends GUI {
@@ -62,29 +63,69 @@ public class InvCreateRow extends GUI {
 								ItemStack out2 = itemOut2.clone();
 								if(in1.getType().equals(disabledItemsList) || in2.getType().equals(disabledItemsList) || out1.getType().equals(disabledItemsList) || out2.getType().equals(disabledItemsList))
 									return;
-								if(in1.getType().equals(Material.SHULKER_BOX) && in1.getItemMeta() instanceof BlockStateMeta) {
+								if(in1.getType().toString().contains("SHULKER_BOX") && in1.getItemMeta() instanceof BlockStateMeta) {
 									BlockStateMeta itemMeta1 = (BlockStateMeta) in1.getItemMeta();
 									ShulkerBox shulkerBox1 = (ShulkerBox) itemMeta1.getBlockState();
 									if(shulkerBox1.getInventory().contains(disabledItemsList))
 										return;
 								}
-								if(in2.getType().equals(Material.SHULKER_BOX) && in2.getItemMeta() instanceof BlockStateMeta) {
+								else if(in1.getType().equals(Material.BUNDLE)) {
+									BundleMeta bundleIn1 = (BundleMeta) in1.getItemMeta();
+									if(bundleIn1.hasItems()) {
+										ItemStack itemDisabledIn = new ItemStack(disabledItemsList);
+										List<ItemStack> bundleIn1Items = bundleIn1.getItems();
+										for(ItemStack bundleList : bundleIn1Items)
+											if(bundleList.isSimilar(itemDisabledIn))
+												return;
+									}
+								}
+								if(in2.getType().toString().contains("SHULKER_BOX") && in2.getItemMeta() instanceof BlockStateMeta) {
 									BlockStateMeta itemMeta2 = (BlockStateMeta) in2.getItemMeta();
 									ShulkerBox shulkerBox2 = (ShulkerBox) itemMeta2.getBlockState();
 									if(shulkerBox2.getInventory().contains(disabledItemsList))
 										return;
 								}
-								if(out1.getType().equals(Material.SHULKER_BOX) && out1.getItemMeta() instanceof BlockStateMeta) {
+								else if(in2.getType().equals(Material.BUNDLE)) {
+									BundleMeta bundleIn2 = (BundleMeta) in2.getItemMeta();
+									if(bundleIn2.hasItems()) {
+										ItemStack itemDisabledIn2 = new ItemStack(disabledItemsList);
+										List<ItemStack> bundleIn2Items = bundleIn2.getItems();
+										for(ItemStack bundleList : bundleIn2Items)
+											if(bundleList.isSimilar(itemDisabledIn2))
+												return;
+									}
+								}
+								if(out1.getType().toString().contains("SHULKER_BOX") && out1.getItemMeta() instanceof BlockStateMeta) {
 									BlockStateMeta itemMeta3 = (BlockStateMeta) out1.getItemMeta();
 									ShulkerBox shulkerBox3 = (ShulkerBox) itemMeta3.getBlockState();
 									if(shulkerBox3.getInventory().contains(disabledItemsList))
 										return;
 								}
-								if(out2.getType().equals(Material.SHULKER_BOX) && out2.getItemMeta() instanceof BlockStateMeta) {
+								else if(out1.getType().equals(Material.BUNDLE)) {
+									BundleMeta bundleOut1 = (BundleMeta) out1.getItemMeta();
+									if(bundleOut1.hasItems()) {
+										ItemStack itemDisabledOut = new ItemStack(disabledItemsList);
+										List<ItemStack> bundleOut1Items = bundleOut1.getItems();
+										for(ItemStack bundleList : bundleOut1Items)
+											if(bundleList.isSimilar(itemDisabledOut))
+												return;
+									}
+								}
+								if(out2.getType().toString().contains("SHULKER_BOX") && out2.getItemMeta() instanceof BlockStateMeta) {
 									BlockStateMeta itemMeta4 = (BlockStateMeta) out2.getItemMeta();
 									ShulkerBox shulkerBox4 = (ShulkerBox) itemMeta4.getBlockState();
 									if(shulkerBox4.getInventory().contains(disabledItemsList))
 										return;
+								}
+								else if(out2.getType().equals(Material.BUNDLE)) {
+									BundleMeta bundleOut2 = (BundleMeta) out2.getItemMeta();
+									if(bundleOut2.hasItems()) {
+										ItemStack itemDisabledOut2 = new ItemStack(disabledItemsList);
+										List<ItemStack> bundleOut2Items = bundleOut2.getItems();
+										for(ItemStack bundleList : bundleOut2Items)
+											if(bundleList.isSimilar(itemDisabledOut2))
+												return;
+									}
 								}
 							}
 						}

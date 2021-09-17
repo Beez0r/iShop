@@ -214,8 +214,12 @@ public class CommandShop implements CommandExecutor {
 			isShopLoc = iShop.wgLoader.checkRegion(block);
 		else
 			isShopLoc = true;
+		if(!isShopLoc) {
+			player.sendMessage(Messages.WG_REGION.toString());
+			return;
+		}
 		Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
-		if(shop.isPresent() || !isShopLoc) {
+		if(shop.isPresent()) {
 			player.sendMessage(Messages.EXISTING_SHOP.toString());
 			return;
 		}
@@ -330,9 +334,20 @@ public class CommandShop implements CommandExecutor {
 				try {
 					shopOwner = getUUID(playerShop);
 				} catch (Exception e) {
-					player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_PLAYER_FOUND.toString());
-					return;
+					UUID foundPlayerUUID = null;
+					boolean foundPlayer = false;
+					for(OfflinePlayer offlinePlayers : Bukkit.getOfflinePlayers())
+						if(offlinePlayers.getName().equalsIgnoreCase(playerShop)) {
+							foundPlayerUUID = offlinePlayers.getUniqueId();
+							foundPlayer = true;
+							break;
+						}
+					if(!foundPlayer) {
+						player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
+						Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_PLAYER_FOUND);
+						return;
+					}
+					shopOwner = foundPlayerUUID;
 				}
 			}
 		}
@@ -345,9 +360,10 @@ public class CommandShop implements CommandExecutor {
 		if(!shop.isPresent()) {
 			Shop.createShop(block.getLocation(), shopOwner);
 			player.sendMessage(Messages.PLAYER_SHOP_CREATED.toString().replaceAll("%p", playerShop));
+			final UUID shopOwnerFinal = shopOwner;
 			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
 				Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
-				Shop.shopList.put(shops.get().shopId(), shopOwner);
+				Shop.shopList.put(shops.get().shopId(), shopOwnerFinal);
 			}, 10);
 		} else { player.sendMessage(Messages.EXISTING_SHOP.toString()); }
 	}
@@ -375,21 +391,40 @@ public class CommandShop implements CommandExecutor {
 			if(match == null)
 				match = Material.BARREL;
 		}
-		if(!block.getType().equals(match)) {
-			player.sendMessage(Messages.TARGET_MISMATCH.toString());
-			return;
+		if(!EventShop.multipleShopBlocks) {
+			if(!block.getType().equals(match)) {
+				player.sendMessage(Messages.TARGET_MISMATCH.toString());
+				return;
+			}
+		} else {
+			boolean shopMatch = false;
+			for(String shopBlocks:EventShop.multipleShopBlock) {
+				Material shopListBlocks = Material.matchMaterial(shopBlocks);
+				if(shopListBlocks != null && block.getType().equals(shopListBlocks)) {
+					shopMatch = true;
+					break;
+				}
+			}
+			if(!block.getType().equals(match) && !shopMatch) {
+				player.sendMessage(Messages.TARGET_MISMATCH.toString());
+				return;
+			}
 		}
 		Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
 		if(shop.isPresent()) {
 			player.sendMessage(Messages.EXISTING_SHOP.toString());
 			return;
 		}
-		Shop newShop = Shop.createShop(block.getLocation(), UUID.fromString("00000000-0000-0000-0000-000000000000"), true);
+		String adminHead;
+		try { adminHead = iShop.config.getString("adminPlayerHeadShops"); }
+			catch(Exception e) { adminHead = "00000000-0000-0000-0000-000000000000"; }
+		Shop newShop = Shop.createShop(block.getLocation(), UUID.fromString(adminHead), true);
 		player.sendMessage(Messages.SHOP_CREATED.toString());
 		if(iShop.config.getBoolean("adminShopPublic")) {
+			final String adminHeadFinal = adminHead;
 			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
 				Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
-				Shop.shopList.put(shops.get().shopId(), UUID.fromString("00000000-0000-0000-0000-000000000000"));
+				Shop.shopList.put(shops.get().shopId(), UUID.fromString(adminHeadFinal));
 			}, 10);
 		}
 		InvAdminShop inv = new InvAdminShop(newShop, player);
@@ -481,7 +516,7 @@ public class CommandShop implements CommandExecutor {
 				sOwner = getUUID(playerName);
 			} catch (Exception e) {
 				player.sendMessage(Messages.NO_PLAYER_SHOP.toString());
-				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " +  Messages.NO_PLAYER_SHOP.toString());
+				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_PLAYER_SHOP);
 				return;
 			}
 		}
@@ -549,9 +584,9 @@ public class CommandShop implements CommandExecutor {
 		if(plugin != null)
 			plugin.createConfig();
 		if(player != null)
-			player.sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
+			player.sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD);
 		else
-			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD.toString());
+			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + Messages.SHOP_RELOAD);
 		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> {
 			EventShop.adminShopEnabled = iShop.config.getBoolean("enableAdminShop");
 			EventShop.noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
@@ -585,6 +620,7 @@ public class CommandShop implements CommandExecutor {
 			Shop.maxDays = iShop.config.getInt("maxInactiveDays");
 			Shop.deletePlayerShop = iShop.config.getBoolean("deleteBlock");
 			Shop.stockMessages = iShop.config.getBoolean("enableShopSoldMessage");
+			Shop.exemptExpiringList = iShop.config.getStringList("exemptExpiringShops");
 		});
 	}
 
@@ -687,7 +723,7 @@ public class CommandShop implements CommandExecutor {
 				sOwner = getUUID(stockOwner);
 			} catch (Exception e) {
 				player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
-				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " +  Messages.NO_PLAYER_FOUND.toString());
+				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_PLAYER_FOUND);
 				return;
 			}
 		}
@@ -832,7 +868,7 @@ public class CommandShop implements CommandExecutor {
 				sOwner = getUUID(playerName);
 			} catch (Exception e) {
 				player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
-				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " +  Messages.NO_PLAYER_FOUND.toString());
+				Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_PLAYER_FOUND);
 				return;
 			}
 		}

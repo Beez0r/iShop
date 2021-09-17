@@ -76,7 +76,8 @@ public enum Messages {
 	STOCK_COUNT_EMPTY("countEmpty"),
 	STOCK_COUNT_ERROR("countError"),
 	STOCK_INTEGER("stockIntegerError"),
-	TARGET_MISMATCH("targetMismatch");
+	TARGET_MISMATCH("targetMismatch"),
+	WG_REGION("outsideRegion");
 
 	private final String msg;
 

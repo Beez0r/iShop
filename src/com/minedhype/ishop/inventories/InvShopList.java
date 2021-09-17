@@ -60,9 +60,9 @@ public class InvShopList extends GUI {
 		int shopListPages = (int)Math.ceil(shopslist.size()-1)/44;
 		for(int i=45; i<54; i++) {
 			if(i == 47 && pag > 0)
-				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag)), p -> openPage(p, pag-1));
+				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag)), p -> openPage(p, pag-1));
 			else if(i == 51 && pag < shopListPages)
-				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE.toString()+" " + (pag+2)), p -> openPage(p, pag+1));
+				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag+2)), p -> openPage(p, pag+1));
 			else
 				placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 		}
@@ -78,7 +78,7 @@ public class InvShopList extends GUI {
 					SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
 					skullMeta.setOwningPlayer(offlinePlayer);
-					if(Shop.shopList.get(id).equals(UUID.fromString("00000000-0000-0000-0000-000000000000")))
+					if(Shop.getShopById(id).get().isAdmin())
 						skullMeta.setDisplayName(Messages.ADMIN_SHOP_NUMBER.toString().replaceAll("%id", id.toString()));
 					else
 						skullMeta.setDisplayName(Messages.SHOP_NUMBER.toString().replaceAll("%player", offlinePlayer.getName()).replaceAll("%id", id.toString()));

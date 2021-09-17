@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.WallSign;
+import org.bukkit.entity.GlowItemFrame;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
@@ -270,7 +271,7 @@ public class EventShop implements Listener {
 
 	@EventHandler
 	public void itemFrameItem(EntityDamageByEntityEvent event) {
-		if(placeFrameSign && shopEnabled && event.getEntity() instanceof ItemFrame) {
+		if(placeFrameSign && shopEnabled && (event.getEntity() instanceof ItemFrame || event.getEntity() instanceof GlowItemFrame)) {
 			BlockFace blockFace = event.getEntity().getFacing();
 			Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace.getOppositeFace());
 			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
@@ -304,7 +305,7 @@ public class EventShop implements Listener {
 
 	@EventHandler
 	public void HangingBreakItemFrameEntity(HangingBreakByEntityEvent event) {
-		if(placeFrameSign && shopEnabled && event.getEntity() instanceof ItemFrame) {
+		if(placeFrameSign && shopEnabled && (event.getEntity() instanceof ItemFrame || event.getEntity() instanceof GlowItemFrame)) {
 			BlockFace blockFace = event.getEntity().getAttachedFace();
 			Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace);
 			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
@@ -317,7 +318,7 @@ public class EventShop implements Listener {
 
 	@EventHandler
 	public void HangingBreakItemFrame(HangingBreakEvent event) {
-		if(placeFrameSign && shopEnabled && !event.getCause().equals(HangingBreakEvent.RemoveCause.ENTITY) && event.getEntity() instanceof ItemFrame) {
+		if(placeFrameSign && shopEnabled && !event.getCause().equals(HangingBreakEvent.RemoveCause.ENTITY) && (event.getEntity() instanceof ItemFrame || event.getEntity() instanceof GlowItemFrame)) {
 			BlockFace blockFace = event.getEntity().getAttachedFace();
 			Block attachedBlock = event.getEntity().getLocation().getBlock().getRelative(blockFace);
 			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());
@@ -330,7 +331,7 @@ public class EventShop implements Listener {
 
 	@EventHandler
 	public void itemFrameItemRotate(PlayerInteractEntityEvent event) {
-		if(placeFrameSign && shopEnabled && event.getRightClicked() instanceof ItemFrame) {
+		if(placeFrameSign && shopEnabled && (event.getRightClicked() instanceof ItemFrame || event.getRightClicked() instanceof GlowItemFrame)) {
 			BlockFace blockFace = event.getRightClicked().getFacing();
 			Block attachedBlock = event.getRightClicked().getLocation().getBlock().getRelative(blockFace.getOppositeFace());
 			Optional<Shop> shop = Shop.getShopByLocation(attachedBlock.getLocation());

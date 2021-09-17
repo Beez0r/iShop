@@ -43,6 +43,9 @@ disabledWorldList:
 # This enables admin shops that don't need stock. Created by typing /shop adminshop, requires ishop.admin permission
 enableAdminShop: true
 
+# Set player head for admin shops when listing using UUID. Default is 00000000-0000-0000-0000-000000000000
+adminPlayerHeadShops: 00000000-0000-0000-0000-000000000000
+
 # Enable clickable chest item in self owned shop gui that will access stock
 enableStockAccessFromShopGUI: true
 
@@ -94,6 +97,10 @@ returnAmount: 0.0
 # Amount of days a player is inactive before deleting their shops
 # Set to 0 to disable
 maxInactiveDays: 0
+
+# List of player UUID's that will be exempt from shops expiring if maxInactiveDays is set above 0
+exemptExpiringShops:
+  - 00000000-0000-0000-0000-000000000000
 
 # Delete block that the shop is located at when deleting a shop
 deleteBlock: false
@@ -225,6 +232,7 @@ outOfStockRange: "&cYou are too far away from your shop(s) to access stock inven
 countAmount: "&aTotal amount of %item found: %amount"
 countEmpty: "&cCannot find any %item in stock inventory!"
 countError: "&cGiven item to search stock for does not exist!"
+outsideRegion: "&cCannot create shop outside of ishop region!"
 
 # Do not edit this!
-configVersion: 3.0
+configVersion: 3.1

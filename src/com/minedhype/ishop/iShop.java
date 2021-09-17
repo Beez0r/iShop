@@ -46,11 +46,11 @@ public class iShop extends JavaPlugin {
 		this.createConfig();
 		if(config.getString("shopBlock") == null) {
 			config.set("shopBlock", "minecraft:barrel");
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_SHOP_BLOCK.toString());
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_SHOP_BLOCK);
 		}
 		if(config.getString("stockBlock") == null) {
 			config.set("stockBlock", "minecraft:composter");
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_STOCK_BLOCK.toString());
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] " + Messages.NO_STOCK_BLOCK);
 		}
 		getServer().getPluginManager().registerEvents(new EventShop(), this);
 		getServer().getPluginManager().registerEvents(new GUIEvent(), this);
@@ -252,9 +252,14 @@ public class iShop extends JavaPlugin {
 					config.set("countAmount", "&aTotal amount of %item found: %amount");
 					config.set("countEmpty", "&cCannot find any %item in stock inventory!");
 					config.set("countError", "&cGiven item to search stock for does not exist!");
-					config.set("configVersion", "3.0");
-					config.save(configFile);
 				case "3.0":
+					config.set("adminPlayerHeadShops", "00000000-0000-0000-0000-000000000000");
+					List<String> exemptExpiredShops = Arrays.asList("00000000-0000-0000-0000-000000000000");
+					config.set("exemptExpiringShops", exemptExpiredShops);
+					config.set("outsideRegion", "&cCannot create shop outside of ishop region!");
+					config.set("configVersion", "3.1");
+					config.save(configFile);
+				case "3.1":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }
