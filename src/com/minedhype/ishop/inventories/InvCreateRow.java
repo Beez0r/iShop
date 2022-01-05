@@ -25,6 +25,7 @@ public class InvCreateRow extends GUI {
 	private ItemStack itemOut2;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	public static Boolean itemsDisabled = iShop.config.getBoolean("disabledItems");
+	public static Boolean strictStock = iShop.config.getBoolean("strictStock");
 	public static List<String> disabledItemList = iShop.config.getStringList("disabledItemsList");
 	
 	public InvCreateRow(Shop shop, int index) {
@@ -53,14 +54,14 @@ public class InvCreateRow extends GUI {
 						return;
 					if((itemOut == airItem && itemOut2 == airItem) || (itemIn == airItem && itemIn2 == airItem))
 						return;
+					ItemStack in1 = itemIn.clone();
+					ItemStack in2 = itemIn2.clone();
+					ItemStack out1 = itemOut.clone();
+					ItemStack out2 = itemOut2.clone();
 					if(itemsDisabled) {
 						for(String itemsList:disabledItemList) {
 							Material disabledItemsList = Material.matchMaterial(itemsList);
 							if(disabledItemsList != null) {
-								ItemStack in1 = itemIn.clone();
-								ItemStack in2 = itemIn2.clone();
-								ItemStack out1 = itemOut.clone();
-								ItemStack out2 = itemOut2.clone();
 								if(in1.getType().equals(disabledItemsList) || in2.getType().equals(disabledItemsList) || out1.getType().equals(disabledItemsList) || out2.getType().equals(disabledItemsList))
 									return;
 								if(in1.getType().toString().contains("SHULKER_BOX") && in1.getItemMeta() instanceof BlockStateMeta) {
@@ -130,7 +131,7 @@ public class InvCreateRow extends GUI {
 							}
 						}
 					}
-					shop.getRows()[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, false);
+					shop.getRows()[index] = new RowStore(out1, out2, in1, in2, false);
 					InvAdminShop inv = new InvAdminShop(shop, p.getPlayer());
 					inv.open(p);
 				});

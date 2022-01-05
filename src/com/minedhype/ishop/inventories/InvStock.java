@@ -5,6 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.HashMap;
+import com.minedhype.ishop.Messages;
+import com.minedhype.ishop.Permission;
+import com.minedhype.ishop.Shop;
+import com.minedhype.ishop.StockShop;
+import com.minedhype.ishop.iShop;
+import com.minedhype.ishop.gui.GUI;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -12,10 +18,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import com.minedhype.ishop.Messages;
-import com.minedhype.ishop.StockShop;
-import com.minedhype.ishop.iShop;
-import com.minedhype.ishop.gui.GUI;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BundleMeta;
 
@@ -26,6 +28,7 @@ public class InvStock extends GUI {
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	private final UUID owner;
 	private int pag;
+	private Player player;
 	
 	private InvStock(UUID owner) {
 		super(54, Messages.SHOP_TITLE_STOCK.toString());
@@ -41,51 +44,59 @@ public class InvStock extends GUI {
 		super.onClick(event);
 		if(event.getRawSlot() >= 45 && event.getRawSlot() < 54)
 			return;
-		if(InvCreateRow.itemsDisabled && event.getRawSlot() >= 54) {
-			ItemStack item = event.getCurrentItem();
-			ItemStack item2 = event.getCursor();
-			for(String itemsList:InvCreateRow.disabledItemList) {
-				Material disabledItemsList = Material.matchMaterial(itemsList);
-				if(item == null)
-					item = airItem;
-				if(item2 == null)
-					item2 = airItem;
-				if(disabledItemsList != null) {
-					if(!item.isSimilar(airItem)) {
-						if(item.getType().equals(disabledItemsList))
-							return;
-						if(item.getType().toString().contains("SHULKER_BOX") && item.getItemMeta() instanceof BlockStateMeta) {
-							BlockStateMeta itemMeta1 = (BlockStateMeta) item.getItemMeta();
-							ShulkerBox shulkerBox1 = (ShulkerBox) itemMeta1.getBlockState();
-							if(shulkerBox1.getInventory().contains(disabledItemsList))
+		if(event.getRawSlot() >= 54 && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			if(InvCreateRow.strictStock) {
+				ItemStack item = event.getCurrentItem();
+				ItemStack item2 = event.getCursor();
+				if(Shop.strictStockShopCheck(item, owner) || Shop.strictStockShopCheck(item2, owner))
+					return;
+			}
+			if(InvCreateRow.itemsDisabled) {
+				ItemStack item = event.getCurrentItem();
+				ItemStack item2 = event.getCursor();
+				for(String itemsList:InvCreateRow.disabledItemList) {
+					Material disabledItemsList = Material.matchMaterial(itemsList);
+					if(item == null)
+						item = airItem;
+					if(item2 == null)
+						item2 = airItem;
+					if(disabledItemsList != null) {
+						if(!item.isSimilar(airItem)) {
+							if(item.getType().equals(disabledItemsList))
 								return;
-						} else if(item.getType().equals(Material.BUNDLE)) {
-							BundleMeta bundleIn1 = (BundleMeta) item.getItemMeta();
-							if(bundleIn1.hasItems()) {
-								ItemStack itemDisabledOut = new ItemStack(disabledItemsList);
-								List<ItemStack> bundleIn1Items = bundleIn1.getItems();
-								for(ItemStack bundleList : bundleIn1Items)
-									if(bundleList.isSimilar(itemDisabledOut))
-										return;
+							if(item.getType().toString().contains("SHULKER_BOX") && item.getItemMeta() instanceof BlockStateMeta) {
+								BlockStateMeta itemMeta1 = (BlockStateMeta) item.getItemMeta();
+								ShulkerBox shulkerBox1 = (ShulkerBox) itemMeta1.getBlockState();
+								if(shulkerBox1.getInventory().contains(disabledItemsList))
+									return;
+							} else if(item.getType().equals(Material.BUNDLE)) {
+								BundleMeta bundleIn1 = (BundleMeta) item.getItemMeta();
+								if(bundleIn1.hasItems()) {
+									ItemStack itemDisabledOut = new ItemStack(disabledItemsList);
+									List<ItemStack> bundleIn1Items = bundleIn1.getItems();
+									for(ItemStack bundleList : bundleIn1Items)
+										if(bundleList.isSimilar(itemDisabledOut))
+											return;
+								}
 							}
 						}
-					}
-					if(!item2.isSimilar(airItem)) {
-						if(item2.getType().equals(disabledItemsList))
-							return;
-						if(item2.getType().toString().contains("SHULKER_BOX") && item2.getItemMeta() instanceof BlockStateMeta) {
-							BlockStateMeta itemMeta2 = (BlockStateMeta) item2.getItemMeta();
-							ShulkerBox shulkerBox2 = (ShulkerBox) itemMeta2.getBlockState();
-							if(shulkerBox2.getInventory().contains(disabledItemsList))
+						if(!item2.isSimilar(airItem)) {
+							if(item2.getType().equals(disabledItemsList))
 								return;
-						} else if(item2.getType().equals(Material.BUNDLE)) {
-							BundleMeta bundleIn2 = (BundleMeta) item2.getItemMeta();
-							if(bundleIn2.hasItems()) {
-								ItemStack itemDisabledOut = new ItemStack(disabledItemsList);
-								List<ItemStack> bundleIn2Items = bundleIn2.getItems();
-								for(ItemStack bundleList : bundleIn2Items)
-									if(bundleList.isSimilar(itemDisabledOut))
-										return;
+							if(item2.getType().toString().contains("SHULKER_BOX") && item2.getItemMeta() instanceof BlockStateMeta) {
+								BlockStateMeta itemMeta2 = (BlockStateMeta) item2.getItemMeta();
+								ShulkerBox shulkerBox2 = (ShulkerBox) itemMeta2.getBlockState();
+								if(shulkerBox2.getInventory().contains(disabledItemsList))
+									return;
+							} else if(item2.getType().equals(Material.BUNDLE)) {
+								BundleMeta bundleIn2 = (BundleMeta) item2.getItemMeta();
+								if(bundleIn2.hasItems()) {
+									ItemStack itemDisabledOut = new ItemStack(disabledItemsList);
+									List<ItemStack> bundleIn2Items = bundleIn2.getItems();
+									for(ItemStack bundleList : bundleIn2Items)
+										if(bundleList.isSimilar(itemDisabledOut))
+											return;
+								}
 							}
 						}
 					}
@@ -123,6 +134,7 @@ public class InvStock extends GUI {
 	
 	@Override
 	public void open(Player player) {
+		this.player = player;
 		refreshItems();
 		super.open(player);
 	}

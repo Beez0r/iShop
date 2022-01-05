@@ -85,6 +85,7 @@ public class iShop extends JavaPlugin {
 	public void onDisable() {
 		tickTask.cancel();
 		expiredTask.cancel();
+		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Saving shops & stock items to database, please wait & do not kill server process...");
 		if(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId())) {
 			while(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId()))
 				;
@@ -94,6 +95,7 @@ public class iShop extends JavaPlugin {
 			saveTask.cancel();
 			Shop.saveData();
 		}
+		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Saving complete!");
 		if(connection != null) {
 			try {
 				connection.close();
@@ -257,9 +259,11 @@ public class iShop extends JavaPlugin {
 					List<String> exemptExpiredShops = Arrays.asList("00000000-0000-0000-0000-000000000000");
 					config.set("exemptExpiringShops", exemptExpiredShops);
 					config.set("outsideRegion", "&cCannot create shop outside of ishop region!");
-					config.set("configVersion", "3.1");
-					config.save(configFile);
 				case "3.1":
+					config.set("strictStock", false);
+					config.set("configVersion", "3.2");
+					config.save(configFile);
+				case "3.2":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

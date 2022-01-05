@@ -611,6 +611,7 @@ public class CommandShop implements CommandExecutor {
 			InvAdminShop.stockGUIShop = iShop.config.getBoolean("enableStockAccessFromShopGUI");
 			InvCreateRow.disabledItemList = iShop.config.getStringList("disabledItemsList");
 			InvCreateRow.itemsDisabled = iShop.config.getBoolean("disabledItems");
+			InvCreateRow.strictStock = iShop.config.getBoolean("strictStock");
 			InvShop.listAllShops = iShop.config.getBoolean("publicShopListCommand");
 			Shop.showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
 			Shop.shopEnabled = iShop.config.getBoolean("enableShopBlock");

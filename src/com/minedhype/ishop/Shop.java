@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.minedhype.ishop.inventories.InvAdminShop;
 import org.bukkit.Bukkit;
@@ -95,6 +96,23 @@ public class Shop {
 	public static Optional<Shop> getShopById(int id) { return shops.parallelStream().filter(shop -> shop.idTienda == id).findFirst(); }
 	public static boolean checkShopDistanceFromStockBlock(Location stockLocation, UUID shopOwner) { return shops.parallelStream().filter(s -> !s.admin && s.isOwner(shopOwner)).anyMatch(s -> s.getLocation().getWorld().equals(stockLocation.getWorld()) && s.location.distanceSquared(stockLocation) <= EventShop.stockRangeLimit*EventShop.stockRangeLimit); }
 	public static int getNumShops(UUID owner) { return (int) shops.parallelStream().filter(t -> !t.admin && t.owner.equals(owner)).count(); }
+
+	public static boolean strictStockShopCheck(ItemStack item, UUID uuid) {
+		AtomicBoolean restricted = new AtomicBoolean(true);
+		shops.parallelStream().filter(s -> !s.admin && s.isOwner(uuid)).forEach(s -> {
+			if(restricted.get()) {
+				for(int i=0; i<5; i++) {
+					if(restricted.get()) {
+						Optional<RowStore> row = s.getRow(i);
+						if(row.isPresent())
+							if(row.get().getItemOut().isSimilar(item) || row.get().getItemOut2().isSimilar(item))
+								restricted.set(false);
+					}
+				}
+			}
+		});
+		return restricted.get();
+	}
 
 	public static void getPlayersShopList() {
 		if(iShop.config.getBoolean("adminShopPublic"))

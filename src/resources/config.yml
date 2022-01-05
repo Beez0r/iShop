@@ -157,6 +157,9 @@ stockRangeLimitFromShop: 0
 # Set to true if you would like '/shop stock' command range limit to be enforced using stockRangeLimitFromShop distance
 stockRangeLimitUsingCommand: false
 
+# This will only allow items that are in active shop trades to be added and stored in stock inventory
+strictStock: false
+
 # Customizable Messages
 adminShop: "Admin Shop #%id"
 adminShopDisabled: "&cAdmin shops have been disabled!"
@@ -235,4 +238,4 @@ countError: "&cGiven item to search stock for does not exist!"
 outsideRegion: "&cCannot create shop outside of ishop region!"
 
 # Do not edit this!
-configVersion: 3.1
+configVersion: 3.2
