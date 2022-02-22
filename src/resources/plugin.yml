@@ -5,7 +5,7 @@ author: Beez0r
 website: https://minedhype.com
 version: "${project.version}"
 api-version: "1.17"
-softdepend: [Vault, WorldGuard]
+softdepend: [GriefPrevention, Vault, WorldGuard]
 commands:
   ishop:
     description: "/shop"

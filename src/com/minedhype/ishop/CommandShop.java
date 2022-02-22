@@ -28,6 +28,8 @@ import org.json.simple.JSONValue;
 import com.minedhype.ishop.inventories.InvAdminShop;
 import com.minedhype.ishop.inventories.InvShopList;
 import com.minedhype.ishop.inventories.InvStock;
+import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 public class CommandShop implements CommandExecutor {
 	@Override
@@ -104,9 +106,9 @@ public class CommandShop implements CommandExecutor {
 		player.sendMessage(ChatColor.GRAY + "/" + label + " delete");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " deleteid <id>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " list");
-		if(iShop.config.getBoolean("publicListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
+		if(iShop.config.getBoolean("publicListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_LIST.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " list <player>");
-		if(iShop.config.getBoolean("publicShopListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()))
+		if(iShop.config.getBoolean("publicShopListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_SHOPS.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " shops");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " manage <id>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " out");
@@ -216,6 +218,18 @@ public class CommandShop implements CommandExecutor {
 			isShopLoc = true;
 		if(!isShopLoc) {
 			player.sendMessage(Messages.WG_REGION.toString());
+			return;
+		}
+		boolean allowShopCreateInClaim = false;
+		if(iShop.gpLoader != null) {
+			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false, false, null);
+			if(claim == null || claim.allowAccess(player) == null || claim.allowEdit(player) == null || claim.allowContainers(player) == null)
+				allowShopCreateInClaim = true;
+		}
+		else
+			allowShopCreateInClaim = true;
+		if(!allowShopCreateInClaim) {
+			player.sendMessage(Messages.GP_CLAIM.toString());
 			return;
 		}
 		Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
@@ -503,7 +517,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private void listShops(Player player, String playerName) {
-		if(playerName != null && !iShop.config.getBoolean("publicListCommand") && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(playerName != null && !iShop.config.getBoolean("publicListCommand") && !player.hasPermission(Permission.SHOP_ADMIN.toString()) || !player.hasPermission(Permission.SHOP_LIST.toString())) {
 			player.sendMessage(Messages.NO_PERMISSION.toString());
 			return;
 		}
@@ -532,7 +546,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private void listAllShops(Player player) {
-		if(!InvShop.listAllShops && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(!InvShop.listAllShops && !player.hasPermission(Permission.SHOP_ADMIN.toString()) || !player.hasPermission(Permission.SHOP_SHOPS.toString())) {
 			player.sendMessage(Messages.SHOP_LIST_DISABLED.toString());
 			return;
 		}
@@ -636,7 +650,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private static void shopManage(Player player, String shopID) {
-		if(!InvAdminShop.remoteManage && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(!InvAdminShop.remoteManage && !player.hasPermission(Permission.SHOP_ADMIN.toString()) || !player.hasPermission(Permission.SHOP_REMOTEMANAGE.toString())) {
 			player.sendMessage(Messages.SHOP_REMOTE.toString());
 			return;
 		}
@@ -672,7 +686,7 @@ public class CommandShop implements CommandExecutor {
 	}
 
 	private static void viewShop(Player player, String shopId) {
-		if(!iShop.config.getBoolean("remoteShopping") && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(!iShop.config.getBoolean("remoteShopping") && !player.hasPermission(Permission.SHOP_ADMIN.toString()) || !player.hasPermission(Permission.SHOP_REMOTESHOPPING.toString())) {
 			player.sendMessage(Messages.SHOP_NO_REMOTE.toString());
 			return;
 		}
@@ -689,7 +703,7 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
 			return;
 		}
-		if(shop.get().getOwner().equals(player.getUniqueId()) && !InvAdminShop.remoteManage && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(shop.get().getOwner().equals(player.getUniqueId()) && !InvAdminShop.remoteManage && !player.hasPermission(Permission.SHOP_ADMIN.toString()) || !player.hasPermission(Permission.SHOP_REMOTEMANAGE.toString())) {
 			player.sendMessage(Messages.SHOP_REMOTE.toString());
 			return;
 		}

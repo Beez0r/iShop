@@ -466,13 +466,19 @@ public class Shop {
 			loadShops = iShop.getConnection().prepareStatement("SELECT location, owner, itemIn, itemIn2, itemOut, itemOut2, idTienda, admin, broadcast FROM zooMercaTiendasFilas LEFT JOIN zooMercaTiendas ON id = idTienda ORDER BY idTienda;");
 			ResultSet dataStore = loadShops.executeQuery();
 			while(dataStore.next()) {
+				if(dataStore.getString(1) == null) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null location in database!");
+					continue;
+				}
 				String[] locationRaw = dataStore.getString(1).split(";");
 				int x = Integer.parseInt(locationRaw[0]);
 				int y = Integer.parseInt(locationRaw[1]);
 				int z = Integer.parseInt(locationRaw[2]);
 				World world = Bukkit.getWorld(locationRaw[3]);
-				if(world == null)
+				if(world == null) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null world in database!");
 					continue;
+				}
 				Location location = new Location(world, x, y, z);
 				Optional<Shop> shop = Shop.getShopByLocation(location);
 				if(!shop.isPresent()) {

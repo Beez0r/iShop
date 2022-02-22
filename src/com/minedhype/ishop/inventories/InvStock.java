@@ -28,6 +28,7 @@ public class InvStock extends GUI {
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	private final UUID owner;
 	private int pag;
+	private int totalPages = iShop.config.getInt("stockPages");
 	private Player player;
 	
 	private InvStock(UUID owner) {
@@ -115,10 +116,14 @@ public class InvStock extends GUI {
 			placeItem(i, inv.getItem(i));
 
 		for(int i=45; i<54; i++) {
-			if(i == 47 && pag > 0)
+			if(i == 46 && pag > 4 && totalPages >= 10)
+				placeItem(i, GUI.createItem(Material.SPECTRAL_ARROW, Messages.SHOP_PAGE_SKIPPREV.toString()), p -> openPage(p, pag-5));
+			else if(i == 47 && pag > 0)
 				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag)), p -> openPage(p, pag-1));
-			else if(i == 51 && pag < iShop.config.getInt("stockPages")-1)
+			else if(i == 51 && pag < totalPages-1)
 				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag+2)), p -> openPage(p, pag+1));
+			else if(i == 52 && pag < totalPages-5 && totalPages >= 10)
+				placeItem(i, GUI.createItem(Material.SPECTRAL_ARROW, Messages.SHOP_PAGE_SKIPAHEAD.toString()), p -> openPage(p, pag+5));
 			else
 				placeItem(i, GUI.createItem(Material.BLACK_STAINED_GLASS_PANE, ""));
 		}

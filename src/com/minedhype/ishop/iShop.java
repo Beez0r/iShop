@@ -22,11 +22,13 @@ import com.minedhype.ishop.gui.GUIEvent;
 import com.minedhype.ishop.MetricsLite;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.scheduler.BukkitTask;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 public class iShop extends JavaPlugin {
 	File configFile;
 	public static FileConfiguration config;
 	public static WorldGuardLoader wgLoader = null;
+	public static GriefPrevention gpLoader = null;
 	private static BukkitTask expiredTask, saveTask, tickTask;
 	private static Connection connection = null;
 	private static Economy economy = null;
@@ -34,6 +36,9 @@ public class iShop extends JavaPlugin {
 
 	@Override
 	public void onLoad() {
+		Plugin gpCheck = Bukkit.getPluginManager().getPlugin("GriefPrevention");
+		if(gpCheck != null)
+			gpLoader = (GriefPrevention)gpCheck;
 		Plugin wgCheck = Bukkit.getPluginManager().getPlugin("WorldGuard");
 		if(wgCheck != null)
 			wgLoader = new WorldGuardLoader();
@@ -261,9 +266,13 @@ public class iShop extends JavaPlugin {
 					config.set("outsideRegion", "&cCannot create shop outside of ishop region!");
 				case "3.1":
 					config.set("strictStock", false);
-					config.set("configVersion", "3.2");
-					config.save(configFile);
 				case "3.2":
+					config.set("noClaimPermission", "&cYou do not have permission in this claim to create a shop!");
+					config.set("pageSkipAhead", "5 Pages >>");
+					config.set("pageSkipPrev", "<< 5 Pages");
+					config.set("configVersion", "3.3");
+					config.save(configFile);
+				case "3.3":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

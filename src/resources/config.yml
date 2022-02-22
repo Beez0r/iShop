@@ -236,6 +236,9 @@ countAmount: "&aTotal amount of %item found: %amount"
 countEmpty: "&cCannot find any %item in stock inventory!"
 countError: "&cGiven item to search stock for does not exist!"
 outsideRegion: "&cCannot create shop outside of ishop region!"
+noClaimPermission: "&cYou do not have permission in this claim to create a shop!"
+pageSkipAhead: "5 Pages >>"
+pageSkipPrev: "<< 5 Pages"
 
 # Do not edit this!
-configVersion: 3.2
+configVersion: 3.3
