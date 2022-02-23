@@ -39,6 +39,10 @@ public class CommandShop implements CommandExecutor {
 				reloadShop(null);
 				return true;
 			}
+			else if(args[0].equalsIgnoreCase("deleteid") && args[1] != null) {
+				deleteShopID(null, args[1]);
+				return true;
+			}
 			else {
 				sender.sendMessage(Messages.NOT_A_PLAYER.toString());
 				return false;
@@ -485,24 +489,33 @@ public class CommandShop implements CommandExecutor {
 			sID = Integer.parseInt(shopId);
 		} catch (Exception e) { sID = -1; }
 		if(sID < 0) {
-			player.sendMessage(Messages.SHOP_ID_INTEGER.toString());
+			if(player != null)
+				player.sendMessage(Messages.SHOP_ID_INTEGER.toString());
+			else
+				Bukkit.getConsoleSender().sendMessage(Messages.SHOP_ID_INTEGER.toString());
 			return;
 		}
 		Optional<Shop> shop = Shop.getShopById(sID);
 		if(!shop.isPresent()) {
-			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
+			if(player != null)
+				player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
+			else
+				Bukkit.getConsoleSender().sendMessage(Messages.SHOP_NOT_FOUND.toString());
 			return;
 		}
-		if(!shop.get().isOwner(player.getUniqueId()) && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(player != null && !shop.get().isOwner(player.getUniqueId()) && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(Messages.SHOP_NO_SELF.toString());
 			return;
 		}
-		if(shop.get().isAdmin() && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+		if(shop.get().isAdmin() && player != null && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(Messages.NO_PERMISSION.toString());
 			return;
 		}
 		if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
-			player.sendMessage(Messages.SHOP_BUSY.toString());
+			if(player != null)
+				player.sendMessage(Messages.SHOP_BUSY.toString());
+			else
+				Bukkit.getConsoleSender().sendMessage(Messages.SHOP_BUSY.toString());
 			return;
 		}
 		double cost = iShop.config.getDouble("returnAmount");
@@ -513,7 +526,10 @@ public class CommandShop implements CommandExecutor {
 		}
 		Shop.shopList.remove(shop.get().shopId());
 		shop.get().deleteShop();
-		player.sendMessage(Messages.SHOP_IDDELETED.toString().replaceAll("%id", shopId));
+		if(player != null)
+			player.sendMessage(Messages.SHOP_IDDELETED.toString().replaceAll("%id", shopId));
+		else
+			Bukkit.getConsoleSender().sendMessage(Messages.SHOP_IDDELETED.toString().replaceAll("%id", shopId));
 	}
 
 	private void listShops(Player player, String playerName) {
