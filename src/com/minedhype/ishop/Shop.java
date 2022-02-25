@@ -467,7 +467,7 @@ public class Shop {
 			ResultSet dataStore = loadShops.executeQuery();
 			while(dataStore.next()) {
 				if(dataStore.getString(1) == null) {
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null location in database!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null location found in database! Make backups!");
 					continue;
 				}
 				String[] locationRaw = dataStore.getString(1).split(";");
@@ -476,7 +476,7 @@ public class Shop {
 				int z = Integer.parseInt(locationRaw[2]);
 				World world = Bukkit.getWorld(locationRaw[3]);
 				if(world == null) {
-					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null world in database!");
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null world found in database! Make backups!");
 					continue;
 				}
 				Location location = new Location(world, x, y, z);
