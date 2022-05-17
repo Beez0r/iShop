@@ -9,7 +9,8 @@ public enum Permission {
 	SHOP_REMOTEMANAGE("ishop.remotemanage"),
 	SHOP_REMOTESHOPPING("ishop.remoteshopping"),
 	SHOP_SHOPS("ishop.shops"),
-	SHOP_STOCK("ishop.stock");
+	SHOP_STOCK("ishop.stock"),
+	SHOP_STOCK_PREFIX("ishop.pages.");
 
 	private final String perm;
 	Permission(String perms) {

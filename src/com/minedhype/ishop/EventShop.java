@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -201,6 +202,26 @@ public class EventShop implements Listener {
 					return;
 				} else { InvStock.inShopInv.put(event.getPlayer(), event.getPlayer().getUniqueId()); }
 				InvStock inv = InvStock.getInvStock(event.getPlayer().getUniqueId());
+				int maxStockPages = InvAdminShop.maxPages;
+				if(InvAdminShop.usePerms) {
+					String permPrefix = Permission.SHOP_STOCK_PREFIX.toString();
+					for(PermissionAttachmentInfo attInfo : event.getPlayer().getEffectivePermissions()) {
+						String perm = attInfo.getPermission();
+						if(perm.startsWith(permPrefix)) {
+							int num;
+							try {
+								num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
+							} catch(Exception e) { num = InvAdminShop.maxPages; }
+							if(num > InvAdminShop.permissionMax)
+								maxStockPages = InvAdminShop.permissionMax;
+							else if(num > 0)
+								maxStockPages = num;
+							else
+								maxStockPages = InvAdminShop.maxPages;
+						}
+					}
+				}
+				inv.setMaxPages(maxStockPages);
 				inv.setPag(0);
 				inv.open(event.getPlayer());
 			}
@@ -233,6 +254,26 @@ public class EventShop implements Listener {
 							return;
 						} else { InvStock.inShopInv.put(event.getPlayer(), event.getPlayer().getUniqueId()); }
 						InvStock inv = InvStock.getInvStock(event.getPlayer().getUniqueId());
+						int maxStockPages = InvAdminShop.maxPages;
+						if(InvAdminShop.usePerms) {
+							String permPrefix = Permission.SHOP_STOCK_PREFIX.toString();
+							for(PermissionAttachmentInfo attInfo : event.getPlayer().getEffectivePermissions()) {
+								String perm = attInfo.getPermission();
+								if(perm.startsWith(permPrefix)) {
+									int num;
+									try {
+										num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
+									} catch(Exception e) { num = InvAdminShop.maxPages; }
+									if(num > InvAdminShop.permissionMax)
+										maxStockPages = InvAdminShop.permissionMax;
+									else if(num > 0)
+										maxStockPages = num;
+									else
+										maxStockPages = InvAdminShop.maxPages;
+								}
+							}
+						}
+						inv.setMaxPages(maxStockPages);
 						inv.setPag(0);
 						inv.open(event.getPlayer());
 					}

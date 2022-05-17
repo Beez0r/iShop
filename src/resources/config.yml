@@ -53,8 +53,11 @@ enableStockAccessFromShopGUI: true
 # Players with ishop.stock permission will bypass if disabled
 enableStockCommand: true
 
-# Number of pages to have in the stock GUI
+# Number of default stock pages to have in the stock GUI
 stockPages: 5
+
+# Maximum number of stock pages to have in the stock GUI if usePermissions is set to true
+maxStockPages: 10
 
 # Enable sending of messages when players have purchased or sold item(s) from shops
 enableShopNotifications: true
@@ -239,6 +242,7 @@ outsideRegion: "&cCannot create shop outside of ishop region!"
 noClaimPermission: "&cYou do not have permission in this claim to create a shop!"
 pageSkipAhead: "5 Pages >>"
 pageSkipPrev: "<< 5 Pages"
+removedAllPlayer: "&6Removed&c %shops &6shop(s) for player:&c %p"
 
 # Do not edit this!
-configVersion: 3.3
+configVersion: 3.4

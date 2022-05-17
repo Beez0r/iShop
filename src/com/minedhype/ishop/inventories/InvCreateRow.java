@@ -159,7 +159,7 @@ public class InvCreateRow extends GUI {
 		if(inv.getType().equals(InventoryType.CHEST) && event.getView().getTitle().contains(Messages.SHOP_TITLE_CREATESHOP.toString())) {
 			event.setCancelled(true);
 			if(event.getRawSlot() == 10 || event.getRawSlot() == 11 || event.getRawSlot() == 15 || event.getRawSlot() == 16) {
-				ItemStack item =  event.getCursor().clone();
+				ItemStack item = event.getCursor().clone();
 				if(event.getClick().isRightClick())
 					item.setAmount(1);
 				placeItem(event.getRawSlot(), item);

@@ -34,6 +34,7 @@ import com.minedhype.ishop.inventories.InvStock;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.economy.Economy;
 
 public class Shop {
 	public static boolean deletePlayerShop = iShop.config.getBoolean("deleteBlock");
@@ -119,6 +120,33 @@ public class Shop {
 			shops.parallelStream().forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
 		else
 			shops.parallelStream().filter(s -> !s.admin).forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
+	}
+
+	public static void removeAllPlayersShops(Player player, UUID sOwner, String pOwner) {
+		int deletedCount = 0;
+		List<Shop> deleteShops = new ArrayList<>();
+		for(Shop shop:shops)
+			if(!shop.admin && shop.isOwner(sOwner)) {
+				deleteShops.add(shop);
+				deletedCount++;
+			}
+		for(Shop shop:deleteShops) {
+			shopList.remove(shop.shopId());
+			shop.deleteShop();
+		}
+		Optional<Economy> economy = iShop.getEconomy();
+		if(economy.isPresent()) {
+			double cost = iShop.config.getDouble("returnAmount");
+			if(deletedCount > 0 && cost > 0) {
+				OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(sOwner);
+				double totalCost = cost * deletedCount;
+				economy.get().depositPlayer(offPlayer, totalCost);
+			}
+		}
+		if(deletedCount > 0)
+			player.sendMessage(Messages.SHOP_REMOVED_ALL_PLAYER.toString().replaceAll("%p", pOwner).replaceAll("%shops", String.valueOf(deletedCount)));
+		else
+			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
 	}
 
 	public static void getShopList(Player player, UUID sOwner, String pOwner) {
@@ -748,7 +776,11 @@ public class Shop {
 
 	public void giveItem(ItemStack item) {
 		ItemStack copy = item.clone();
-		int max = iShop.config.getInt("stockPages");
+		int max;
+		if(InvAdminShop.usePerms)
+			max = InvAdminShop.permissionMax;
+		else
+			max = InvAdminShop.maxPages;
 		for(int i=0; i<max; i++) {
 			Optional<StockShop> stock = StockShop.getStockShopByOwner(this.owner, i);
 			if(!stock.isPresent())
@@ -764,7 +796,11 @@ public class Shop {
 
 	public void takeItem(ItemStack item) {
 		ItemStack copy = item.clone();
-		int max = iShop.config.getInt("stockPages");
+		int max;
+		if(InvAdminShop.usePerms)
+			max = InvAdminShop.permissionMax;
+		else
+			max = InvAdminShop.maxPages;
 		for(int i=0; i<max; i++) {
 			Optional<StockShop> stock = StockShop.getStockShopByOwner(this.owner, i);
 			if(!stock.isPresent())

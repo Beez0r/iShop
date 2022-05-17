@@ -3,6 +3,7 @@ package com.minedhype.ishop.inventories;
 import java.util.Optional;
 import com.minedhype.ishop.iShop;
 import com.minedhype.ishop.Messages;
+import com.minedhype.ishop.Permission;
 import com.minedhype.ishop.RowStore;
 import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.Utils;
@@ -12,11 +13,15 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import com.minedhype.ishop.gui.GUI;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class InvAdminShop extends GUI {
 	public static boolean remoteManage = iShop.config.getBoolean("remoteManage");
 	public static boolean stockGUIShop = iShop.config.getBoolean("enableStockAccessFromShopGUI");
 	public static boolean stockCommandEnabled = iShop.config.getBoolean("enableStockCommand");
+	public static boolean usePerms = iShop.config.getBoolean("usePermissions");
+	public static int maxPages = iShop.config.getInt("stockPages");
+	public static int permissionMax = iShop.config.getInt("maxStockPages");
 	private final Shop shop;
 
 	public InvAdminShop(Shop shop, Player player) {
@@ -91,6 +96,26 @@ public class InvAdminShop extends GUI {
 						placeItem(y * 9 + x, GUI.createItem(Material.CHEST, Messages.SHOP_TITLE_STOCK.toString()), p -> {
 							p.closeInventory();
 							InvStock inv = InvStock.getInvStock(player.getUniqueId());
+							int maxStockPages = maxPages;
+							if(usePerms) {
+								String permPrefix = Permission.SHOP_STOCK_PREFIX.toString();
+								for(PermissionAttachmentInfo attInfo : player.getEffectivePermissions()) {
+									String perm = attInfo.getPermission();
+									if(perm.startsWith(permPrefix)) {
+										int num;
+										try {
+											num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
+										} catch(Exception e) { num = maxPages; }
+										if(num > permissionMax)
+											maxStockPages = permissionMax;
+										else if(num > 0)
+											maxStockPages = num;
+										else
+											maxStockPages = maxPages;
+									}
+								}
+							}
+							inv.setMaxPages(maxStockPages);
 							inv.setPag(0);
 							InvStock.inShopInv.put(player, player.getUniqueId());
 							inv.open(player);

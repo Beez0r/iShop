@@ -50,6 +50,7 @@ public enum Messages {
 	SHOP_PURCHASE("buy"),
 	SHOP_RELOAD("reload"),
 	SHOP_REMOTE("noRemoteManage"),
+	SHOP_REMOVED_ALL_PLAYER("removedAllPlayer"),
 	SHOP_SELL("sell"),
 	SHOP_TITLE_ADMIN_SHOP("adminShop"),
 	SHOP_TITLE_BROADCAST_OFF("broadcastOff"),

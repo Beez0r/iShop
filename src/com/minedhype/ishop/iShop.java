@@ -270,9 +270,12 @@ public class iShop extends JavaPlugin {
 					config.set("noClaimPermission", "&cYou do not have permission in this claim to create a shop!");
 					config.set("pageSkipAhead", "5 Pages >>");
 					config.set("pageSkipPrev", "<< 5 Pages");
-					config.set("configVersion", "3.3");
-					config.save(configFile);
 				case "3.3":
+					config.set("maxStockPages", 10);
+					config.set("removedAllPlayer", "&6Removed&c %shops &6shop(s) for player:&c %p");
+					config.set("configVersion", "3.4");
+					config.save(configFile);
+				case "3.4":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

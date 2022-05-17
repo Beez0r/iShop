@@ -105,7 +105,7 @@ public class InvShopList extends GUI {
 		shopslist.clear();
 		final UUID playerUUID = player.getUniqueId();
 		final Player openPlayer = player;
-		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () ->  {
+		Bukkit.getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> {
 			getShopList(playerUUID);
 			Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> {
 				PlayerShopList();
