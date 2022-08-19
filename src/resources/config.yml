@@ -243,6 +243,10 @@ noClaimPermission: "&cYou do not have permission in this claim to create a shop!
 pageSkipAhead: "5 Pages >>"
 pageSkipPrev: "<< 5 Pages"
 removedAllPlayer: "&6Removed&c %shops &6shop(s) for player:&c %p"
+shopCreatedLoc: "&7Shop has been &aCREATED&7 for&a %p &7at &a%x &7/&a %y &7/&a %z &7in &a%w&7!"
+shopDeletedLoc: "&7Shop has been &cDELETED&7 for&a %p &7at &a%x &7/&a %y &7/&a %z &7in &a%w&7!"
+shopLocationErrorNum: "&cLocation coordinates must be a positive or negative number!"
+shopLocationErrorWorld: "&cLocation coordinates must be in a valid world!"
 
 # Do not edit this!
-configVersion: 3.4
+configVersion: 3.5

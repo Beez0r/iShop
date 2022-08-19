@@ -76,7 +76,11 @@ public class iShop extends JavaPlugin {
 		} catch(Exception e) { e.printStackTrace(); }
 		}, delayTime);
 		expiredTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, delayTime+20, 20000);
-		saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::saveData, delayTime+1200, 6000);
+		saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+			try {
+				Shop.saveData();
+			} catch (Exception e) { Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[iShop] Warning: Tried saving to database while being modified at the same time. Saving will continue and try again later, but will also save to database safely upon server shutdown."); };
+		}, delayTime+1200, 6000);
 		tickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, delayTime+150, 50);
 		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, delayTime+100);
 		MetricsLite metrics = new MetricsLite(this, 9189);
@@ -88,18 +92,11 @@ public class iShop extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		tickTask.cancel();
 		expiredTask.cancel();
-		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Saving shops & stock items to database, please wait & do not kill server process...");
-		if(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId())) {
-			while(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId()))
-				;
-			saveTask.cancel();
-		}
-		else {
-			saveTask.cancel();
-			Shop.saveData();
-		}
+		saveTask.cancel();
+		tickTask.cancel();
+		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Safely saving shops & stock items to database, please wait & do not kill server process...");
+		Shop.saveData();
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Saving complete!");
 		if(connection != null) {
 			try {
@@ -273,9 +270,14 @@ public class iShop extends JavaPlugin {
 				case "3.3":
 					config.set("maxStockPages", 10);
 					config.set("removedAllPlayer", "&6Removed&c %shops &6shop(s) for player:&c %p");
-					config.set("configVersion", "3.4");
-					config.save(configFile);
 				case "3.4":
+					config.set("shopCreatedLoc", "&7Shop has been &aCREATED&7 for&a %p &7at &a%x &7/&a %y &7/&a %z &7in &a%w&7!");
+					config.set("shopDeletedLoc", "&7Shop has been &cDELETED&7 for&a %p &7at &a%x &7/&a %y &7/&a %z &7in &a%w&7!");
+					config.set("shopLocationErrorNum", "&cLocation coordinates must be a positive or negative number!");
+					config.set("shopLocationErrorWorld", "&cLocation coordinates must be in a valid world!");
+					config.set("configVersion", "3.5");
+					config.save(configFile);
+				case "3.5":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }
