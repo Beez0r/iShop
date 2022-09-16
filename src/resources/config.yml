@@ -163,6 +163,15 @@ stockRangeLimitUsingCommand: false
 # This will only allow items that are in active shop trades to be added and stored in stock inventory
 strictStock: false
 
+# Prevent players from creating duplicate item trades within each shop they own
+preventDuplicates: true
+
+# Prevent players from creating duplicate item trades from any shop they own
+preventAllDuplicates: false
+
+# Save shops with no trades to database on server shutdown
+saveEmptyShops: true
+
 # Customizable Messages
 adminShop: "Admin Shop #%id"
 adminShopDisabled: "&cAdmin shops have been disabled!"
@@ -249,4 +258,4 @@ shopLocationErrorNum: "&cLocation coordinates must be a positive or negative num
 shopLocationErrorWorld: "&cLocation coordinates must be in a valid world!"
 
 # Do not edit this!
-configVersion: 3.5
+configVersion: 3.6

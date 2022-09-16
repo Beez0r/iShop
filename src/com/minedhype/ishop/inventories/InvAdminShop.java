@@ -81,7 +81,7 @@ public class InvAdminShop extends GUI {
 					final int index = y-1;
 					if(row.isPresent()) {
 						placeItem(y*9+x, GUI.createItem(Material.TNT, ChatColor.BOLD+ Messages.SHOP_TITLE_DELETE.toString()), p -> {
-							shop.delete(p, index);
+							shop.delete(index);
 							InvAdminShop inv = new InvAdminShop(shop, p.getPlayer());
 							inv.open(p);
 						});

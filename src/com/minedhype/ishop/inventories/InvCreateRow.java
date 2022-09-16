@@ -9,8 +9,9 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import com.minedhype.ishop.RowStore;
 import com.minedhype.ishop.Messages;
+import com.minedhype.ishop.Permission;
+import com.minedhype.ishop.RowStore;
 import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.iShop;
 import com.minedhype.ishop.gui.GUI;
@@ -25,6 +26,8 @@ public class InvCreateRow extends GUI {
 	private ItemStack itemOut2;
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
 	public static Boolean itemsDisabled = iShop.config.getBoolean("disabledItems");
+	public static Boolean preventDupeTrades = iShop.config.getBoolean("preventDuplicates");
+	public static Boolean preventAllDupeTrades = iShop.config.getBoolean("preventAllDuplicates");
 	public static Boolean strictStock = iShop.config.getBoolean("strictStock");
 	public static List<String> disabledItemList = iShop.config.getStringList("disabledItemsList");
 	
@@ -58,6 +61,16 @@ public class InvCreateRow extends GUI {
 					ItemStack in2 = itemIn2.clone();
 					ItemStack out1 = itemOut.clone();
 					ItemStack out2 = itemOut2.clone();
+					if(!p.hasPermission(Permission.SHOP_ADMIN.toString())) {
+						if(preventAllDupeTrades) {
+							if(Shop.hasAnyDuplicateTrades(out1, out2, in1, in2, p.getUniqueId()))
+								return;
+						}
+						else if(preventDupeTrades) {
+							if(Shop.hasDuplicateTrades(out1, out2, in1, in2, shop.shopId()))
+								return;
+						}
+					}
 					if(itemsDisabled) {
 						for(String itemsList:disabledItemList) {
 							Material disabledItemsList = Material.matchMaterial(itemsList);

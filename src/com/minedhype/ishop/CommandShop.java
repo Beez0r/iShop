@@ -428,7 +428,10 @@ public class CommandShop implements CommandExecutor {
 			return;
 		}
 		if(!iShop.config.getBoolean("enableShopBlock")) {
-			player.sendMessage(Messages.DISABLED_SHOP_BLOCK.toString());
+			if(player != null)
+				player.sendMessage(Messages.DISABLED_SHOP_BLOCK.toString());
+			else
+				Bukkit.getConsoleSender().sendMessage(Messages.DISABLED_SHOP_BLOCK.toString());
 			return;
 		}
 		String world;
@@ -975,6 +978,8 @@ public class CommandShop implements CommandExecutor {
 			InvAdminShop.usePerms = iShop.config.getBoolean("usePermissions");
 			InvCreateRow.disabledItemList = iShop.config.getStringList("disabledItemsList");
 			InvCreateRow.itemsDisabled = iShop.config.getBoolean("disabledItems");
+			InvCreateRow.preventDupeTrades = iShop.config.getBoolean("preventDuplicates");
+			InvCreateRow.preventAllDupeTrades = iShop.config.getBoolean("preventAllDuplicates");
 			InvCreateRow.strictStock = iShop.config.getBoolean("strictStock");
 			InvShop.listAllShops = iShop.config.getBoolean("publicShopListCommand");
 			Shop.showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
@@ -984,6 +989,7 @@ public class CommandShop implements CommandExecutor {
 			Shop.particleEffects = iShop.config.getBoolean("showParticles");
 			Shop.maxDays = iShop.config.getInt("maxInactiveDays");
 			Shop.deletePlayerShop = iShop.config.getBoolean("deleteBlock");
+			Shop.saveEmptyShops = iShop.config.getBoolean("saveEmptyShops");
 			Shop.stockMessages = iShop.config.getBoolean("enableShopSoldMessage");
 			Shop.exemptExpiringList = iShop.config.getStringList("exemptExpiringShops");
 		});

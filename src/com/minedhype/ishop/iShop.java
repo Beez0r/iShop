@@ -75,14 +75,16 @@ public class iShop extends JavaPlugin {
 			Shop.loadData();
 		} catch(Exception e) { e.printStackTrace(); }
 		}, delayTime);
-		expiredTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, delayTime+20, 20000);
+		expiredTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, delayTime+9, 20000);
 		saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
 			try {
-				Shop.saveData();
-			} catch (Exception e) { Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[iShop] Warning: Tried saving to database while being modified at the same time. Saving will continue and try again later, but will also save to database safely upon server shutdown."); };
+				Shop.saveData(false);
+			} catch (Exception e) { Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[iShop] Warning: Tried saving to database while being modified at the same time. Saving will continue and try again later, but will also save to database safely upon server shutdown."); }
 		}, delayTime+1200, 6000);
-		tickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, delayTime+150, 50);
-		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, delayTime+100);
+		if(Shop.shopEnabled && Shop.particleEffects)
+			tickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, delayTime+250, 50);
+		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, delayTime+160);
+		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::removeEmptyShopTrade, delayTime+100);
 		MetricsLite metrics = new MetricsLite(this, 9189);
 		new UpdateChecker(this, 84555).getVersion(version -> {
 			if(!this.getDescription().getVersion().equalsIgnoreCase(version))
@@ -96,7 +98,7 @@ public class iShop extends JavaPlugin {
 		saveTask.cancel();
 		tickTask.cancel();
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Safely saving shops & stock items to database, please wait & do not kill server process...");
-		Shop.saveData();
+		Shop.saveData(true);
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Saving complete!");
 		if(connection != null) {
 			try {
@@ -275,9 +277,13 @@ public class iShop extends JavaPlugin {
 					config.set("shopDeletedLoc", "&7Shop has been &cDELETED&7 for&a %p &7at &a%x &7/&a %y &7/&a %z &7in &a%w&7!");
 					config.set("shopLocationErrorNum", "&cLocation coordinates must be a positive or negative number!");
 					config.set("shopLocationErrorWorld", "&cLocation coordinates must be in a valid world!");
-					config.set("configVersion", "3.5");
-					config.save(configFile);
 				case "3.5":
+					config.set("preventDuplicates", true);
+					config.set("preventAllDuplicates", false);
+					config.set("saveEmptyShops", true);
+					config.set("configVersion", "3.6");
+					config.save(configFile);
+				case "3.6":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

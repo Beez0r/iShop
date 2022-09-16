@@ -39,6 +39,7 @@ import net.milkbowl.vault.economy.Economy;
 public class Shop {
 	public static boolean deletePlayerShop = iShop.config.getBoolean("deleteBlock");
 	public static boolean particleEffects = iShop.config.getBoolean("showParticles");
+	public static boolean saveEmptyShops = iShop.config.getBoolean("saveEmptyShops");
 	public static boolean shopOutStock = iShop.config.getBoolean("enableOutOfStockMessages");
 	public static boolean shopEnabled = iShop.config.getBoolean("enableShopBlock");
 	public static boolean showOwnedShops = iShop.config.getBoolean("publicShopListShowsOwned");
@@ -568,7 +569,7 @@ public class Shop {
 		}
 	}
 
-	public static void saveData() {
+	public static void saveData(boolean shutDown) {
 		StockShop.saveData();
 		PreparedStatement stmt = null;
 		try {
@@ -581,8 +582,18 @@ public class Shop {
 					stmt.close();
 			} catch (Exception e) { e.printStackTrace(); }
 		}
-		for(Shop shop : shops)
-			shop.saveDataShop();
+		if(shutDown && saveEmptyShops) {
+			for(Shop shop : shops)
+				if(shop.saveDataShopEmpty()) {
+					ItemStack air = new ItemStack(Material.AIR, 0);
+					shop.getRows()[0] = new RowStore(air, air, air, air, false);
+					shop.saveEmptyShops();
+				}
+		}
+		else {
+			for(Shop shop : shops)
+				shop.saveDataShop();
+		}
 	}
 
 	public boolean hasItems() {
@@ -596,6 +607,30 @@ public class Shop {
 		for(RowStore row : rows)
 			if(row != null)
 				row.saveData(idTienda);
+	}
+
+	private boolean saveDataShopEmpty() {
+		boolean isEmpty = true;
+		for(RowStore row : rows)
+			if(row != null) {
+				row.saveData(idTienda);
+				if(isEmpty)
+					isEmpty = false;
+			}
+		return isEmpty;
+	}
+
+	private void saveEmptyShops() {
+		RowStore row = rows[0];
+		row.saveData(idTienda);
+	}
+
+	public static void removeEmptyShopTrade() {
+		for(Shop shop : shops) {
+			Optional<RowStore> row = shop.getRow(0);
+			if(row.get().getItemIn().getType().isAir() &&  row.get().getItemIn2().getType().isAir() && row.get().getItemOut().getType().isAir() && row.get().getItemOut2().getType().isAir())
+				shop.delete(0);
+		}
 	}
 
 	public void buy(Player player, int index) {
@@ -814,7 +849,7 @@ public class Shop {
 		InvStock.getInvStock(this.owner).refreshItems();
 	}
 
-	public void delete(Player player, int index) {
+	public void delete(int index) {
 		rows[index] = null;
 	}
 	public void deleteShop() {
@@ -1127,6 +1162,57 @@ public class Shop {
 					cdTime.put(ownerPlayer, System.currentTimeMillis());
 				}
 		}
+	}
+
+	public static boolean hasDuplicateTrades(ItemStack out1, ItemStack out2, ItemStack in1, ItemStack in2, int shopId) {
+		Optional <Shop> shop = getShopById(shopId);
+		for(RowStore row:shop.get().getRows()) {
+			if(row != null) {
+				boolean row1, row2, row3, row4;
+				if(row.getItemIn().equals(in1) || (row.getItemIn().getType().isAir() && in1.getType().isAir()))
+					row1 = true;
+				else continue;
+				if(row.getItemIn2().equals(in2) || (row.getItemIn2().getType().isAir() && in2.getType().isAir()))
+					row2 = true;
+				else continue;
+				if(row.getItemOut().equals(out1) || (row.getItemOut().getType().isAir() && out1.getType().isAir()))
+					row3 = true;
+				else continue;
+				if(row.getItemOut2().equals(out2) || (row.getItemOut2().getType().isAir() && out2.getType().isAir()))
+					row4 = true;
+				else continue;
+				if(row1 && row2 && row3 && row4)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean hasAnyDuplicateTrades(ItemStack out1, ItemStack out2, ItemStack in1, ItemStack in2, UUID shopOwner) {
+		for(Shop shop:shops) {
+			if(shop.isOwner(shopOwner) && !shop.isAdmin()) {
+				for(RowStore row:shop.getRows()) {
+					if(row != null) {
+						boolean row1, row2, row3, row4;
+						if(row.getItemIn().equals(in1) || (row.getItemIn().getType().isAir() && in1.getType().isAir()))
+							row1 = true;
+						else continue;
+						if(row.getItemIn2().equals(in2) || (row.getItemIn2().getType().isAir() && in2.getType().isAir()))
+							row2 = true;
+						else continue;
+						if(row.getItemOut().equals(out1) || (row.getItemOut().getType().isAir() && out1.getType().isAir()))
+							row3 = true;
+						else continue;
+						if(row.getItemOut2().equals(out2) || (row.getItemOut2().getType().isAir() && out2.getType().isAir()))
+							row4 = true;
+						else continue;
+						if(row1 && row2 && row3 && row4)
+							return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	public Optional<RowStore> getRow(int index) {
