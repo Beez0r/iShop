@@ -61,6 +61,7 @@ public class iShop extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new GUIEvent(), this);
 		getCommand("ishop").setExecutor(new CommandShop());
 		int delayTime;
+		int saveDatabaseTime;
 		try {
 			delayTime = config.getInt("shopsDatabaseLoadDelay");
 		} catch(Exception e) { delayTime = 0; }
@@ -68,6 +69,13 @@ public class iShop extends JavaPlugin {
 			delayTime = 1;
 		else
 			delayTime*=20;
+		try {
+			saveDatabaseTime = config.getInt("saveDatabase");
+		} catch(Exception e) { saveDatabaseTime = 15; }
+		if(saveDatabaseTime < 5)
+			saveDatabaseTime = 5;
+		(saveDatabaseTime)*=60;
+		(saveDatabaseTime)*=20;
 		Bukkit.getScheduler().runTaskLater(this, () -> {
 		try {
 			connection = DriverManager.getConnection(chainConnect);
@@ -80,7 +88,7 @@ public class iShop extends JavaPlugin {
 			try {
 				Shop.saveData(false);
 			} catch (Exception e) { Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "[iShop] Warning: Tried saving to database while being modified at the same time. Saving will continue and try again later, but will also save to database safely upon server shutdown."); }
-		}, delayTime+1200, 6000);
+		}, delayTime+1200, saveDatabaseTime);
 		if(Shop.shopEnabled && Shop.particleEffects)
 			tickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, delayTime+250, 50);
 		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, delayTime+160);
@@ -281,9 +289,11 @@ public class iShop extends JavaPlugin {
 					config.set("preventDuplicates", true);
 					config.set("preventAllDuplicates", false);
 					config.set("saveEmptyShops", true);
-					config.set("configVersion", "3.6");
-					config.save(configFile);
 				case "3.6":
+					config.set("saveDatabase", 15);
+					config.set("configVersion", "3.7");
+					config.save(configFile);
+				case "3.7":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

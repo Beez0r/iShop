@@ -172,6 +172,9 @@ preventAllDuplicates: false
 # Save shops with no trades to database on server shutdown
 saveEmptyShops: true
 
+# Save shops and stock to database interval in minutes. Database will auto save upon server shutdown. Default is every 15 minutes
+saveDatabase: 15
+
 # Customizable Messages
 adminShop: "Admin Shop #%id"
 adminShopDisabled: "&cAdmin shops have been disabled!"
@@ -258,4 +261,4 @@ shopLocationErrorNum: "&cLocation coordinates must be a positive or negative num
 shopLocationErrorWorld: "&cLocation coordinates must be in a valid world!"
 
 # Do not edit this!
-configVersion: 3.6
+configVersion: 3.7
