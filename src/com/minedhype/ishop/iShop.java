@@ -23,12 +23,16 @@ import com.minedhype.ishop.MetricsLite;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.scheduler.BukkitTask;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.angeschossen.lands.api.LandsIntegration;
 
 public class iShop extends JavaPlugin {
 	File configFile;
 	public static FileConfiguration config;
 	public static WorldGuardLoader wgLoader = null;
 	public static GriefPrevention gpLoader = null;
+	public static LandsIntegration lands = null;
+	public static boolean superiorSkyblock2Check;
+	public static boolean townyCheck;
 	private static BukkitTask expiredTask, saveTask, tickTask;
 	private static Connection connection = null;
 	private static Economy economy = null;
@@ -42,6 +46,19 @@ public class iShop extends JavaPlugin {
 		Plugin wgCheck = Bukkit.getPluginManager().getPlugin("WorldGuard");
 		if(wgCheck != null)
 			wgLoader = new WorldGuardLoader();
+		Plugin landsCheck = Bukkit.getPluginManager().getPlugin("Lands");
+		if(landsCheck != null)
+			lands = LandsIntegration.of(iShop.getPlugin());
+		Plugin superiorSkyblock2Enabled = Bukkit.getPluginManager().getPlugin("SuperiorSkyblock2");
+		if(superiorSkyblock2Enabled != null)
+			superiorSkyblock2Check = true;
+		else
+			superiorSkyblock2Check = false;
+		Plugin townyEnabled = Bukkit.getPluginManager().getPlugin("Towny");
+		if(townyEnabled != null)
+			townyCheck = true;
+		else
+			townyCheck = false;
 	}
 
 	@Override
@@ -102,9 +119,33 @@ public class iShop extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		expiredTask.cancel();
-		saveTask.cancel();
-		tickTask.cancel();
+		if(Bukkit.getScheduler().isCurrentlyRunning(tickTask.getTaskId())) {
+			while(Bukkit.getScheduler().isCurrentlyRunning(tickTask.getTaskId()))
+				;
+			tickTask.cancel();
+		}
+		else
+			tickTask.cancel();
+		if(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId())) {
+			while(Bukkit.getScheduler().isCurrentlyRunning(saveTask.getTaskId()))
+				;
+			saveTask.cancel();
+		}
+		else
+			saveTask.cancel();
+		if(Bukkit.getScheduler().isCurrentlyRunning(expiredTask.getTaskId())) {
+			while(Bukkit.getScheduler().isCurrentlyRunning(expiredTask.getTaskId()))
+				;
+			expiredTask.cancel();
+		}
+		else
+			expiredTask.cancel();
+		if(!tickTask.isCancelled())
+			tickTask.cancel();
+		if(!saveTask.isCancelled())
+			saveTask.cancel();
+		if(!expiredTask.isCancelled())
+			expiredTask.cancel();
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Safely saving shops & stock items to database, please wait & do not kill server process...");
 		Shop.saveData(true);
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Saving complete!");
@@ -291,9 +332,12 @@ public class iShop extends JavaPlugin {
 					config.set("saveEmptyShops", true);
 				case "3.6":
 					config.set("saveDatabase", 15);
-					config.set("configVersion", "3.7");
-					config.save(configFile);
 				case "3.7":
+					config.set("skipPermsCheckForAdminCreateShop", true);
+					config.set("noPermissionToCreateShop", "&cYou do not have permission to create a shop at this location!");
+					config.set("configVersion", "3.8");
+					config.save(configFile);
+				case "3.8":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

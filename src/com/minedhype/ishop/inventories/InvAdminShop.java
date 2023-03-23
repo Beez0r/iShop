@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import com.minedhype.ishop.gui.GUI;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class InvAdminShop extends GUI {
 	public static boolean remoteManage = iShop.config.getBoolean("remoteManage");
@@ -99,21 +98,16 @@ public class InvAdminShop extends GUI {
 							int maxStockPages = maxPages;
 							if(usePerms) {
 								String permPrefix = Permission.SHOP_STOCK_PREFIX.toString();
-								for(PermissionAttachmentInfo attInfo : player.getEffectivePermissions()) {
-									String perm = attInfo.getPermission();
-									if(perm.startsWith(permPrefix)) {
-										int num;
-										try {
-											num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
-										} catch(Exception e) { num = maxPages; }
-										if(num > permissionMax)
-											maxStockPages = permissionMax;
-										else if(num > 0)
-											maxStockPages = num;
-										else
-											maxStockPages = maxPages;
+								int maxPermPages = InvAdminShop.permissionMax;
+								boolean permissionFound = false;
+								for(int i=maxPermPages; i>0; i--)
+									if(player.hasPermission(permPrefix + i)) {
+										maxStockPages = i;
+										permissionFound = true;
+										break;
 									}
-								}
+								if(!permissionFound)
+									maxStockPages = maxPermPages;
 							}
 							inv.setMaxPages(maxStockPages);
 							inv.setPag(0);

@@ -175,6 +175,9 @@ saveEmptyShops: true
 # Save shops and stock to database interval in minutes. Database will auto save upon server shutdown. Default is every 15 minutes
 saveDatabase: 15
 
+# When a player with iShop.admin permission uses command createshop and is not a server operator, skip checking for permission within GriefPrevention, Lands, SuperiorSkyblock2, Towny, and WorldGuard
+skipPermsCheckForAdminCreateShop: true
+
 # Customizable Messages
 adminShop: "Admin Shop #%id"
 adminShopDisabled: "&cAdmin shops have been disabled!"
@@ -259,6 +262,7 @@ shopCreatedLoc: "&7Shop has been &aCREATED&7 for&a %p &7at &a%x &7/&a %y &7/&a %
 shopDeletedLoc: "&7Shop has been &cDELETED&7 for&a %p &7at &a%x &7/&a %y &7/&a %z &7in &a%w&7!"
 shopLocationErrorNum: "&cLocation coordinates must be a positive or negative number!"
 shopLocationErrorWorld: "&cLocation coordinates must be in a valid world!"
+noPermissionToCreateShop: "&cYou do not have permission to create a shop at this location!"
 
 # Do not edit this!
-configVersion: 3.7
+configVersion: 3.8

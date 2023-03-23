@@ -5,7 +5,7 @@ author: Beez0r
 website: https://minedhype.com
 version: "${project.version}"
 api-version: "1.17"
-softdepend: [GriefPrevention, Vault, WorldGuard]
+softdepend: [GriefPrevention, Lands, SuperiorSkyblock2, Towny, Vault, WorldGuard]
 commands:
   ishop:
     description: "/shop"

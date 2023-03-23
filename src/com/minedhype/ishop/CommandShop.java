@@ -5,8 +5,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.minedhype.ishop.inventories.InvCreateRow;
 import com.minedhype.ishop.inventories.InvShop;
+import com.palmergames.bukkit.towny.utils.ShopPlotUtil;
+import me.angeschossen.lands.api.flags.type.Flags;
+import me.angeschossen.lands.api.land.LandWorld;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -272,6 +279,36 @@ public class CommandShop implements CommandExecutor {
 			player.sendMessage(Messages.GP_CLAIM.toString());
 			return;
 		}
+		boolean allowShopCreateWithinLands = false;
+		if(iShop.lands != null) {
+			LandWorld world = iShop.lands.getWorld(player.getWorld());
+			if(world != null)
+				if(world.hasRoleFlag(player.getUniqueId(), block.getLocation(), Flags.BLOCK_PLACE))
+					allowShopCreateWithinLands = true;
+		}
+		else
+			allowShopCreateWithinLands = true;
+		if(!allowShopCreateWithinLands) {
+			player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+			return;
+		}
+		if(iShop.superiorSkyblock2Check) {
+			Island island = SuperiorSkyblockAPI.getIslandAt(block.getLocation());
+			if(island != null) {
+				IslandPrivilege islandPrivilege = IslandPrivilege.getByName("Build");
+				SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(player.getUniqueId());
+				if(!island.hasPermission(superiorPlayer, islandPrivilege)) {
+					player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+					return;
+				}
+			}
+		}
+		if(iShop.townyCheck) {
+			if(!ShopPlotUtil.doesPlayerHaveAbilityToEditShopPlot(player, block.getLocation())) {
+				player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+				return;
+			}
+		}
 		Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
 		if(shop.isPresent()) {
 			player.sendMessage(Messages.EXISTING_SHOP.toString());
@@ -409,6 +446,59 @@ public class CommandShop implements CommandExecutor {
 		if(offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
 			player.sendMessage(Messages.NO_PLAYER_FOUND.toString());
 			return;
+		}
+		if(!player.isOp() && !iShop.config.getBoolean("skipPermsCheckForAdminCreateShop")) {
+			boolean isShopLoc;
+			if(iShop.wgLoader != null)
+				isShopLoc = iShop.wgLoader.checkRegion(block);
+			else
+				isShopLoc = true;
+			if(!isShopLoc) {
+				player.sendMessage(Messages.WG_REGION.toString());
+				return;
+			}
+			boolean allowShopCreateInClaim = false;
+			if(iShop.gpLoader != null) {
+				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false, false, null);
+				if(claim == null || claim.checkPermission(player, ClaimPermission.Access, null) == null || claim.checkPermission(player, ClaimPermission.Build, null) == null || claim.checkPermission(player, ClaimPermission.Edit, null) == null || claim.checkPermission(player, ClaimPermission.Manage, null) == null || claim.checkPermission(player, ClaimPermission.Inventory, null) == null)
+					allowShopCreateInClaim = true;
+			}
+			else
+				allowShopCreateInClaim = true;
+			if(!allowShopCreateInClaim) {
+				player.sendMessage(Messages.GP_CLAIM.toString());
+				return;
+			}
+			boolean allowShopCreateWithinLands = false;
+			if(iShop.lands != null) {
+				LandWorld world = iShop.lands.getWorld(player.getWorld());
+				if(world != null)
+					if(world.hasRoleFlag(player.getUniqueId(), block.getLocation(), Flags.BLOCK_PLACE))
+						allowShopCreateWithinLands = true;
+			}
+			else
+				allowShopCreateWithinLands = true;
+			if(!allowShopCreateWithinLands) {
+				player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+				return;
+			}
+			if(iShop.superiorSkyblock2Check) {
+				Island island = SuperiorSkyblockAPI.getIslandAt(block.getLocation());
+				if(island != null) {
+					IslandPrivilege islandPrivilege = IslandPrivilege.getByName("Build");
+					SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(player.getUniqueId());
+					if(!island.hasPermission(superiorPlayer, islandPrivilege)) {
+						player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+						return;
+					}
+				}
+			}
+			if(iShop.townyCheck) {
+				if(!ShopPlotUtil.doesPlayerHaveAbilityToEditShopPlot(player, block.getLocation())) {
+					player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+					return;
+				}
+			}
 		}
 		Optional<Shop> shop = Shop.getShopByLocation(block.getLocation());
 		if(!shop.isPresent()) {
@@ -911,21 +1001,16 @@ public class CommandShop implements CommandExecutor {
 		int maxStockPages = InvAdminShop.maxPages;
 		if(InvAdminShop.usePerms) {
 			String permPrefix = Permission.SHOP_STOCK_PREFIX.toString();
-			for(PermissionAttachmentInfo attInfo : player.getEffectivePermissions()) {
-				String perm = attInfo.getPermission();
-				if(perm.startsWith(permPrefix)) {
-					int num;
-					try {
-						num = Integer.parseInt(perm.substring(perm.lastIndexOf(".")+1));
-					} catch(Exception e) { num = InvAdminShop.maxPages; }
-					if(num > InvAdminShop.permissionMax)
-						maxStockPages = InvAdminShop.permissionMax;
-					else if(num > 0)
-						maxStockPages = num;
-					else
-						maxStockPages = InvAdminShop.maxPages;
+			int maxPermPages = InvAdminShop.permissionMax;
+			boolean permissionFound = false;
+			for(int i=maxPermPages; i>0; i--)
+				if(player.hasPermission(permPrefix + i)) {
+					maxStockPages = i;
+					permissionFound = true;
+					break;
 				}
-			}
+			if(!permissionFound)
+				maxStockPages = maxPermPages;
 		}
 		if(openPage > 0 && openPage > maxStockPages-1)
 			openPage = maxStockPages-1;

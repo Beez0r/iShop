@@ -9,6 +9,7 @@ public enum Messages {
 	EXISTING_SHOP("existingShop"),
 	GP_CLAIM("noClaimPermission"),
 	NOT_A_PLAYER("notPlayer"),
+	NO_SHOP_CREATE_PERMISSION("noPermissionToCreateShop"),
 	NO_PERMISSION("noPermissions"),
 	NO_PLAYER_FOUND("noPlayerFound"),
 	NO_PLAYER_SHOP("noPlayerShop"),
