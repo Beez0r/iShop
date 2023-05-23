@@ -13,8 +13,7 @@ public class Utils {
 		if(item.hasItemMeta()) {
 			ItemStack itemClone = item.clone();
 			return (player.getInventory().containsAtLeast(item, item.getAmount()) || player.getInventory().containsAtLeast(itemClone, itemClone.getAmount()));
-		}
-		else
+		} else
 			return player.getInventory().containsAtLeast(item, item.getAmount());
 	}
 
@@ -38,8 +37,7 @@ public class Utils {
 				ItemStack itemClone = item.clone();
 				if(stockStore.get().getInventory().containsAtLeast(item, amount) || stockStore.get().getInventory().containsAtLeast(itemClone, amount))
 					return true;
-			}
-			else {
+			} else {
 				if(stockStore.get().getInventory().containsAtLeast(item, amount))
 					return true;
 			}
@@ -49,8 +47,7 @@ public class Utils {
 						ItemStack itemClone = item.clone();
 						if(stockStore.get().getInventory().getItem(j) != null && (stockStore.get().getInventory().getItem(j).isSimilar(item) || stockStore.get().getInventory().getItem(j).isSimilar(itemClone)))
 							itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
-					}
-					else {
+					} else {
 						if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).isSimilar(item))
 							itemAmountCount += stockStore.get().getInventory().getItem(j).getAmount();
 					}
@@ -111,8 +108,7 @@ public class Utils {
 								}
 							} else if(item2Amount < item2Total && stockStore.get().getInventory().getItem(j).isSimilar(item2))
 								item2Amount += stockStore.get().getInventory().getItem(j).getAmount();
-						}
-						else {
+						} else {
 							ItemStack itemClone = item.clone();
 							ItemStack item2Clone = item2.clone();
 							if(item1Amount < item1Total && (stockStore.get().getInventory().getItem(j).isSimilar(item) || stockStore.get().getInventory().getItem(j).isSimilar(itemClone))) {

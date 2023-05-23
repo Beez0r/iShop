@@ -77,6 +77,7 @@ public class iShop extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new EventShop(), this);
 		getServer().getPluginManager().registerEvents(new GUIEvent(), this);
 		getCommand("ishop").setExecutor(new CommandShop());
+		getCommand("ishop").setTabCompleter(new TabComplete());
 		int delayTime;
 		int saveDatabaseTime;
 		try {
@@ -335,9 +336,18 @@ public class iShop extends JavaPlugin {
 				case "3.7":
 					config.set("skipPermsCheckForAdminCreateShop", true);
 					config.set("noPermissionToCreateShop", "&cYou do not have permission to create a shop at this location!");
-					config.set("configVersion", "3.8");
-					config.save(configFile);
 				case "3.8":
+					config.set("publicFindCommand", true);
+					config.set("findCommandCooldown", 5);
+					config.set("publicMoveCommand", true);
+					config.set("cooldownMessageFind","&6You must wait &c%time second(s) &6before using find command again!");
+					config.set("findError", "&cGiven item to search shops for does not exist!");
+					config.set("listFind", "&6Listing all found shop(s) trading &a%item&6:");
+					config.set("nolistFind", "&cNo shop(s) have been found!");
+					config.set("shopMoved", "&6Shop &a#%id &6has been moved to new targeted location!");
+					config.set("configVersion", "3.9");
+					config.save(configFile);
+				case "3.9":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

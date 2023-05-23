@@ -123,6 +123,24 @@ public class Shop {
 			shops.parallelStream().filter(s -> !s.admin).forEach(s -> shopList.putIfAbsent(s.idTienda, s.owner));
 	}
 
+	public static void findItem(Player player, ItemStack item, String itemName) {
+		player.sendMessage(Messages.SHOP_FIND.toString().replaceAll("%item", itemName.toLowerCase()));
+		AtomicBoolean foundItem = new AtomicBoolean(false);
+		shops.parallelStream().forEach(s -> {
+				for(int i=0; i<5; i++) {
+					Optional<RowStore> row = s.getRow(i);
+					if(row.isPresent())
+						if(row.get().getItemOut().isSimilar(item) || row.get().getItemOut2().isSimilar(item)) {
+							foundItem.set(true);
+							player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
+							break;
+						}
+				}
+		});
+		if(!foundItem.get())
+			player.sendMessage(Messages.SHOP_FIND_NONE.toString());
+	}
+
 	public static void removeAllPlayersShops(Player player, UUID sOwner, String pOwner) {
 		int deletedCount = 0;
 		List<Shop> deleteShops = new ArrayList<>();
@@ -881,6 +899,34 @@ public class Shop {
 				} catch (Exception e) { e.printStackTrace(); }
 			}
 		});
+	}
+
+	public static void moveShop(Location oldLoc, Location newLoc, Player player, int shopID) {
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			PreparedStatement stmt = null;
+			try {
+				stmt = iShop.getConnection().prepareStatement("UPDATE zooMercaTiendas SET location = ? WHERE location = ?;");
+				String oldLocationRaw = oldLoc.getBlockX()+";"+oldLoc.getBlockY()+";"+oldLoc.getBlockZ()+";"+oldLoc.getWorld().getName();
+				String newLocationRaw = newLoc.getBlockX()+";"+newLoc.getBlockY()+";"+newLoc.getBlockZ()+";"+newLoc.getWorld().getName();
+				stmt.setString(1, newLocationRaw);
+				stmt.setString(2, oldLocationRaw);
+				stmt.executeUpdate();
+				Optional<Shop> newShopLoc = Shop.getShopById(shopID);
+				newShopLoc.get().location.setX(newLoc.getX());
+				newShopLoc.get().location.setY(newLoc.getY());
+				newShopLoc.get().location.setZ(newLoc.getZ());
+				newShopLoc.get().location.setWorld(newLoc.getWorld());
+			} catch (Exception e) { e.printStackTrace(); }
+			finally {
+				try {
+					if(stmt != null)
+						stmt.close();
+				} catch (Exception e) { e.printStackTrace(); }
+			}
+			player.sendMessage(Messages.SHOP_MOVED.toString().replaceAll("%id", String.valueOf(shopID)));
+		});
+		if(deletePlayerShop)
+			Bukkit.getScheduler().runTask(iShop.getPlugin(), () -> oldLoc.getBlock().setType(Material.AIR));
 	}
 
 	public void sendShopMessages(String i1, String i2, String o1, String o2, int inA1, int inA2, int outA1, int outA2, UUID shopOwner, Player player, boolean isAdminShop, boolean rowBroadcast) {

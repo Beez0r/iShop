@@ -1,7 +1,9 @@
 package com.minedhype.ishop;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
@@ -42,26 +44,28 @@ import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 public class CommandShop implements CommandExecutor {
+
+	private final Map<UUID, Long> findCooldown = new HashMap<>();
+	static boolean findCommandPublic = iShop.config.getBoolean("publicFindCommand");
+	static boolean moveCommandPublic = iShop.config.getBoolean("publicMoveCommand");
+	static int findCooldownTime = iShop.config.getInt("findCommandCooldown");
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(sender instanceof ConsoleCommandSender && args.length > 0) {
 			if(args[0].equalsIgnoreCase("reload")) {
 				reloadShop(null);
 				return true;
-			}
-			else if(args[0].equalsIgnoreCase("deleteid") && args[1] != null) {
+			} else if(args[0].equalsIgnoreCase("deleteid") && args[1] != null) {
 				deleteShopID(null, args[1]);
 				return true;
-			}
-			else if(args[0].equalsIgnoreCase("createlocation") && args.length > 5) {
+			} else if(args[0].equalsIgnoreCase("createlocation") && args.length > 5) {
 				Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> createLocation(null, args[1], args[2], args[3], args[4], args[5]));
 				return true;
-			}
-			else if(args[0].equalsIgnoreCase("deletelocation") && args.length > 4) {
+			} else if(args[0].equalsIgnoreCase("deletelocation") && args.length > 4) {
 				Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> deleteLocation(null, args[1], args[2], args[3], args[4]));
 				return true;
-			}
-			else {
+			} else {
 				sender.sendMessage(ChatColor.GOLD + "iShop Console Commands:");
 				sender.sendMessage(ChatColor.GRAY + label + " createlocation <player> <x> <y> <z> <world>");
 				sender.sendMessage(ChatColor.GRAY + label + " deletelocation <x> <y> <z> <world>");
@@ -101,6 +105,8 @@ public class CommandShop implements CommandExecutor {
 			deleteShopID(player, args[1]);
 		else if(args[0].equalsIgnoreCase("deletelocation") && args.length > 4)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> deleteLocation(player, args[1], args[2], args[3], args[4]));
+		else if(args[0].equalsIgnoreCase("find") && args.length >= 2)
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> find(player, args[1]));
 		else if(args[0].equalsIgnoreCase("list") && args.length == 1)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> listShops(player, null));
 		else if(args[0].equalsIgnoreCase("list") && args.length >= 2)
@@ -113,6 +119,8 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> manageStock(player, args[1], "1"));
 		else if(args[0].equalsIgnoreCase("managestock") && args.length >= 3)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> manageStock(player, args[1], args[2]));
+		else if(args[0].equalsIgnoreCase("move") && args.length >= 2)
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> moveShop(player, args[1]));
 		else if(args[0].equalsIgnoreCase("out") && args.length == 1)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> outOfStock(player, null));
 		else if(args[0].equalsIgnoreCase("out") && args.length >= 2)
@@ -145,18 +153,23 @@ public class CommandShop implements CommandExecutor {
 		player.sendMessage(ChatColor.GRAY + "/" + label + " create");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " delete");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " deleteid <id>");
+		if(findCommandPublic || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_FIND.toString()))
+			player.sendMessage(ChatColor.GRAY + "/" + label + " find <item>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " list");
 		if(iShop.config.getBoolean("publicListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_LIST.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " list <player>");
-		if(iShop.config.getBoolean("publicShopListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_SHOPS.toString()))
-			player.sendMessage(ChatColor.GRAY + "/" + label + " shops");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " manage <id>");
+		if(moveCommandPublic || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_MOVE.toString()))
+			player.sendMessage(ChatColor.GRAY + "/" + label + " move <id>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " out");
 		if(player.hasPermission(Permission.SHOP_ADMIN.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " out <player>");
-		if(iShop.config.getBoolean("enableShopSoldMessage"));
+		if(iShop.config.getBoolean("publicShopListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_SHOPS.toString()))
+			player.sendMessage(ChatColor.GRAY + "/" + label + " shops");
+		if(iShop.config.getBoolean("enableShopSoldMessage"))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " sold <page/clear>");
-		player.sendMessage(ChatColor.GRAY + "/" + label + " stock <page>");
+		if(iShop.config.getBoolean("enableStockCommand") || player.hasPermission(Permission.SHOP_STOCK.toString()) || player.hasPermission(Permission.SHOP_ADMIN.toString()))
+			player.sendMessage(ChatColor.GRAY + "/" + label + " stock <page>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " view <id>");
 		if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(ChatColor.GRAY + "/" + label + " adminshop");
@@ -884,6 +897,169 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getConsoleSender().sendMessage(Messages.SHOP_DELETED_LOC.toString().replaceAll("%p", shopOwner).replaceAll("%w", world).replaceAll("%x", x).replaceAll("%y", y).replaceAll("%z", z));
 	}
 
+	private void find(Player player, String itemName) {
+		if(!findCommandPublic && !player.hasPermission(Permission.SHOP_FIND.toString()) && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.NO_PERMISSION.toString());
+			return;
+		}
+		if(findCooldownTime > 0 && !player.hasPermission(Permission.SHOP_ADMIN.toString()) && !player.hasPermission(Permission.SHOP_BYPASS_FIND_CD.toString())) {
+			if(findCooldown.containsKey(player.getUniqueId())) {
+				long secondsLeft = (((findCooldown.get(player.getUniqueId()))/1000)+findCooldownTime) - (System.currentTimeMillis()/1000);
+				if(secondsLeft > 0) {
+					player.sendMessage(Messages.SHOP_FIND_COOLDOWN.toString().replaceAll("%time", String.valueOf(secondsLeft)));
+					return;
+				}
+			}
+			findCooldown.put(player.getUniqueId(), System.currentTimeMillis());
+		}
+		Material material = Material.matchMaterial(itemName);
+		if(material == null) {
+			try {
+				material = Material.matchMaterial(itemName.split("minecraft:")[1].toUpperCase());
+			} catch(Exception ignored) { }
+			if(material == null) {
+				player.sendMessage(Messages.SHOP_FIND_ERROR.toString());
+				return;
+			}
+		}
+		ItemStack item = new ItemStack(material);
+		Shop.findItem(player, item, itemName);
+	}
+
+	private void moveShop(Player player, String shopId) {
+		if(!moveCommandPublic && !player.hasPermission(Permission.SHOP_MOVE.toString()) && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.NO_PERMISSION.toString());
+			return;
+		}
+		int sId;
+		try {
+			sId = Integer.parseInt(shopId);
+		} catch (Exception e) { sId = -1; }
+		if(sId < 1) {
+			if(player != null)
+				player.sendMessage(Messages.SHOP_ID_INTEGER.toString());
+			return;
+		}
+		Block block = player.getTargetBlockExact(5);
+		if(block == null) {
+			player.sendMessage(Messages.TARGET_MISMATCH.toString());
+			return;
+		}
+		if(iShop.config.getBoolean("disableShopInWorld")) {
+			List<String> disabledWorldsList = iShop.config.getStringList("disabledWorldList");
+			for(String disabledWorlds:disabledWorldsList)
+				if(disabledWorlds != null && block.getWorld().getName().equals(disabledWorlds)) {
+					player.sendMessage(Messages.SHOP_WORLD_DISABLED.toString());
+					return;
+				}
+		}
+		String shopBlock = iShop.config.getString("shopBlock");
+		Material match = Material.matchMaterial(shopBlock);
+		if(match == null) {
+			try {
+				match = Material.matchMaterial(shopBlock.split("minecraft:")[1].toUpperCase());
+			} catch(Exception ignored) { }
+			if(match == null)
+				match = Material.BARREL;
+		}
+		if(!EventShop.multipleShopBlocks) {
+			if(!block.getType().equals(match)) {
+				player.sendMessage(Messages.TARGET_MISMATCH.toString());
+				return;
+			}
+		} else {
+			boolean shopMatch = false;
+			for(String shopBlocks:EventShop.multipleShopBlock) {
+				Material shopListBlocks = Material.matchMaterial(shopBlocks);
+				if(shopListBlocks != null && block.getType().equals(shopListBlocks)) {
+					shopMatch = true;
+					break;
+				}
+			}
+			if(!block.getType().equals(match) && !shopMatch) {
+				player.sendMessage(Messages.TARGET_MISMATCH.toString());
+				return;
+			}
+		}
+		if(!player.isOp()) {
+			boolean isShopLoc;
+			if(iShop.wgLoader != null)
+				isShopLoc = iShop.wgLoader.checkRegion(block);
+			else
+				isShopLoc = true;
+			if(!isShopLoc) {
+				player.sendMessage(Messages.WG_REGION.toString());
+				return;
+			}
+			boolean allowShopCreateInClaim = false;
+			if(iShop.gpLoader != null) {
+				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false, false, null);
+				if(claim == null || claim.checkPermission(player, ClaimPermission.Access, null) == null || claim.checkPermission(player, ClaimPermission.Build, null) == null || claim.checkPermission(player, ClaimPermission.Edit, null) == null || claim.checkPermission(player, ClaimPermission.Manage, null) == null || claim.checkPermission(player, ClaimPermission.Inventory, null) == null)
+					allowShopCreateInClaim = true;
+			} else
+				allowShopCreateInClaim = true;
+			if(!allowShopCreateInClaim) {
+				player.sendMessage(Messages.GP_CLAIM.toString());
+				return;
+			}
+			boolean allowShopCreateWithinLands = false;
+			if(iShop.lands != null) {
+				LandWorld world = iShop.lands.getWorld(player.getWorld());
+				if(world != null)
+					if(world.hasRoleFlag(player.getUniqueId(), block.getLocation(), Flags.BLOCK_PLACE))
+						allowShopCreateWithinLands = true;
+			}
+			else
+				allowShopCreateWithinLands = true;
+			if(!allowShopCreateWithinLands) {
+				player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+				return;
+			}
+			if(iShop.superiorSkyblock2Check) {
+				Island island = SuperiorSkyblockAPI.getIslandAt(block.getLocation());
+				if(island != null) {
+					IslandPrivilege islandPrivilege = IslandPrivilege.getByName("Build");
+					SuperiorPlayer superiorPlayer = SuperiorSkyblockAPI.getPlayer(player.getUniqueId());
+					if(!island.hasPermission(superiorPlayer, islandPrivilege)) {
+						player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+						return;
+					}
+				}
+			}
+			if(iShop.townyCheck)
+				if(!ShopPlotUtil.doesPlayerHaveAbilityToEditShopPlot(player, block.getLocation())) {
+					player.sendMessage(Messages.NO_SHOP_CREATE_PERMISSION.toString());
+					return;
+				}
+		}
+		Optional<Shop> shopLocation = Shop.getShopByLocation(block.getLocation());
+		if(shopLocation.isPresent()) {
+			player.sendMessage(Messages.EXISTING_SHOP.toString());
+			return;
+		}
+		Optional<Shop> shop = Shop.getShopById(sId);
+		if(!shop.isPresent()) {
+			player.sendMessage(Messages.SHOP_NOT_FOUND.toString());
+			return;
+		}
+		if(!shop.get().isOwner(player.getUniqueId()) && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.SHOP_NO_SELF.toString());
+			return;
+		}
+		if(shop.get().isAdmin() && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.NO_PERMISSION.toString());
+			return;
+		}
+		if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
+			player.sendMessage(Messages.SHOP_BUSY.toString());
+			return;
+		}
+		final Location oldShopBlock = shop.get().getLocation();
+		final Location newShopBlock = block.getLocation();
+		final int shopID = shop.get().shopId();
+		Shop.moveShop(oldShopBlock, newShopBlock, player, shopID);
+	}
+
 	private void removeAllShops(Player player, String playerName) {
 		if(!player.hasPermission(Permission.SHOP_ADMIN.toString())) {
 			player.sendMessage(Messages.NO_PERMISSION.toString());
@@ -1077,6 +1253,9 @@ public class CommandShop implements CommandExecutor {
 			Shop.saveEmptyShops = iShop.config.getBoolean("saveEmptyShops");
 			Shop.stockMessages = iShop.config.getBoolean("enableShopSoldMessage");
 			Shop.exemptExpiringList = iShop.config.getStringList("exemptExpiringShops");
+			findCommandPublic = iShop.config.getBoolean("publicFindCommand");
+			findCooldownTime = iShop.config.getInt("findCommandCooldown");
+			moveCommandPublic = iShop.config.getBoolean("publicMoveCommand");
 		});
 	}
 

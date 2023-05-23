@@ -105,7 +105,7 @@ maxInactiveDays: 0
 exemptExpiringShops:
   - 00000000-0000-0000-0000-000000000000
 
-# Delete block that the shop is located at when deleting a shop
+# Remove block that the shop is located at when deleting or moving a shop
 deleteBlock: false
 
 # Show particle effects on active shop blocks
@@ -177,6 +177,15 @@ saveDatabase: 15
 
 # When a player with iShop.admin permission uses command createshop and is not a server operator, skip checking for permission within GriefPrevention, Lands, SuperiorSkyblock2, Towny, and WorldGuard
 skipPermsCheckForAdminCreateShop: true
+
+# Allow everyone to use "/shop find <item>" command to search all player shops that are selling given item
+publicFindCommand: true
+
+# Time in seconds players must wait to use find command again. Set to 0 to disable
+findCommandCooldown: 5
+
+# Allow everyone to use '/shop move' command to move their shops to a new location
+publicMoveCommand: true
 
 # Customizable Messages
 adminShop: "Admin Shop #%id"
@@ -263,6 +272,10 @@ shopDeletedLoc: "&7Shop has been &cDELETED&7 for&a %p &7at &a%x &7/&a %y &7/&a %
 shopLocationErrorNum: "&cLocation coordinates must be a positive or negative number!"
 shopLocationErrorWorld: "&cLocation coordinates must be in a valid world!"
 noPermissionToCreateShop: "&cYou do not have permission to create a shop at this location!"
-
+cooldownMessageFind: "&6You must wait &c%time second(s) &6before using find command again!"
+findError: "&cGiven item to search shops for does not exist!"
+listFind: "&6Listing all found shop(s) trading &a%item&6:"
+nolistFind: "&cNo shop(s) have been found!"
+shopMoved: "&6Shop &a#%id &6has been moved to new targeted location!"
 # Do not edit this!
-configVersion: 3.8
+configVersion: 3.9
