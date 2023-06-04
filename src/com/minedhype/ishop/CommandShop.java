@@ -365,14 +365,12 @@ public class CommandShop implements CommandExecutor {
 				return;
 			}
 		}
-		Shop newShop = Shop.createShop(block.getLocation(), player.getUniqueId());
+		Shop.createShop(block.getLocation(), player.getUniqueId());
 		player.sendMessage(Messages.SHOP_CREATED.toString());
 		Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(iShop.getPlugin(), () -> {
 			Optional<Shop> shops = Shop.getShopByLocation(block.getLocation());
 			Shop.shopList.put(shops.get().shopId(), player.getUniqueId());
 		}, 10);
-		InvAdminShop inv = new InvAdminShop(newShop, player);
-		inv.open(player, newShop.getOwner());
 	}
 
 	private void createShop(Player player, String playerShop) {
