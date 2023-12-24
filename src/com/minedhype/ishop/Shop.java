@@ -20,11 +20,13 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.Plugin;
 import com.google.gson.JsonArray;
@@ -127,15 +129,156 @@ public class Shop {
 		player.sendMessage(Messages.SHOP_FIND.toString().replaceAll("%item", itemName.toLowerCase()));
 		AtomicBoolean foundItem = new AtomicBoolean(false);
 		shops.parallelStream().forEach(s -> {
-				for(int i=0; i<5; i++) {
-					Optional<RowStore> row = s.getRow(i);
-					if(row.isPresent())
-						if(row.get().getItemOut().isSimilar(item) || row.get().getItemOut2().isSimilar(item)) {
+			AtomicBoolean foundItemInShop = new AtomicBoolean(false);
+			for(int i=0; i<5; i++) {
+				Optional<RowStore> row = s.getRow(i);
+				if(row.isPresent() && !foundItemInShop.get()) {
+					boolean itemMatch = row.get().getItemOut().isSimilar(item);
+					boolean itemMatch2 = row.get().getItemOut2().isSimilar(item);
+					if(((itemMatch && itemMatch2) && Utils.hasDoubleItemStock(s, item, item)) || ((itemMatch && !itemMatch2) && Utils.hasStock(s, row.get().getItemOut2())) || ((!itemMatch && itemMatch2) && Utils.hasStock(s, row.get().getItemOut()))) {
+						foundItem.set(true);
+						foundItemInShop.set(true);
+						player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
+						break;
+					}
+					if(row.get().getItemOut().getType().toString().contains("SHULKER_BOX") && row.get().getItemOut().getItemMeta() instanceof BlockStateMeta && Utils.hasStock(s, row.get().getItemOut())) {
+						BlockStateMeta itemMeta = (BlockStateMeta) row.get().getItemOut().getItemMeta();
+						ShulkerBox shulkerBox = (ShulkerBox) itemMeta.getBlockState();
+						if(shulkerBox.getInventory().contains(item.getType()))
+							for(ItemStack itemSearch:shulkerBox.getInventory().getContents()) {
+								if(itemSearch.isSimilar(item)) {
+									foundItem.set(true);
+									foundItemInShop.set(true);
+									player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
+									break;
+								}
+							}
+					}
+					if(row.get().getItemOut2().getType().toString().contains("SHULKER_BOX") && row.get().getItemOut2().getItemMeta() instanceof BlockStateMeta && Utils.hasStock(s, row.get().getItemOut2())) {
+						BlockStateMeta itemMeta = (BlockStateMeta) row.get().getItemOut2().getItemMeta();
+						ShulkerBox shulkerBox = (ShulkerBox) itemMeta.getBlockState();
+						if(shulkerBox.getInventory().contains(item.getType()))
+							for(ItemStack itemSearch:shulkerBox.getInventory().getContents()) {
+								if(itemSearch.isSimilar(item)) {
+									foundItem.set(true);
+									foundItemInShop.set(true);
+									player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
+									break;
+								}
+							}
+					}
+				}
+			}
+		});
+		if(!foundItem.get())
+			player.sendMessage(Messages.SHOP_FIND_NONE.toString());
+	}
+	public static void findBook(Player player, String bookName) {
+		player.sendMessage(Messages.SHOP_FIND.toString().replaceAll("%item", bookName.toLowerCase()));
+		AtomicBoolean foundItem = new AtomicBoolean(false);
+		shops.parallelStream().forEach(s -> {
+			AtomicBoolean foundBookInShop = new AtomicBoolean(false);
+			for(int i=0; i<5; i++) {
+				Optional<RowStore> row = s.getRow(i);
+				if(!row.isPresent())
+					continue;
+				if(!foundBookInShop.get() && (row.get().getItemOut().getType().equals(Material.ENCHANTED_BOOK) || row.get().getItemOut2().getType().equals(Material.ENCHANTED_BOOK))) {
+					if(row.get().getItemOut().equals(row.get().getItemOut2()) && row.get().getItemOut().getItemMeta() instanceof EnchantmentStorageMeta) {
+						EnchantmentStorageMeta meta = (EnchantmentStorageMeta) row.get().getItemOut().getItemMeta();
+						if(meta.getStoredEnchants().toString().contains(bookName)) {
+							if(!Utils.hasEnchantment(s, bookName, true))
+								break;
 							foundItem.set(true);
-							player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
+							foundBookInShop.set(true);
+							player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
 							break;
 						}
+					}
+					else {
+						if(row.get().getItemOut().getItemMeta() instanceof EnchantmentStorageMeta) {
+							EnchantmentStorageMeta meta = (EnchantmentStorageMeta) row.get().getItemOut().getItemMeta();
+							if(meta.getStoredEnchants().toString().contains(bookName)) {
+								if(!Utils.hasEnchantment(s, bookName, false) || !Utils.hasStock(s, row.get().getItemOut2()))
+									break;
+								foundItem.set(true);
+								foundBookInShop.set(true);
+								player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
+								break;
+							}
+						}
+						if(row.get().getItemOut2().getItemMeta() instanceof EnchantmentStorageMeta) {
+							EnchantmentStorageMeta meta2 = (EnchantmentStorageMeta) row.get().getItemOut2().getItemMeta();
+							if(meta2.getStoredEnchants().toString().contains(bookName)) {
+								if(!Utils.hasEnchantment(s, bookName, false) || !Utils.hasStock(s, row.get().getItemOut()))
+									break;
+								foundItem.set(true);
+								foundBookInShop.set(true);
+								player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
+								break;
+							}
+						}
+					}
 				}
+				if(!foundBookInShop.get() && (row.get().getItemOut().getType().toString().contains("SHULKER_BOX") && row.get().getItemOut2().getType().toString().contains("SHULKER_BOX")) && (row.get().getItemOut().getItemMeta() instanceof BlockStateMeta && row.get().getItemOut2().getItemMeta() instanceof BlockStateMeta) && row.get().getItemOut().equals(row.get().getItemOut2())) {
+					BlockStateMeta itemMeta = (BlockStateMeta) row.get().getItemOut().getItemMeta();
+					ShulkerBox shulkerBox = (ShulkerBox) itemMeta.getBlockState();
+					if(shulkerBox.getInventory().contains(Material.ENCHANTED_BOOK)) {
+						for(ItemStack item:shulkerBox.getInventory().getContents()) {
+							if(item != null && item.getType().equals(Material.ENCHANTED_BOOK) && item.hasItemMeta() && item.getItemMeta() instanceof EnchantmentStorageMeta) {
+								EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+								if(meta.getStoredEnchants().toString().contains(bookName)) {
+									if(!Utils.hasDoubleItemStock(s, row.get().getItemOut(), row.get().getItemOut2()))
+										break;
+									foundItem.set(true);
+									foundBookInShop.set(true);
+									player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
+									break;
+								}
+							}
+						}
+					}
+				}
+				else {
+					if(!foundBookInShop.get() && row.get().getItemOut().getType().toString().contains("SHULKER_BOX") && row.get().getItemOut().getItemMeta() instanceof BlockStateMeta) {
+						BlockStateMeta itemMeta = (BlockStateMeta) row.get().getItemOut().getItemMeta();
+						ShulkerBox shulkerBox = (ShulkerBox) itemMeta.getBlockState();
+						if(shulkerBox.getInventory().contains(Material.ENCHANTED_BOOK)) {
+							for(ItemStack item:shulkerBox.getInventory().getContents()) {
+								if(item != null && item.getType().equals(Material.ENCHANTED_BOOK) && item.hasItemMeta() && item.getItemMeta() instanceof EnchantmentStorageMeta) {
+									EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+									if(meta.getStoredEnchants().toString().contains(bookName)) {
+										if(!Utils.hasStock(s, row.get().getItemOut()))
+											break;
+										foundItem.set(true);
+										foundBookInShop.set(true);
+										player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
+										break;
+									}
+								}
+							}
+						}
+					}
+					if(!foundBookInShop.get() && row.get().getItemOut2().getType().toString().contains("SHULKER_BOX") && row.get().getItemOut2().getItemMeta() instanceof BlockStateMeta) {
+						BlockStateMeta itemMeta = (BlockStateMeta) row.get().getItemOut2().getItemMeta();
+						ShulkerBox shulkerBox = (ShulkerBox) itemMeta.getBlockState();
+						if(shulkerBox.getInventory().contains(Material.ENCHANTED_BOOK)) {
+							for(ItemStack item:shulkerBox.getInventory().getContents()) {
+								if(item != null && item.getType().equals(Material.ENCHANTED_BOOK) && item.hasItemMeta() && item.getItemMeta() instanceof EnchantmentStorageMeta) {
+									EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+									if(meta.getStoredEnchants().toString().contains(bookName)) {
+										if(!Utils.hasStock(s, row.get().getItemOut2()))
+											break;
+										foundItem.set(true);
+										foundBookInShop.set(true);
+										player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		});
 		if(!foundItem.get())
 			player.sendMessage(Messages.SHOP_FIND_NONE.toString());
@@ -172,14 +315,14 @@ public class Shop {
 		player.sendMessage(Messages.SHOP_FOUND.toString().replaceAll("%p", pOwner).replaceAll("%shops", String.valueOf(getNumShops(sOwner))));
 		shops.parallelStream().filter(s -> !s.admin && s.isOwner(sOwner)).forEach(s -> {
 			if(s.isOwner(player.getUniqueId()) && InvAdminShop.remoteManage) {
-				String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+				String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName());
 				TextComponent manageMsg = new TextComponent(manageMessage);
 				TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE + ChatColor.DARK_GRAY + "]");
 				manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
 				manageMsg.addExtra(manageText);
 				player.spigot().sendMessage(manageMsg);
 			} else if(player.hasPermission(Permission.SHOP_ADMIN.toString())) {
-				String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+				String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName());
 				TextComponent manageMsg = new TextComponent(manageMessage);
 				TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE + ChatColor.DARK_GRAY + "]");
 				manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));
@@ -194,14 +337,14 @@ public class Shop {
 				} else
 					player.spigot().sendMessage(manageMsg);
 			} else if(iShop.config.getBoolean("remoteShopping") && !s.isOwner(player.getUniqueId())) {
-				String shopMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+				String shopMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName());
 				TextComponent shopMsg = new TextComponent(shopMessage);
 				TextComponent shopText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_SHOP + ChatColor.DARK_GRAY + "]");
 				shopText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop view " + s.idTienda));
 				shopMsg.addExtra(shopText);
 				player.spigot().sendMessage(shopMsg);
 			} else
-				player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName());
+				player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
 		});
 	}
 
@@ -209,7 +352,7 @@ public class Shop {
 		player.sendMessage(Messages.SHOP_LIST_ADMINSHOPS.toString());
 		AtomicInteger shopCount = new AtomicInteger(0);
 		shops.parallelStream().filter(s -> s.admin).forEach(s -> {
-			String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)) + ChatColor.GREEN + s.location.getBlockX() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockY() + ChatColor.GOLD + " / " + ChatColor.GREEN + s.location.getBlockZ() + ChatColor.GOLD + " in " + ChatColor.GREEN + s.location.getWorld().getName();
+			String manageMessage = Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName());
 			TextComponent manageMsg = new TextComponent(manageMessage);
 			TextComponent manageText = new TextComponent(ChatColor.DARK_GRAY + " [" + Messages.SHOP_CLICK_MANAGE + ChatColor.DARK_GRAY + "]");
 			manageText.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/shop manage " + s.idTienda));

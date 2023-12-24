@@ -41,6 +41,7 @@ public class EventShop implements Listener {
 	public static boolean noShopNoStock = iShop.config.getBoolean("mustOwnShopForStock");
 	public static boolean placeFrameSign = iShop.config.getBoolean("placeItemFrameSigns");
 	public static boolean protectShopFromExplosion = iShop.config.getBoolean("protectShopBlocksFromExplosions");
+	public static boolean shuttingDown = false;
 	public static int soldMessageDelayTime = iShop.config.getInt("soldNotificationsDelayTime");
 	public static int stockRangeLimit = iShop.config.getInt("stockRangeLimitFromShop");
 	public static String shopBlock = iShop.config.getString("shopBlock");
@@ -88,6 +89,8 @@ public class EventShop implements Listener {
 				return;
 			}
 			event.setCancelled(true);
+			if(shuttingDown)
+				return;
 			if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
 				if(event.getHand().equals(EquipmentSlot.HAND))
 					event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
@@ -122,6 +125,8 @@ public class EventShop implements Listener {
 				return;
 			}
 			event.setCancelled(true);
+			if(shuttingDown)
+				return;
 			if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
 				if(event.getHand().equals(EquipmentSlot.HAND))
 					event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
@@ -159,6 +164,8 @@ public class EventShop implements Listener {
 						return;
 					}
 					event.setCancelled(true);
+					if(shuttingDown)
+						return;
 					if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
 						if(event.getHand().equals(EquipmentSlot.HAND))
 							event.getPlayer().sendMessage(Messages.SHOP_BUSY.toString());
@@ -186,6 +193,8 @@ public class EventShop implements Listener {
 			if(!isShopLoc || event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking())
 				return;
 			event.setCancelled(true);
+			if(shuttingDown)
+				return;
 			if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
 				if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1 && noShopNoStock) {
 					event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
@@ -233,6 +242,8 @@ public class EventShop implements Listener {
 					if(!isShopLoc || event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking())
 						return;
 					event.setCancelled(true);
+					if(shuttingDown)
+						return;
 					if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
 						if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1 && noShopNoStock) {
 							event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());

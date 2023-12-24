@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import com.minedhype.ishop.inventories.InvAdminShop;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 public class Utils {
 	public static boolean hasStock(Player player, ItemStack item) {
@@ -97,7 +98,7 @@ public class Utils {
 			if(!stockStore.isPresent())
 				continue;
 			if(stockStore.get().getInventory().contains(item.getType()) || stockStore.get().getInventory().contains(item2.getType())) {
-				for(int j=0; j<stockStore.get().getInventory().getSize()-1; j++) {
+				for(int j=0; j<stockStore.get().getInventory().getSize(); j++) {
 					if(stockStore.get().getInventory().getItem(j) != null) {
 						if(!item.hasItemMeta() && !item2.hasItemMeta()) {
 							if(item1Amount < item1Total && stockStore.get().getInventory().getItem(j).isSimilar(item)) {
@@ -123,6 +124,39 @@ public class Utils {
 					}
 					if(item1Amount >= item1Total && item2Amount >= item2Total)
 						return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean hasEnchantment(Shop shop, String bookName, boolean doubleBook) {
+		if(shop.isAdmin())
+			return true;
+		int max;
+		if(InvAdminShop.usePerms)
+			max = InvAdminShop.permissionMax;
+		else
+			max = InvAdminShop.maxPages;
+		int count = 0;
+		for(int i=0; i<max; i++) {
+			Optional<StockShop> stockStore = StockShop.getStockShopByOwner(shop.getOwner(), i);
+			if(!stockStore.isPresent())
+				continue;
+			if(stockStore.get().getInventory().contains(Material.ENCHANTED_BOOK)) {
+				for(int j=0; j<stockStore.get().getInventory().getSize(); j++) {
+					if(stockStore.get().getInventory().getItem(j) != null && stockStore.get().getInventory().getItem(j).getType().equals(Material.ENCHANTED_BOOK) && stockStore.get().getInventory().getItem(j).hasItemMeta()) {
+							EnchantmentStorageMeta meta = (EnchantmentStorageMeta) stockStore.get().getInventory().getItem(j).getItemMeta();
+							if(meta.getStoredEnchants().toString().contains(bookName)) {
+								if(doubleBook) {
+									count++;
+									if(count>1)
+										return true;
+								}
+								else
+									return true;
+							}
+					}
 				}
 			}
 		}

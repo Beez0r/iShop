@@ -52,6 +52,8 @@ public class CommandShop implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if(EventShop.shuttingDown)
+			return true;
 		if(sender instanceof ConsoleCommandSender && args.length > 0) {
 			if(args[0].equalsIgnoreCase("reload")) {
 				reloadShop(null);
@@ -107,6 +109,8 @@ public class CommandShop implements CommandExecutor {
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> deleteLocation(player, args[1], args[2], args[3], args[4]));
 		else if(args[0].equalsIgnoreCase("find") && args.length >= 2)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> find(player, args[1]));
+		else if(args[0].equalsIgnoreCase("findbook") && args.length >= 2)
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> findBook(player, args[1]));
 		else if(args[0].equalsIgnoreCase("list") && args.length == 1)
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(iShop.getPlugin(), () -> listShops(player, null));
 		else if(args[0].equalsIgnoreCase("list") && args.length >= 2)
@@ -153,8 +157,10 @@ public class CommandShop implements CommandExecutor {
 		player.sendMessage(ChatColor.GRAY + "/" + label + " create");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " delete");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " deleteid <id>");
-		if(findCommandPublic || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_FIND.toString()))
+		if(findCommandPublic || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_FIND.toString())) {
 			player.sendMessage(ChatColor.GRAY + "/" + label + " find <item>");
+			player.sendMessage(ChatColor.GRAY + "/" + label + " findbook <enchantment>");
+		}
 		player.sendMessage(ChatColor.GRAY + "/" + label + " list");
 		if(iShop.config.getBoolean("publicListCommand") || player.hasPermission(Permission.SHOP_ADMIN.toString()) || player.hasPermission(Permission.SHOP_LIST.toString()))
 			player.sendMessage(ChatColor.GRAY + "/" + label + " list <player>");
@@ -920,8 +926,34 @@ public class CommandShop implements CommandExecutor {
 				return;
 			}
 		}
+		if(material.isAir()) {
+			player.sendMessage(Messages.SHOP_FIND_ERROR.toString());
+			return;
+		}
 		ItemStack item = new ItemStack(material);
 		Shop.findItem(player, item, itemName);
+	}
+
+	private void findBook(Player player, String bookName) {
+		if(!findCommandPublic && !player.hasPermission(Permission.SHOP_FIND.toString()) && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			player.sendMessage(Messages.NO_PERMISSION.toString());
+			return;
+		}
+		if(findCooldownTime > 0 && !player.hasPermission(Permission.SHOP_ADMIN.toString()) && !player.hasPermission(Permission.SHOP_BYPASS_FIND_CD.toString())) {
+			if(findCooldown.containsKey(player.getUniqueId())) {
+				long secondsLeft = (((findCooldown.get(player.getUniqueId()))/1000)+findCooldownTime) - (System.currentTimeMillis()/1000);
+				if(secondsLeft > 0) {
+					player.sendMessage(Messages.SHOP_FIND_COOLDOWN.toString().replaceAll("%time", String.valueOf(secondsLeft)));
+					return;
+				}
+			}
+			findCooldown.put(player.getUniqueId(), System.currentTimeMillis());
+		}
+		if(!TabComplete.enchantments.contains(bookName)) {
+			player.sendMessage(Messages.SHOP_FIND_ERROR.toString());
+			return;
+		}
+		Shop.findBook(player, bookName);
 	}
 
 	private void moveShop(Player player, String shopId) {

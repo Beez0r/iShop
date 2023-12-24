@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -120,6 +121,9 @@ public class iShop extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		EventShop.shuttingDown = true;
+		for(Player player:Bukkit.getServer().getOnlinePlayers())
+			player.closeInventory();
 		if(Bukkit.getScheduler().isCurrentlyRunning(tickTask.getTaskId())) {
 			while(Bukkit.getScheduler().isCurrentlyRunning(tickTask.getTaskId()))
 				;
@@ -345,9 +349,11 @@ public class iShop extends JavaPlugin {
 					config.set("listFind", "&6Listing all found shop(s) trading &a%item&6:");
 					config.set("nolistFind", "&cNo shop(s) have been found!");
 					config.set("shopMoved", "&6Shop &a#%id &6has been moved to new targeted location!");
-					config.set("configVersion", "3.9");
-					config.save(configFile);
 				case "3.9":
+					config.set("location", "&6Shop&a %id &6location XYZ:&a %x &6/&a %y &6/&a %z &6in&a %world");
+					config.set("configVersion", "3.10");
+					config.save(configFile);
+				case "3.10":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

@@ -202,7 +202,7 @@ deleteTitle: "DELETE"
 disabledShopBlock: "&cCannot create shop location when shop blocks are disabled!"
 existingShop: "&cCannot create shop where existing shop is already located!"
 foundShops: "&6Found&a %shops &6shop(s) for player:&a %p"
-location: "&6Shop&a %id &6location XYZ: "
+location: "&6Shop&a %id &6location XYZ:&a %x &6/&a %y &6/&a %z &6in&a %world"
 noItems: "&cYou do not have enough item(s) to buy from this shop!"
 noMoney: "&cYou do not have enough money to create a shop! You need at least &o$"
 noPermissions: "&cYou do not have permission for this command!"
@@ -278,4 +278,4 @@ listFind: "&6Listing all found shop(s) trading &a%item&6:"
 nolistFind: "&cNo shop(s) have been found!"
 shopMoved: "&6Shop &a#%id &6has been moved to new targeted location!"
 # Do not edit this!
-configVersion: 3.9
+configVersion: 3.10
