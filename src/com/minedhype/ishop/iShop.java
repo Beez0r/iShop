@@ -1,7 +1,9 @@
 package com.minedhype.ishop;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,12 +15,15 @@ import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import com.minedhype.ishop.gui.GUIEvent;
 import com.minedhype.ishop.MetricsLite;
 import net.milkbowl.vault.economy.Economy;
@@ -79,6 +84,10 @@ public class iShop extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new GUIEvent(), this);
 		getCommand("ishop").setExecutor(new CommandShop());
 		getCommand("ishop").setTabCompleter(new TabComplete());
+		try {
+			connection = DriverManager.getConnection(chainConnect);
+			this.createTables();
+		} catch(Exception e) { e.printStackTrace(); }
 		int delayTime;
 		int saveDatabaseTime;
 		try {
@@ -97,8 +106,6 @@ public class iShop extends JavaPlugin {
 		(saveDatabaseTime)*=20;
 		Bukkit.getScheduler().runTaskLater(this, () -> {
 		try {
-			connection = DriverManager.getConnection(chainConnect);
-			this.createTables();
 			Shop.loadData();
 		} catch(Exception e) { e.printStackTrace(); }
 		}, delayTime);
@@ -168,8 +175,8 @@ public class iShop extends JavaPlugin {
 		try {
 			stmts = new PreparedStatement[] {
 					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaTiendas(id INTEGER PRIMARY KEY autoincrement, location varchar(64), owner varchar(64));"),
-					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaTiendasFilas(itemIn text, itemOut text, idTienda INTEGER);"),
-					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaStocks(owner varchar(64), items JSON);")
+					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaTiendasFilas(itemInNew blob, itemIn2New blob, itemOutNew blob, itemOut2New blob, idTienda INTEGER);"),
+					connection.prepareStatement("CREATE TABLE IF NOT EXISTS zooMercaStocks(owner varchar(64), itemsNew blob);")
 			};
 		} catch(Exception e) { e.printStackTrace(); }
 		for(PreparedStatement stmt : stmts) {
@@ -180,18 +187,75 @@ public class iShop extends JavaPlugin {
 		}
 		List<PreparedStatement> stmtsPatches = new ArrayList<>();
 		try {
-			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemIn2 text NULL DEFAULT 'v: 2580\ntype: AIR\namount: 0' "));
-			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemOut2 text NULL DEFAULT 'v: 2580\ntype: AIR\namount: 0' "));
-			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN broadcast BOOLEAN DEFAULT 0"));
-			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaStocks ADD COLUMN pag INTEGER DEFAULT 0"));
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemInNew blob;"));
+		} catch(Exception ignored) { }
+		try {
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemIn2New blob;"));
+		} catch(Exception ignored) { }
+		try {
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemOutNew blob;"));
+		} catch(Exception ignored) { }
+		try {
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN itemOut2New blob;"));
+		} catch(Exception ignored) { }
+		try {
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas ADD COLUMN broadcast BOOLEAN DEFAULT 0;"));
+		} catch(Exception ignored) { }
+		try {
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaStocks ADD COLUMN pag INTEGER DEFAULT 0;"));
+		} catch(Exception ignored) { }
+		try {
+			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaStocks ADD COLUMN itemsNew blob;"));
+		} catch(Exception ignored) { }
+		try {
 			stmtsPatches.add(connection.prepareStatement("ALTER TABLE zooMercaTiendas ADD COLUMN admin BOOLEAN DEFAULT FALSE;"));
 		} catch(Exception ignored) { }
 		for(PreparedStatement stmtsPatch : stmtsPatches) {
 			try {
 				stmtsPatch.execute();
 				stmtsPatch.close();
-			} catch (Exception ignored) { }
+			} catch(Exception ignored) { }
 		}
+	}
+
+	public static void dropOldColumns() {
+		PreparedStatement[] stmts = new PreparedStatement[] { };
+		try {
+			stmts = new PreparedStatement[] {
+					connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas DROP COLUMN itemIn;"),
+					connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas DROP COLUMN itemIn2;"),
+					connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas DROP COLUMN itemOut;"),
+					connection.prepareStatement("ALTER TABLE zooMercaTiendasFilas DROP COLUMN itemOut2;"),
+					connection.prepareStatement("ALTER TABLE zooMercaStocks DROP COLUMN items;")
+			};
+		} catch(Exception e) { e.printStackTrace(); }
+		for(PreparedStatement stmt : stmts) {
+			try {
+				stmt.execute();
+				stmt.close();
+			} catch(Exception e) { e.printStackTrace(); }
+		}
+	}
+
+	public static ItemStack[] decodeByte(InputStream inputStream) throws IOException, ClassNotFoundException {
+		if(inputStream == null || inputStream.available() == 0)
+			return new ItemStack[0];
+		BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+		ItemStack[] items = new ItemStack[dataInput.readInt()];
+		for(int i=0; i<items.length; i++)
+			items[i] = (ItemStack) dataInput.readObject();
+		dataInput.close();
+		return items;
+	}
+
+	public static byte[] encodeByte(ItemStack[] items) throws IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+		dataOutput.writeInt(items.length);
+		for(int i=0; i<items.length; i++)
+			dataOutput.writeObject(items[i]);
+		dataOutput.close();
+		return outputStream.toByteArray();
 	}
 
 	public static Connection getConnection() {
@@ -351,9 +415,11 @@ public class iShop extends JavaPlugin {
 					config.set("shopMoved", "&6Shop &a#%id &6has been moved to new targeted location!");
 				case "3.9":
 					config.set("location", "&6Shop&a %id &6location XYZ:&a %x &6/&a %y &6/&a %z &6in&a %world");
-					config.set("configVersion", "3.10");
-					config.save(configFile);
 				case "3.10":
+					config.set("shopParticles", "villager_happy");
+					config.set("configVersion", "3.11");
+					config.save(configFile);
+				case "3.11":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }

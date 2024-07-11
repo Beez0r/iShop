@@ -187,6 +187,9 @@ findCommandCooldown: 5
 # Allow everyone to use '/shop move' command to move their shops to a new location
 publicMoveCommand: true
 
+# Change the particle effect (requires server restart) for shops to any Enum Constant Particle found at https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+shopParticles: "villager_happy"
+
 # Customizable Messages
 adminShop: "Admin Shop #%id"
 adminShopDisabled: "&cAdmin shops have been disabled!"
@@ -278,4 +281,4 @@ listFind: "&6Listing all found shop(s) trading &a%item&6:"
 nolistFind: "&cNo shop(s) have been found!"
 shopMoved: "&6Shop &a#%id &6has been moved to new targeted location!"
 # Do not edit this!
-configVersion: 3.10
+configVersion: 3.11

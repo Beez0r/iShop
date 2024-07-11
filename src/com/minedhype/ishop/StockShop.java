@@ -8,11 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import org.bukkit.inventory.ItemStack;
 
 public class StockShop {
 	private static final List<StockShop> stocks = new ArrayList<>();
@@ -54,19 +50,9 @@ public class StockShop {
 	private void saveStockData() {
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaStocks (owner, items, pag) VALUES (?,?,?);");
-			JsonArray items = new JsonArray();
-			for(ItemStack item : inventory.getContents()) {
-				if(item == null)
-					continue;
-				YamlConfiguration config = new YamlConfiguration();
-				item.serialize().forEach(config::set);
-				String itemRaw = config.saveToString();
-				items.add(itemRaw);
-			}
-			String itemsJson = (new Gson()).toJson(items);
+			stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaStocks (owner, itemsNew, pag) VALUES (?,?,?);");
 			stmt.setString(1, owner.toString());
-			stmt.setString(2, itemsJson);
+			stmt.setBytes(2,iShop.encodeByte(inventory.getContents()));
 			stmt.setInt(3, pag);
 			stmt.execute();
 		} catch (Exception e) { e.printStackTrace(); }

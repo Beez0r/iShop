@@ -1,5 +1,6 @@
 package com.minedhype.ishop;
 
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.sql.rowset.serial.SerialBlob;
 import com.minedhype.ishop.inventories.InvAdminShop;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,6 +27,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -37,6 +40,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.Economy;
+import static com.minedhype.ishop.iShop.decodeByte;
 
 public class Shop {
 	public static boolean deletePlayerShop = iShop.config.getBoolean("deleteBlock");
@@ -49,6 +53,7 @@ public class Shop {
 	public static boolean stockMessages = iShop.config.getBoolean("enableShopSoldMessage");
 	public static boolean stockMessagesSaveAll = iShop.config.getBoolean("enableSavingAllShopSoldMessages");
 	public static List<String> exemptExpiringList = iShop.config.getStringList("exemptExpiringShops");
+	public static Particle shopParticles = Particle.valueOf(iShop.config.getString("shopParticles").toUpperCase());
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
 	public static final ConcurrentHashMap<Integer, UUID> shopList = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<UUID, ArrayList<String>> shopMessages = new ConcurrentHashMap<>();
@@ -599,6 +604,20 @@ public class Shop {
 		return shop;
 	}
 
+	public static Shop duplicateShop(Location loc, UUID owner, int shopId) {
+		Shop shop = new Shop(-1, owner, loc, false);
+		shops.add(shop);
+		Optional<StockShop> stockShop = StockShop.getStockShopByOwner(owner, 0);
+		if(!stockShop.isPresent())
+			new StockShop(owner, 0);
+		Optional<Shop> copyShop = Shop.getShopById(shopId);
+		for(int i=0;i<5;i++) {
+			if(copyShop.get().getRows()[i] != null)
+				shop.getRows()[i] = copyShop.get().getRows()[i];
+		}
+		return shop;
+	}
+
 	public static void tickShops() {
 		if(!shopEnabled)
 			return;
@@ -608,7 +627,11 @@ public class Shop {
 					double x = shop.location.getBlockX() + 0.5;
 					double y = shop.location.getBlockY() + 1.25;
 					double z = shop.location.getBlockZ() + 0.5;
-					shop.location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, x, y, z, 10, 0.1, 0.1, 0.1);
+					try {
+						shop.location.getWorld().spawnParticle(shopParticles, x, y, z, 10, 0.1, 0.1, 0.1);
+					} catch(Exception e) {
+						shop.location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, x, y, z, 10, 0.1, 0.1, 0.1);
+					}
 				}
 		}
 	}
@@ -632,28 +655,19 @@ public class Shop {
 		PreparedStatement loadShops = null;
 
 		try {
-			loadStocks = iShop.getConnection().prepareStatement("SELECT owner, items, pag FROM zooMercaStocks;");
+			loadStocks = iShop.getConnection().prepareStatement("SELECT owner, itemsNew, pag FROM zooMercaStocks;");
 			ResultSet dataStocks = loadStocks.executeQuery();
 			while(dataStocks.next()) {
 				String ownerRaw = dataStocks.getString(1);
 				UUID owner = UUID.fromString(ownerRaw);
-				String dataItems = dataStocks.getString(2);
-				List<ItemStack> itemsList = new ArrayList<>();
-				JsonArray itemsArray = new JsonParser().parse(dataItems).getAsJsonArray();
-				for(JsonElement jsonItem : itemsArray) {
-					String itemstackRaw = jsonItem.getAsString();
-					YamlConfiguration config = new YamlConfiguration();
-					try {
-						config.loadFromString(itemstackRaw);
-					} catch (InvalidConfigurationException e) { e.printStackTrace(); }
-					Map<String, Object> itemRaw = config.getValues(true);
-					itemsList.add(ItemStack.deserialize(itemRaw));
-				}
 				int pag = dataStocks.getInt(3);
-				StockShop stock = new StockShop(owner, pag);
-				stock.getInventory().setContents(itemsList.toArray(new ItemStack[0]));
+				try {
+					Blob blob = new SerialBlob(dataStocks.getBytes(2));
+					StockShop stock = new StockShop(owner, pag);
+					stock.getInventory().setContents(decodeByte(blob.getBinaryStream()));
+				} catch (Exception ignored) { }
 			}
-			loadShops = iShop.getConnection().prepareStatement("SELECT location, owner, itemIn, itemIn2, itemOut, itemOut2, idTienda, admin, broadcast FROM zooMercaTiendasFilas LEFT JOIN zooMercaTiendas ON id = idTienda ORDER BY idTienda;");
+			loadShops = iShop.getConnection().prepareStatement("SELECT location, owner, itemInNew, itemIn2New, itemOutNew, itemOut2New, idTienda, admin, broadcast FROM zooMercaTiendasFilas LEFT JOIN zooMercaTiendas ON id = idTienda ORDER BY idTienda;");
 			ResultSet dataStore = loadShops.executeQuery();
 			while(dataStore.next()) {
 				if(dataStore.getString(1) == null) {
@@ -688,32 +702,34 @@ public class Shop {
 				}
 				if(index >= rows.length)
 					continue;
-				String itemInstack1Raw = dataStore.getString(3);
-				YamlConfiguration configIn1 = new YamlConfiguration();
-				String itemInstack2Raw = dataStore.getString(4);
-				YamlConfiguration configIn2 = new YamlConfiguration();
-				String itemOutstack1Raw = dataStore.getString(5);
-				YamlConfiguration configOut1 = new YamlConfiguration();
-				String itemOutstack2Raw = dataStore.getString(6);
-				YamlConfiguration configOut2 = new YamlConfiguration();
-				try {
-					configIn1.loadFromString(itemInstack1Raw);
-					configIn2.loadFromString(itemInstack2Raw);
-					configOut1.loadFromString(itemOutstack1Raw);
-					configOut2.loadFromString(itemOutstack2Raw);
-				} catch (InvalidConfigurationException e) { e.printStackTrace(); }
-				Map<String, Object> itemInRaw = configIn1.getValues(true);
-				ItemStack itemIn = ItemStack.deserialize(itemInRaw);
-				Map<String, Object> itemIn2Raw = configIn2.getValues(true);
-				ItemStack itemIn2 = ItemStack.deserialize(itemIn2Raw);
-				Map<String, Object> itemOutRaw = configOut1.getValues(true);
-				ItemStack itemOut = ItemStack.deserialize(itemOutRaw);
-				Map<String, Object> itemOut2Raw = configOut2.getValues(true);
-				ItemStack itemOut2 = ItemStack.deserialize(itemOut2Raw);
 				boolean broadcast = dataStore.getBoolean(9);
-				rows[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, broadcast);
+				ItemStack airItem = new ItemStack(Material.AIR, 0);
+				final Inventory invIn = Bukkit.createInventory(null,9);
+				final Inventory invIn2 = Bukkit.createInventory(null,9);
+				final Inventory invOut = Bukkit.createInventory(null,9);
+				final Inventory invOut2 = Bukkit.createInventory(null,9);
+				try {
+					Blob blob = new SerialBlob(dataStore.getBytes(3));
+					invIn.setContents(decodeByte(blob.getBinaryStream()));
+				}
+				catch(Exception e) { invIn.addItem(airItem); }
+				try {
+					Blob blob = new SerialBlob(dataStore.getBytes(4));
+					invIn2.setContents(decodeByte(blob.getBinaryStream()));
+				}
+				catch(Exception e) { invIn2.addItem(airItem); }
+				try {
+					Blob blob = new SerialBlob(dataStore.getBytes(5));
+					invOut.setContents(decodeByte(blob.getBinaryStream()));
+				}
+				catch(Exception e) { invOut.addItem(airItem); }
+				try {
+					Blob blob = new SerialBlob(dataStore.getBytes(6));
+					invOut2.setContents(decodeByte(blob.getBinaryStream()));
+				}
+				catch(Exception e) { invOut2.addItem(airItem); }
+				rows[index] = new RowStore(invIn.getItem(0), invIn2.getItem(0), invOut.getItem(0), invOut2.getItem(0), broadcast);
 			}
-
 		} catch(Exception e) {
 			e.printStackTrace();
 			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Failed to load database properly! Shutting down to prevent data corruption.");
@@ -727,6 +743,113 @@ public class Shop {
 				if(loadShops != null)
 					loadShops.close();
 			} catch (Exception e) { e.printStackTrace(); }
+		}
+	}
+
+	public static void convertData() {
+		boolean failedToLoad = false;
+		PreparedStatement loadOldShops = null;
+		PreparedStatement loadOldStock = null;
+		try {
+			loadOldStock = iShop.getConnection().prepareStatement("SELECT owner, items, pag FROM zooMercaStocks;");
+			ResultSet dataStocks = loadOldStock.executeQuery();
+			while(dataStocks.next()) {
+				String ownerRaw = dataStocks.getString(1);
+				UUID owner = UUID.fromString(ownerRaw);
+				String dataItems = dataStocks.getString(2);
+				List<ItemStack> itemsList = new ArrayList<>();
+				JsonArray itemsArray = new JsonParser().parse(dataItems).getAsJsonArray();
+				for(JsonElement jsonItem : itemsArray) {
+					String itemstackRaw = jsonItem.getAsString();
+					YamlConfiguration config = new YamlConfiguration();
+					try {
+						config.loadFromString(itemstackRaw);
+					} catch (InvalidConfigurationException e) { e.printStackTrace(); }
+					Map<String, Object> itemRaw = config.getValues(true);
+					itemsList.add(ItemStack.deserialize(itemRaw));
+				}
+				int pag = dataStocks.getInt(3);
+				StockShop stock = new StockShop(owner, pag);
+				stock.getInventory().setContents(itemsList.toArray(new ItemStack[0]));
+			}
+			loadOldShops = iShop.getConnection().prepareStatement("SELECT location, owner, itemIn, itemIn2, itemOut, itemOut2, idTienda, admin, broadcast FROM zooMercaTiendasFilas LEFT JOIN zooMercaTiendas ON id = idTienda ORDER BY idTienda;");
+			ResultSet dataStore = loadOldShops.executeQuery();
+			while(dataStore.next()) {
+				if(dataStore.getString(1) == null) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null location found in database! Make backups!");
+					continue;
+				}
+				String[] locationRaw = dataStore.getString(1).split(";");
+				int x = Integer.parseInt(locationRaw[0]);
+				int y = Integer.parseInt(locationRaw[1]);
+				int z = Integer.parseInt(locationRaw[2]);
+				World world = Bukkit.getWorld(locationRaw[3]);
+				if(world == null) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Error: Skipped loading a shop with null world found in database! Make backups!");
+					continue;
+				}
+				Location location = new Location(world, x, y, z);
+				Optional<Shop> shop = Shop.getShopByLocation(location);
+				if(!shop.isPresent()) {
+					String ownerRaw = dataStore.getString(2);
+					UUID owner = UUID.fromString(ownerRaw);
+					int idTienda = dataStore.getInt(7);
+					boolean admin = dataStore.getBoolean(8);
+					shops.add(new Shop(idTienda, owner, location, admin));
+					shop = Shop.getShopByLocation(location);
+				}
+				RowStore[] rows = shop.get().getRows();
+				int index = 0;
+				for(int len=rows.length; index<len; index++) {
+					RowStore row = rows[index];
+					if(row == null || (row.getItemOut().getType().isAir() && row.getItemOut2().getType().isAir()) || (row.getItemIn().getType().isAir() && row.getItemIn2().getType().isAir()))
+						break;
+				}
+				if(index >= rows.length)
+					continue;
+				String itemInstack1Raw = dataStore.getString(3);
+				YamlConfiguration configIn1 = new YamlConfiguration();
+				String itemInstack2Raw = dataStore.getString(4);
+				YamlConfiguration configIn2 = new YamlConfiguration();
+				String itemOutstack1Raw = dataStore.getString(5);
+				YamlConfiguration configOut1 = new YamlConfiguration();
+				String itemOutstack2Raw = dataStore.getString(6);
+				YamlConfiguration configOut2 = new YamlConfiguration();
+				try {
+					configIn1.loadFromString(itemInstack1Raw);
+					configIn2.loadFromString(itemInstack2Raw);
+					configOut1.loadFromString(itemOutstack1Raw);
+					configOut2.loadFromString(itemOutstack2Raw);
+				} catch (Exception e) { e.printStackTrace(); }
+				Map<String, Object> itemInRaw = configIn1.getValues(true);
+				ItemStack itemIn = ItemStack.deserialize(itemInRaw);
+				Map<String, Object> itemIn2Raw = configIn2.getValues(true);
+				ItemStack itemIn2 = ItemStack.deserialize(itemIn2Raw);
+				Map<String, Object> itemOutRaw = configOut1.getValues(true);
+				ItemStack itemOut = ItemStack.deserialize(itemOutRaw);
+				Map<String, Object> itemOut2Raw = configOut2.getValues(true);
+				ItemStack itemOut2 = ItemStack.deserialize(itemOut2Raw);
+				boolean broadcast = dataStore.getBoolean(9);
+				rows[index] = new RowStore(itemOut, itemOut2, itemIn, itemIn2, broadcast);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[iShop] Failed to convert/load database, keep multiple back-ups for safety!");
+			failedToLoad = true;
+		} finally{
+			try {
+				if(loadOldShops != null)
+					loadOldShops.close();
+				if(loadOldStock != null)
+					loadOldStock.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if(!failedToLoad) {
+			iShop.dropOldColumns();
+			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Successfully converted database!");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] We STRONGLY recommend restarting your server now to prevent data corruption!");
 		}
 	}
 

@@ -1,8 +1,9 @@
 package com.minedhype.ishop;
 
 import java.sql.PreparedStatement;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class RowStore {
@@ -24,47 +25,36 @@ public class RowStore {
 	public void saveData(int idTienda) {
 		PreparedStatement stmt = null;
 		try {
-			stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaTiendasFilas (itemIn, itemIn2, itemOut, itemOut2, idTienda, broadcast) VALUES (?,?,?,?,?,?);");
-			YamlConfiguration configIn1 = new YamlConfiguration();
+			stmt = iShop.getConnection().prepareStatement("INSERT INTO zooMercaTiendasFilas (itemInNew, itemIn2New, itemOutNew, itemOut2New, idTienda, broadcast) VALUES (?,?,?,?,?,?);");
+			ItemStack[] saveAirItem = new ItemStack[]{airItem};
+			final Inventory invIn = Bukkit.createInventory(null,9);
+			final Inventory invIn2 = Bukkit.createInventory(null,9);
+			final Inventory invOut = Bukkit.createInventory(null,9);
+			final Inventory invOut2 = Bukkit.createInventory(null,9);
 			if(itemIn != null) {
-				itemIn.serialize().forEach(configIn1::set);
-				String itemInRaw = configIn1.saveToString();
-				stmt.setString(1, itemInRaw);
-			} else {
-				airItem.serialize().forEach(configIn1::set);
-				String itemInRaw = configIn1.saveToString();
-				stmt.setString(1, itemInRaw);
-			}
-			YamlConfiguration configIn2 = new YamlConfiguration();
+				ItemStack[] item = new ItemStack[]{itemIn};
+				invIn.addItem(item[0]);
+			} else
+				invIn.addItem(saveAirItem[0]);
+			stmt.setBytes(1, iShop.encodeByte(invIn.getContents()));
 			if(itemIn2 != null) {
-				itemIn2.serialize().forEach(configIn2::set);
-				String itemIn2Raw = configIn2.saveToString();
-				stmt.setString(2, itemIn2Raw);
-			} else {
-				airItem.serialize().forEach(configIn2::set);
-				String itemIn2Raw = configIn2.saveToString();
-				stmt.setString(2, itemIn2Raw);
-			}
-			YamlConfiguration configOut1 = new YamlConfiguration();
+				ItemStack[] item = new ItemStack[]{itemIn2};
+				invIn2.addItem(item[0]);
+			} else
+				invIn2.addItem(saveAirItem[0]);
+			stmt.setBytes(2, iShop.encodeByte(invIn2.getContents()));
 			if(itemOut != null) {
-				itemOut.serialize().forEach(configOut1::set);
-				String itemOutRaw = configOut1.saveToString();
-				stmt.setString(3, itemOutRaw);
-			} else {
-				airItem.serialize().forEach(configOut1::set);
-				String itemOutRaw = configOut1.saveToString();
-				stmt.setString(3, itemOutRaw);
-			}
-			YamlConfiguration configOut2 = new YamlConfiguration();
+				ItemStack[] item = new ItemStack[]{itemOut};
+				invOut.addItem(item[0]);
+			} else
+				invOut.addItem(saveAirItem[0]);
+			stmt.setBytes(3, iShop.encodeByte(invOut.getContents()));
 			if(itemOut2 != null) {
-				itemOut2.serialize().forEach(configOut2::set);
-				String itemOut2Raw = configOut2.saveToString();
-				stmt.setString(4, itemOut2Raw);
-			} else {
-				airItem.serialize().forEach(configOut2::set);
-				String itemOut2Raw = configOut2.saveToString();
-				stmt.setString(4, itemOut2Raw);
-			}
+				ItemStack[] item = new ItemStack[]{itemOut2};
+				invOut2.addItem(item[0]);
+			} else
+				invOut2.addItem(saveAirItem[0]);
+			stmt.setBytes(4, iShop.encodeByte(invOut2.getContents()));
 			stmt.setInt(5, idTienda);
 			stmt.setBoolean(6, broadcast);
 			stmt.execute();
@@ -81,15 +71,23 @@ public class RowStore {
 		this.broadcast = !this.broadcast;
 	}
 	public ItemStack getItemIn() {
+		if(itemIn == null)
+			return airItem;
 		return itemIn;
 	}
 	public ItemStack getItemIn2() {
+		if(itemIn2 == null)
+			return airItem;
 		return itemIn2;
 	}
 	public ItemStack getItemOut() {
+		if(itemOut == null)
+			return airItem;
 		return itemOut;
 	}
 	public ItemStack getItemOut2() {
+		if(itemOut2 == null)
+			return airItem;
 		return itemOut2;
 	}
 }
