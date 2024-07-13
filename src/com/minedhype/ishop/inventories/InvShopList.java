@@ -77,9 +77,14 @@ public class InvShopList extends GUI {
 					ItemStack item = new ItemStack(playerHead);
 					SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(Shop.shopList.get(id));
-					skullMeta.setOwningPlayer(offlinePlayer);
+					boolean playerNotFound = false;
+					try {
+					skullMeta.setOwningPlayer(offlinePlayer); }
+					catch(Exception e) { playerNotFound = true; }
 					if(Shop.getShopById(id).get().isAdmin())
 						skullMeta.setDisplayName(Messages.ADMIN_SHOP_NUMBER.toString().replaceAll("%id", id.toString()));
+					else if(playerNotFound)
+						skullMeta.setDisplayName(Messages.SHOP_NUMBER.toString().replaceAll("%player", "Unknown Player").replaceAll("%id", id.toString()));
 					else
 						skullMeta.setDisplayName(Messages.SHOP_NUMBER.toString().replaceAll("%player", offlinePlayer.getName()).replaceAll("%id", id.toString()));
 					List<String> skullLore = new ArrayList<>();

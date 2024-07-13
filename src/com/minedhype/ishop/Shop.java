@@ -140,7 +140,7 @@ public class Shop {
 				if(row.isPresent() && !foundItemInShop.get()) {
 					boolean itemMatch = row.get().getItemOut().isSimilar(item);
 					boolean itemMatch2 = row.get().getItemOut2().isSimilar(item);
-					if(((itemMatch && itemMatch2) && Utils.hasDoubleItemStock(s, item, item)) || ((itemMatch && !itemMatch2) && Utils.hasStock(s, row.get().getItemOut2())) || ((!itemMatch && itemMatch2) && Utils.hasStock(s, row.get().getItemOut()))) {
+					if(((itemMatch && itemMatch2) && Utils.hasDoubleItemStock(s, row.get().getItemOut(), row.get().getItemOut2())) || ((itemMatch && !itemMatch2) && Utils.hasStock(s, row.get().getItemOut())) || ((!itemMatch && itemMatch2) && Utils.hasStock(s, row.get().getItemOut2()))) {
 						foundItem.set(true);
 						foundItemInShop.set(true);
 						player.sendMessage(Messages.SHOP_LOCATION.toString().replaceAll("%id", String.valueOf(s.idTienda)).replaceAll("%x", String.valueOf(s.location.getBlockX())).replaceAll("%y", String.valueOf(s.location.getBlockY())).replaceAll("%z", String.valueOf(s.location.getBlockZ())).replaceAll("%world", s.location.getWorld().getName()));
@@ -728,7 +728,7 @@ public class Shop {
 					invOut2.setContents(decodeByte(blob.getBinaryStream()));
 				}
 				catch(Exception e) { invOut2.addItem(airItem); }
-				rows[index] = new RowStore(invIn.getItem(0), invIn2.getItem(0), invOut.getItem(0), invOut2.getItem(0), broadcast);
+				rows[index] = new RowStore(invOut.getItem(0), invOut2.getItem(0), invIn.getItem(0), invIn2.getItem(0), broadcast);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

@@ -160,7 +160,7 @@ public class CommandShop implements CommandExecutor {
 
 	private void listSubCmd(Player player, String label) {
 		player.sendMessage(ChatColor.GOLD + "iShop Commands:");
-		player.sendMessage(ChatColor.GRAY + "/" + label + " copy <shop id>");
+		player.sendMessage(ChatColor.GRAY + "/" + label + " copy <id>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " count <item>");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " create");
 		player.sendMessage(ChatColor.GRAY + "/" + label + " delete");
