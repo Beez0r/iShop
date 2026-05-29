@@ -41,6 +41,7 @@ import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.Economy;
 import static com.minedhype.ishop.iShop.decodeByte;
+import static com.minedhype.ishop.StockShop.purgePlayerStock;
 
 public class Shop {
 	public static boolean deletePlayerShop = iShop.config.getBoolean("deleteBlock");
@@ -52,6 +53,7 @@ public class Shop {
 	public static boolean shopNotifications = iShop.config.getBoolean("enableShopNotifications");
 	public static boolean stockMessages = iShop.config.getBoolean("enableShopSoldMessage");
 	public static boolean stockMessagesSaveAll = iShop.config.getBoolean("enableSavingAllShopSoldMessages");
+	public static boolean stockDeleteWhenShopsExpire = iShop.config.getBoolean("deleteStockWhenShopsExpire");
 	public static List<String> exemptExpiringList = iShop.config.getStringList("exemptExpiringShops");
 	public static Particle shopParticles = Particle.valueOf(iShop.config.getString("shopParticles").toUpperCase());
 	public static int maxDays = iShop.config.getInt("maxInactiveDays");
@@ -106,16 +108,25 @@ public class Shop {
 	public static boolean checkShopDistanceFromStockBlock(Location stockLocation, UUID shopOwner) { return shops.parallelStream().filter(s -> !s.admin && s.isOwner(shopOwner)).anyMatch(s -> s.getLocation().getWorld().equals(stockLocation.getWorld()) && s.location.distanceSquared(stockLocation) <= EventShop.stockRangeLimit*EventShop.stockRangeLimit); }
 	public static int getNumShops(UUID owner) { return (int) shops.parallelStream().filter(t -> !t.admin && t.owner.equals(owner)).count(); }
 
-	public static boolean strictStockShopCheck(ItemStack item, UUID uuid) {
+	public static boolean strictStockShopCheck(ItemStack item, ItemStack item2, UUID uuid) {
 		AtomicBoolean restricted = new AtomicBoolean(true);
 		shops.parallelStream().filter(s -> !s.admin && s.isOwner(uuid)).forEach(s -> {
 			if(restricted.get()) {
 				for(int i=0; i<5; i++) {
 					if(restricted.get()) {
 						Optional<RowStore> row = s.getRow(i);
-						if(row.isPresent())
-							if(row.get().getItemOut().isSimilar(item) || row.get().getItemOut2().isSimilar(item))
-								restricted.set(false);
+						if(row.isPresent()) {
+							if(!item.getType().isAir())
+								if(row.get().getItemOut().isSimilar(item) || row.get().getItemOut2().isSimilar(item)) {
+									restricted.set(false);
+									break;
+								}
+							if(!item2.getType().isAir())
+								if(row.get().getItemOut().isSimilar(item2) || row.get().getItemOut2().isSimilar(item2)) {
+									restricted.set(false);
+									break;
+								}
+						}
 					}
 				}
 			}
@@ -630,7 +641,7 @@ public class Shop {
 					try {
 						shop.location.getWorld().spawnParticle(shopParticles, x, y, z, 10, 0.1, 0.1, 0.1);
 					} catch(Exception e) {
-						shop.location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, x, y, z, 10, 0.1, 0.1, 0.1);
+						shop.location.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, x, y, z, 10, 0.1, 0.1, 0.1);
 					}
 				}
 		}
@@ -638,15 +649,31 @@ public class Shop {
 
 	public static void expiredShops() {
 		exemptListInactive = exemptExpiringList.size() == 1 && exemptExpiringList.get(0).equals("00000000-0000-0000-0000-000000000000");
+		int expiredCount = 0;
 		List<Shop> shopDelete = new ArrayList<>();
-		for(Shop shop : shops)
-			if(shop.hasExpired() || shop.location.getWorld() == null)
+		List<UUID> shopOwners = new ArrayList<>();
+		for(Shop shop : shops) {
+			if(shop.hasExpired()) {
 				shopDelete.add(shop);
+				expiredCount++;
+				if(stockDeleteWhenShopsExpire) {
+					purgePlayerStock(shop.getOwner());
+					if(!shopOwners.contains(shop.getOwner()))
+						shopOwners.add(shop.getOwner());
+				}
+			}
+			else if(shop.location.getWorld() == null)
+				shopDelete.add(shop);
+		}
 
 		for(Shop shop : shopDelete) {
 			shopList.remove(shop.shopId());
 			shop.deleteShop();
 		}
+		if(expiredCount > 0 && !stockDeleteWhenShopsExpire)
+			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + expiredCount + " shops have expired.");
+		else if(!shopOwners.isEmpty())
+			Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] " + expiredCount + " shops have expired. Stock has expired for " + shopOwners.size() + " players.");
 	}
 
 	public static void loadData() {

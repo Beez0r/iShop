@@ -83,12 +83,15 @@ public class EventShop implements Listener {
 			if(placeFrameSign)
 				if(event.getPlayer().isSneaking() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && (shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) && (event.getPlayer().getInventory().getItemInMainHand().getType().toString().endsWith("_SIGN") || event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.ITEM_FRAME)))
 					return;
+			event.setCancelled(true);
+			if(iShop.getPlugin().checkLockdown() && !event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) {
+				event.getPlayer().sendMessage(Messages.SHOP_LOCKDOWN.toString());
+				return;
+			}
 			if(shop.get().isAdmin() && !adminShopEnabled) {
-				event.setCancelled(true);
 				event.getPlayer().sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
 				return;
 			}
-			event.setCancelled(true);
 			if(shuttingDown)
 				return;
 			if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
@@ -119,12 +122,15 @@ public class EventShop implements Listener {
 			if(placeFrameSign)
 				if(event.getPlayer().isSneaking() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && (shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) && (event.getPlayer().getInventory().getItemInMainHand().getType().toString().endsWith("_SIGN") || event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.ITEM_FRAME)))
 					return;
+			event.setCancelled(true);
+			if(iShop.getPlugin().checkLockdown() && !event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) {
+				event.getPlayer().sendMessage(Messages.SHOP_LOCKDOWN.toString());
+				return;
+			}
 			if(shop.get().isAdmin() && !adminShopEnabled) {
-				event.setCancelled(true);
 				event.getPlayer().sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
 				return;
 			}
-			event.setCancelled(true);
 			if(shuttingDown)
 				return;
 			if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
@@ -158,12 +164,15 @@ public class EventShop implements Listener {
 					if(placeFrameSign)
 						if(event.getPlayer().isSneaking() && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && (shop.get().isOwner(event.getPlayer().getUniqueId()) || event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) && (event.getPlayer().getInventory().getItemInMainHand().getType().toString().endsWith("_SIGN") || event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.ITEM_FRAME)))
 							return;
+					event.setCancelled(true);
+					if(iShop.getPlugin().checkLockdown() && !event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) {
+						event.getPlayer().sendMessage(Messages.SHOP_LOCKDOWN.toString());
+						return;
+					}
 					if(shop.get().isAdmin() && !adminShopEnabled) {
-						event.setCancelled(true);
 						event.getPlayer().sendMessage(Messages.ADMIN_SHOP_DISABLED.toString());
 						return;
 					}
-					event.setCancelled(true);
 					if(shuttingDown)
 						return;
 					if(InvStock.inShopInv.containsValue(shop.get().getOwner())) {
@@ -196,6 +205,10 @@ public class EventShop implements Listener {
 			if(shuttingDown)
 				return;
 			if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
+				if(iShop.getPlugin().checkLockdown() && !event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) {
+					event.getPlayer().sendMessage(Messages.SHOP_LOCKDOWN.toString());
+					return;
+				}
 				if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1 && noShopNoStock) {
 					event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
 					return;
@@ -245,6 +258,10 @@ public class EventShop implements Listener {
 					if(shuttingDown)
 						return;
 					if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
+						if(iShop.getPlugin().checkLockdown() && !event.getPlayer().hasPermission(Permission.SHOP_ADMIN.toString())) {
+							event.getPlayer().sendMessage(Messages.SHOP_LOCKDOWN.toString());
+							return;
+						}
 						if(Shop.getNumShops(event.getPlayer().getUniqueId()) < 1 && noShopNoStock) {
 							event.getPlayer().sendMessage(Messages.NO_SHOP_STOCK.toString());
 							return;

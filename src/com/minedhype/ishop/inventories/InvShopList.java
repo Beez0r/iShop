@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class InvShopList extends GUI {
-	private final static ArrayList<ItemStack> shopslist = new ArrayList<>();
-	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
-	private static final ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD,1);
 	private int pag;
+	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
+	private static final ArrayList<ItemStack> shopslist = new ArrayList<>();
+	private static final ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD,1);
 
 	private InvShopList(String shopTitle) {
 		super(54, shopTitle);
@@ -83,7 +83,7 @@ public class InvShopList extends GUI {
 					catch(Exception e) { playerNotFound = true; }
 					if(Shop.getShopById(id).get().isAdmin())
 						skullMeta.setDisplayName(Messages.ADMIN_SHOP_NUMBER.toString().replaceAll("%id", id.toString()));
-					else if(playerNotFound)
+					else if(playerNotFound || offlinePlayer.getName() == null)
 						skullMeta.setDisplayName(Messages.SHOP_NUMBER.toString().replaceAll("%player", "Unknown Player").replaceAll("%id", id.toString()));
 					else
 						skullMeta.setDisplayName(Messages.SHOP_NUMBER.toString().replaceAll("%player", offlinePlayer.getName()).replaceAll("%id", id.toString()));

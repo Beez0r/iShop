@@ -10,6 +10,7 @@ import com.minedhype.ishop.Permission;
 import com.minedhype.ishop.Shop;
 import com.minedhype.ishop.StockShop;
 import com.minedhype.ishop.gui.GUI;
+import com.minedhype.ishop.iShop;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ import org.bukkit.inventory.meta.BundleMeta;
 
 public class InvStock extends GUI {
 
+	public static boolean showStockListAdmin = iShop.config.getBoolean("showStockListItemForAdmin");
 	public static final HashMap<Player, UUID> inShopInv = new HashMap<>();
 	private static final List<InvStock> inventories = new ArrayList<>();
 	private final ItemStack airItem = new ItemStack(Material.AIR, 0);
@@ -45,21 +47,21 @@ public class InvStock extends GUI {
 		if(event.getRawSlot() >= 45 && event.getRawSlot() < 54)
 			return;
 		if(event.getRawSlot() >= 54 && !player.hasPermission(Permission.SHOP_ADMIN.toString())) {
+			ItemStack item = event.getCurrentItem();
+			ItemStack item2 = event.getCursor();
+			if(item == null && item2 == null)
+				return;
+			if(item == null)
+				item = airItem;
+			if(item2 == null)
+				item2 = airItem;
 			if(InvCreateRow.strictStock) {
-				ItemStack item = event.getCurrentItem();
-				ItemStack item2 = event.getCursor();
-				if(Shop.strictStockShopCheck(item, owner) || Shop.strictStockShopCheck(item2, owner))
+				if(Shop.strictStockShopCheck(item,item2,owner))
 					return;
 			}
 			if(InvCreateRow.itemsDisabled) {
-				ItemStack item = event.getCurrentItem();
-				ItemStack item2 = event.getCursor();
 				for(String itemsList:InvCreateRow.disabledItemList) {
 					Material disabledItemsList = Material.matchMaterial(itemsList);
-					if(item == null)
-						item = airItem;
-					if(item2 == null)
-						item2 = airItem;
 					if(disabledItemsList != null) {
 						if(!item.isSimilar(airItem)) {
 							if(item.getType().equals(disabledItemsList))
@@ -118,6 +120,11 @@ public class InvStock extends GUI {
 				placeItem(i, GUI.createItem(Material.SPECTRAL_ARROW, Messages.SHOP_PAGE_SKIPPREV.toString()), p -> openPage(p, pag-5));
 			else if(i == 47 && pag > 0)
 				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag)), p -> openPage(p, pag-1));
+			else if(i == 49 && showStockListAdmin && player != null && player.hasPermission(Permission.SHOP_ADMIN.toString()))
+				placeItem(i, GUI.createItem(Material.END_CRYSTAL,"List of Players with Stock"), p -> {
+					p.closeInventory();
+					p.performCommand("shop liststock");
+				});
 			else if(i == 51 && pag < stockPages-1)
 				placeItem(i, GUI.createItem(Material.ARROW, Messages.SHOP_PAGE + " " + (pag+2)), p -> openPage(p, pag+1));
 			else if(i == 52 && pag < stockPages-5 && stockPages >= 10)

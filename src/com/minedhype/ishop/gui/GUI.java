@@ -35,17 +35,16 @@ public abstract class GUI {
 	public static ItemStack createItem(Material material, String number, short data) {
 		ItemStack item = new ItemStack(material);
 		ItemMeta meta = item.getItemMeta();
-		if(meta != null)
+		if(meta != null) {
 			meta.setDisplayName(ChatColor.RESET + number);
-		else
-			meta.setDisplayName("unnamed");
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-		meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-		meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
-		meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-		item.setItemMeta(meta);
+			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+			meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+			meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+			meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+			item.setItemMeta(meta);
+		}
 		return item;
 	}
 	

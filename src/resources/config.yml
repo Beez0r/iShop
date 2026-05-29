@@ -105,6 +105,14 @@ maxInactiveDays: 0
 exemptExpiringShops:
   - 00000000-0000-0000-0000-000000000000
 
+# Amount of days a player is inactive before deleting their stock inventory
+# Set to 0 to disable
+maxStockInactiveDays: 0
+
+# List of player UUID's that will be exempt from stock expiring if maxStockInactiveDays is set above 0
+exemptExpiringStock:
+  - 00000000-0000-0000-0000-000000000000
+
 # Remove block that the shop is located at when deleting or moving a shop
 deleteBlock: false
 
@@ -188,7 +196,16 @@ findCommandCooldown: 5
 publicMoveCommand: true
 
 # Change the particle effect (requires server restart) for shops to any Enum Constant Particle found at https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
-shopParticles: "villager_happy"
+shopParticles: "happy_villager"
+
+# Delete player stock inventory when their shops expire
+deleteStockWhenShopsExpire: false
+
+# Setting to true will enable lockdown mode on start up. Only players with the ishop.admin permission can access shops, stocks, and commands during lockdown mode. Can toggle on/off using lockdown command.
+lockdownEnabledOnStart: false
+
+# Enable players with ishop.admin permission to see clickable End Crystal item for player stock list while in stock inventory
+showStockListItemForAdmin: true
 
 # Customizable Messages
 adminShop: "Admin Shop #%id"
@@ -280,5 +297,9 @@ findError: "&cGiven item to search shops for does not exist!"
 listFind: "&6Listing all found shop(s) trading &a%item&6:"
 nolistFind: "&cNo shop(s) have been found!"
 shopMoved: "&6Shop &a#%id &6has been moved to new targeted location!"
+purgePlayersStock: "&7Shop stock has been &cPURGED&7 for &c%p&7!"
+lockdown: "&cShops and stock are currently on lockdown."
+enableLockdown: "&7Lockdown has been &aenabled&7. Only shop admins can access shops, stocks, and commands."
+disableLockdown: "&7Lockdown has been &cdisabled&7. Players can access shops, stocks, and commands."
 # Do not edit this!
-configVersion: 3.11
+configVersion: 3.12

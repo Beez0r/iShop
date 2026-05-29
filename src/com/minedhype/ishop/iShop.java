@@ -25,7 +25,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import com.minedhype.ishop.gui.GUIEvent;
-import com.minedhype.ishop.MetricsLite;
+import com.minedhype.ishop.Metrics;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.scheduler.BukkitTask;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -39,10 +39,11 @@ public class iShop extends JavaPlugin {
 	public static LandsIntegration lands = null;
 	public static boolean superiorSkyblock2Check;
 	public static boolean townyCheck;
-	private static BukkitTask expiredTask, saveTask, tickTask;
+	private static BukkitTask expiredShopTask, expiredStockTask, saveTask, tickTask;
 	private static Connection connection = null;
 	private static Economy economy = null;
 	private static String chainConnect;
+	private boolean lockdown;
 
 	@Override
 	public void onLoad() {
@@ -109,7 +110,9 @@ public class iShop extends JavaPlugin {
 			Shop.loadData();
 		} catch(Exception e) { e.printStackTrace(); }
 		}, delayTime);
-		expiredTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, delayTime+9, 20000);
+		lockdown = config.getBoolean("lockdownEnabledOnStart");
+		expiredShopTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::expiredShops, delayTime+9, 20000);
+		expiredStockTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, StockShop::expiredStock, delayTime+200, 35000);
 		saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
 			try {
 				Shop.saveData(false);
@@ -118,8 +121,9 @@ public class iShop extends JavaPlugin {
 		if(Shop.shopEnabled && Shop.particleEffects)
 			tickTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Shop::tickShops, delayTime+250, 50);
 		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::getPlayersShopList, delayTime+160);
+		Bukkit.getScheduler().runTaskLaterAsynchronously(this, StockShop::getPlayersStockList, delayTime+300);
 		Bukkit.getScheduler().runTaskLaterAsynchronously(this, Shop::removeEmptyShopTrade, delayTime+100);
-		MetricsLite metrics = new MetricsLite(this, 9189);
+		Metrics metrics = new Metrics(this, 9189);
 		new UpdateChecker(this, 84555).getVersion(version -> {
 			if(!this.getDescription().getVersion().equalsIgnoreCase(version))
 				getServer().getConsoleSender().sendMessage(ChatColor.RED + "[iShop] There is a new update available! - https://www.spigotmc.org/resources/ishop.84555/");
@@ -145,19 +149,28 @@ public class iShop extends JavaPlugin {
 		}
 		else
 			saveTask.cancel();
-		if(Bukkit.getScheduler().isCurrentlyRunning(expiredTask.getTaskId())) {
-			while(Bukkit.getScheduler().isCurrentlyRunning(expiredTask.getTaskId()))
+		if(Bukkit.getScheduler().isCurrentlyRunning(expiredStockTask.getTaskId())) {
+			while(Bukkit.getScheduler().isCurrentlyRunning(expiredStockTask.getTaskId()))
 				;
-			expiredTask.cancel();
+			expiredStockTask.cancel();
 		}
 		else
-			expiredTask.cancel();
+			expiredStockTask.cancel();
+		if(Bukkit.getScheduler().isCurrentlyRunning(expiredShopTask.getTaskId())) {
+			while(Bukkit.getScheduler().isCurrentlyRunning(expiredShopTask.getTaskId()))
+				;
+			expiredShopTask.cancel();
+		}
+		else
+			expiredShopTask.cancel();
 		if(!tickTask.isCancelled())
 			tickTask.cancel();
 		if(!saveTask.isCancelled())
 			saveTask.cancel();
-		if(!expiredTask.isCancelled())
-			expiredTask.cancel();
+		if(!expiredStockTask.isCancelled())
+			expiredStockTask.cancel();
+		if(!expiredShopTask.isCancelled())
+			expiredShopTask.cancel();
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Safely saving shops & stock items to database, please wait & do not kill server process...");
 		Shop.saveData(true);
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[iShop] Saving complete!");
@@ -416,10 +429,22 @@ public class iShop extends JavaPlugin {
 				case "3.9":
 					config.set("location", "&6Shop&a %id &6location XYZ:&a %x &6/&a %y &6/&a %z &6in&a %world");
 				case "3.10":
-					config.set("shopParticles", "villager_happy");
-					config.set("configVersion", "3.11");
-					config.save(configFile);
+					config.set("shopParticles", "happy_villager");
 				case "3.11":
+					config.set("shopParticles", "happy_villager");
+					config.set("maxStockInactiveDays", 0);
+					List<String> exemptExpiredStock = Arrays.asList("00000000-0000-0000-0000-000000000000");
+					config.set("exemptExpiringStock", exemptExpiredStock);
+					config.set("deleteStockWhenShopsExpire", false);
+					config.set("lockdownEnabledOnStart", false);
+					config.set("showStockListItemForAdmin", true);
+					config.set("purgePlayersStock", "&7Shop stock has been &cPURGED&7 for &c%p&7!");
+					config.set("lockdown","&cShops and stock are currently on lockdown.");
+					config.set("enableLockdown", "&7Lockdown has been &aenabled&7. Only shop admins can access shops, stocks, and commands.");
+					config.set("disableLockdown", "&7Lockdown has been &cdisabled&7. Players can access shops, stocks, and commands.");
+					config.set("configVersion", "3.12");
+					config.save(configFile);
+				case "3.12":
 					break;
 			}
 		} catch(IOException | InvalidConfigurationException e) { e.printStackTrace(); }
@@ -427,4 +452,6 @@ public class iShop extends JavaPlugin {
 	public static iShop getPlugin() {
 		return iShop.getPlugin(iShop.class);
 	}
+	public boolean checkLockdown() { return lockdown; }
+	public void setLockdown(boolean setLock) { lockdown = setLock; }
 }
